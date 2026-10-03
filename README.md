@@ -68,8 +68,12 @@ close-all requires confirmation. Optional Omarchy applications need separate
 installation. Clipboard history is event driven, bounded to 100 items and stored
 in runtime storage that clears at reboot; marked-sensitive entries are skipped.
 
-Launcher: type to filter, arrows to select, Enter to launch. Escape or clicking
-outside closes a panel. Click the island to expand its dashboard (focused
+Launcher (Super+Alt+Space), Titan menus (Super+Space) and keybindings (Super+K)
+share the reference launcher style: type to filter, ↑/↓ or Tab to select, Enter
+to run; the panel grows with its results. Escape or clicking outside closes a
+panel. The session menu (Super+Escape) uses control-center tiles with inline
+confirmation (keys L, E, R, P), and the control center's lock button opens the
+same power actions inline. Game Mode turns the island into a full-width bar. Click the island to expand its dashboard (focused
 window, workspaces, clock, week, media, status, Night light and Game mode); click
 the dashboard clock to morph the island into a month calendar (←/→, wheel or
 arrow keys change month). The island's battery and signal icons open the
@@ -89,13 +93,15 @@ dotfiles/
 │   ├── hypr/                  Lua compositor modules, Hypridle, Hyprlock
 │   ├── quickshell/umbra/
 │   │   ├── shell.qml          Root, screen lifecycle, typed IPC
-│   │   ├── theme/             Central tokens + saved appearance preferences
-│   │   ├── components/        Text, icons, buttons, tiles, slider rows
-│   │   ├── services/          State, audio, network, media, notices, backlight
+│   │   ├── theme/             Tokens, palettes, preferences, settings schema
+│   │   ├── components/        Text, icons, tiles, switches, sliders, SearchMenu
+│   │   ├── services/          State, audio, network, media, notices, backlight,
+│   │   │                      toggles, wallpapers
 │   │   ├── assets/icons/      Original vector UI icons
-│   │   └── modules/           Background, island, tray, overlays, launcher,
-│   │                          controls, connections, calendar, appearance,
-│   │                          media, notifications, session menu
+│   │   └── modules/           Background, island (Bar, dashboard, calendar),
+│   │                          overlays, launcher, command menus, control center,
+│   │                          Settings window, theme/wallpaper carousels,
+│   │                          media, notifications, toast, session menu
 │   ├── kitty/                 Terminal palette and typography
 │   ├── gtk-{3,4}.0/            GTK dark defaults
 │   ├── xdg-desktop-portal/     Hyprland capture + GTK file chooser
@@ -181,7 +187,7 @@ locking and display-off timers are absent, and manual locking remains available.
 lid closure, idle and sleep keys are ignored; all sleep/hibernate targets are
 masked. A boot service disables battery-aware profile switching and selects
 Performance. logind reloads without restarting the desktop. Suspend is absent
-from the session menu. Explicit reboot, power off and logout retain confirmation.
+from the session menu and the control-center power menu. Explicit reboot, power off and logout retain confirmation.
 
 This is a policy for the development laptop, not a requirement for every Titan
 machine. Keep it on external power for unattended operation. Hardware loss of
@@ -192,7 +198,8 @@ hands-on check in `docs/verification.md`.
 
 ## Recovery
 
-If the shell fails, Super+Return still opens Kitty. Run `scripts/shell-restart`.
+If the shell fails, Super+Return still opens Kitty. Run `scripts/shell-restart`;
+it escalates to TERM/KILL if Quickshell hangs while exiting.
 From a TTY it discovers the running Hyprland display. Inspect logs with:
 
 ```sh

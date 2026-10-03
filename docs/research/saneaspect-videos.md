@@ -11,7 +11,7 @@ frame passes of Ob98KFByTec and ZS6syCYFKPE. YouTube returned HTTP 429 for capti
 | ID | Title | Length | Date | Topic | Review |
 | --- | --- | --- | --- | --- | --- |
 | [J8s7O2IGogE](https://www.youtube.com/watch?v=J8s7O2IGogE) | Why I added a workspace switcher to my Dynamic Island | 11:32 | 2026-10-02 | Island + workspace switcher | Measured: captions read; native 1080p frames analysed (2026-10-03). Source of [island-notch.md](island-notch.md). |
-| [Mcjr5T2pHxw](https://www.youtube.com/watch?v=Mcjr5T2pHxw) | Why I stopped looking at unixporn for Hyprland inspiration | 13:30 | 2026-10-01 | Design process, notifications, launcher | Captions (earlier session); video downloaded 2026-10-03, frames not reviewed. |
+| [Mcjr5T2pHxw](https://www.youtube.com/watch?v=Mcjr5T2pHxw) | Why I stopped looking at unixporn for Hyprland inspiration | 13:30 | 2026-10-01 | Design process, notifications, launcher | Captions read (notifications, launcher ranking, power menu); 15 s contact sheet; frames at 11:54 (course power-menu chapter) and 2:00 (lock screen). |
 | [H4B3gZTi9ao](https://www.youtube.com/watch?v=H4B3gZTi9ao) | Learn 80% of Quickshell in 20 min | 20:18 |  |  |  |
 | [n0UT78KC95I](https://www.youtube.com/watch?v=n0UT78KC95I) | Can you get Face ID on Quickshell + Hyprland? | 16:55 |  |  |  |
 | [h9zYpdNsl-E](https://www.youtube.com/watch?v=h9zYpdNsl-E) | Middle click scrolling on hyprland (you’re welcome) | 9:29 |  |  |  |

@@ -44,7 +44,8 @@ while the region picker is open for a full-monitor screenshot.
 
 - Quickshell owns menus, the launcher, theme/background selection, emoji picker,
   clipboard picker, calculator, reminders, keybinding help, world clock, controls
-  and notifications. Omarchy's shell and helper scripts are not installed.
+  and notifications. Menus, the launcher and keybinding help share the
+  saneAspect-style SearchMenu; keybinding rows show key chips. Omarchy's shell and helper scripts are not installed.
 - Kitty, Thunar, Firefox and Neovim fulfill terminal/files/browser/editor actions.
   The exact web-app URLs from Omarchy open in Firefox windows. They require the
   user's own accounts; these bindings do not authenticate to those services.

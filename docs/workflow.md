@@ -33,7 +33,10 @@ interpolation of user text, filenames or calculator expressions.
   `~/Pictures/Wallpapers/<theme>/` from Wallhaven; it uses the network, so
   run it only when asked.
 - `scripts/workflow toggles`: JSON `{"nightlight":BOOL,"gameMode":BOOL}`; safe as
-  a diagnostic. `scripts/workflow nightlight` and `game-mode` change the desktop.
+  a diagnostic, and it refreshes `$XDG_RUNTIME_DIR/titan/toggles.json`, which the
+  shell watches. `scripts/workflow nightlight [toggle|on|off|apply]` and
+  `game-mode` change the desktop. Night light uses the `nightlightTemp` setting
+  (kelvin); `apply` restarts it at the new temperature only if it is on.
   Game mode turns Hyprland animations, blur and shadows off at runtime. It saves
   the previous values in `$XDG_RUNTIME_DIR/titan/game-mode.json` and restores them
   on the next toggle; a Hyprland reload also restores the configured values.

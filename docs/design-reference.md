@@ -39,8 +39,9 @@ for the full channel inventory and review status.
 
 The control center, Settings window, theme and wallpaper carousels, notch mode
 and wallpaper sourcing were studied from frames of 5cp6DkClAuM, J8s7O2IGogE,
-Ob98KFByTec, nKomstQedmE and ipEGXS5WcSg. See
-[research/shell-panels.md](research/shell-panels.md).
+Ob98KFByTec, nKomstQedmE and ipEGXS5WcSg. Launcher and menu styling, the power menu inside the control center, the
+game-mode bar and the night-light temperature slider followed later the same
+day. See [research/shell-panels.md](research/shell-panels.md).
 
 ## Applied to Umbra
 

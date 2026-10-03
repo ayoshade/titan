@@ -42,6 +42,11 @@ instead of maintaining two competing instruction sets.
   See `docs/always-awake.md`; do not re-enable sleep or idle timers without the
   user requesting a policy change. Read `docs/hardware.md` and
   `docs/verification.md` for details and outstanding reliability checks.
+- saneAspect findings and feature checklists live in
+  `docs/research/island-notch.md` (island, dashboard, calendar) and
+  `docs/research/shell-panels.md` (control center, Settings, menus, themes,
+  wallpapers); `docs/research/saneaspect-videos.md` tracks which of his videos
+  were reviewed and how deeply. Update them with each visual change.
 - Hyprlock has had black-screen rendering failures. Authentication has
   succeeded, but reliable lock rendering still needs testing. Suspend/resume testing is
   deferred while the user's always-awake policy is active.
@@ -248,6 +253,9 @@ approval. Do not bypass privilege requirements or pass secrets through logs.
   theme, restart persistence, notification actions, profile boundaries or
   migration repeatability as relevant. Avoid tests that only mirror code.
 - Use `scripts/shell-restart` to replace the desktop shell through Hyprland.
+  Quickshell 0.3.1 can deadlock while exiting; the script escalates to TERM and
+  KILL so the lock is released. Do not restart immediately after saving QML
+  (the hot reload and the restart can race); wrap `qs ipc` calls in `timeout`.
   Preserve the current session and restore temporary test changes. Check
   existing user choices before taking or restoring a test baseline.
 - Capture UI-only reference screenshots when useful; avoid committing screenshots

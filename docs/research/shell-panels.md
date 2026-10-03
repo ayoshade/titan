@@ -83,6 +83,37 @@ Source: ipEGXS5WcSg (frames). He uses three sources:
 - theanimegallery.com;
 - r/unixporn posts.
 
+## Launcher and menus
+
+Sources: 5cp6DkClAuM 0:48–0:53, J8s7O2IGogE 5:00.
+
+- **Panel:** a flat black panel about 460 px wide at the top centre. It has no
+  inner graphite card.
+- **Search:** a magnifier and "Search…", with a hairline divider below.
+- **Rows:** compact, about 42 px. Each has a dark rounded icon tile, a bold
+  name and a muted description.
+- **Selection:** a lighter fill plus a short accent bar at the left edge.
+- **Height:** the panel shrinks to its results; one match gives a one-row
+  panel.
+- **Ranking:** Mcjr5T2pHxw's captions say he studies how OS launchers rank
+  results.
+- **Unknown:** he never shows a keybindings menu or a command menu, so Titan's
+  use the launcher style.
+
+## Power menu, game-mode bar and Display page
+
+- **Power menu:** Mcjr5T2pHxw (captions at 10:02 and 11:54; the course page
+  frame at 11:54) describes "a simple power menu in the control center". The
+  frame only shows his course's example shell. His actual power-menu layout was
+  not visible in any reviewed video.
+- **Game Mode:** 5cp6DkClAuM 0:38–0:41 shows the notch becoming a full-width
+  black bar with the clock centred, and back.
+- **Display page:** the Night Light row has a toggle and a kelvin temperature
+  slider (5cp6DkClAuM 0:35).
+- **Notifications:** his captions say they follow Windows 11 notifications.
+  Grouping of notifications that arrive together is a stated goal, but his
+  layout was not visible.
+
 ## Notch mode and media popup
 
 - **Notch mode** (ipEGXS5WcSg 1:02, Settings → Bar & Island): the island
@@ -108,3 +139,12 @@ Source: ipEGXS5WcSg (frames). He uses three sources:
 | Notch mode and flare | Implemented in `Bar.qml`; off by default |
 | Album-art media popup | Not implemented; media lives in the dashboard and control center |
 | Wallpaper library | `scripts/fetch-wallpapers` (Wallhaven API, colour-matched per theme) |
+| Launcher look and behaviour | Implemented (`components/SearchMenu.qml`, `Launcher.qml`): flat panel, divider, icon tiles, accent bar, height follows results |
+| Super+Space menus, keybindings | Adaptation: the same SearchMenu; keybindings show key chips. His versions are unknown |
+| Session menu | Adaptation: control-center tiles with inline confirmation (`SessionMenu.qml`) |
+| Power menu inside the control center | Implemented: the lock button expands Lock, Log out, Reboot and Power off, with confirmation. His exact layout is unknown |
+| Game-mode full-width bar | Implemented (`Bar.qml` gameBar) |
+| Night light temperature slider | Implemented (`nightlightTemp` setting, Display page and Settings → System) |
+| Notifications | Adaptation: avatar cards grouped by app with "+N more"; toast drops below the island |
+| Media panel | Implemented after the Ob98KFByTec album-art card, with a blurred art backdrop |
+| Lock screen restyle | Not done: Hyprlock reliability is still unverified (see AGENTS.md), and it cannot be tested without locking the session |

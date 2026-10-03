@@ -267,3 +267,29 @@ kernel parameters or bootloader edits were applied.
 - **Not hands-on tested:** real clicks on dashboard rows, control-center tiles
   and Settings controls; Bluetooth connect; per-app volume; the
   wallpaper-carousel keyboard; font changes across all panels.
+
+## Menus, session, notifications and media — 2026-10-03
+
+- **Menus:** the launcher, the Titan root menu, the toggle submenu and
+  keybindings were opened through IPC and visually compared with the
+  reference launcher frames. A
+  `count` id collision first left the lists empty; it was fixed and verified.
+- **Session menu:** rendered with tiles. The control-center power strip was
+  checked with lint only, because opening it needs a click.
+- **Notifications:** three test notifications showed the toast below the
+  island, and the notification center grouped them by app with "+1 more".
+  They were dismissed afterwards. The media panel rendered the blurred
+  album-art card.
+- **Game-mode bar:** `workflow game-mode` showed the full-width bar; toggling
+  again restored the island, and the Hyprland effects read back as enabled.
+- **Night light:** at 3500 K, `wlsunset -t 3500` ran, then it was turned off
+  and the setting reset.
+- **Shell freezes (twice):** `qs kill` sometimes leaves Quickshell deadlocked
+  while exiting, holding the instance lock, so the desktop had no responsive
+  shell. Recovery was SIGKILL and a relaunch. `scripts/shell-restart` now
+  escalates and passed three consecutive restarts.
+- **Doctor:** it had failed since `fetch-wallpapers` was added, because it
+  ran `bash -n` on a Python file. It now parses scripts by shebang and exits 0.
+- **Not hands-on tested:** clicks in the power strip and session confirmations
+  (deliberately not confirmed), launching apps from the new launcher, menu
+  submissions (calculator, reminder), emoji copy, and notification actions.
