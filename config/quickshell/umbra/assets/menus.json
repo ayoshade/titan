@@ -5,47 +5,72 @@
       {
         "label": "Applications",
         "action": "panel",
-        "value": "launcher"
+        "value": "launcher",
+        "icon": "apps",
+        "detail": "Search installed apps"
       },
       {
         "label": "Capture",
         "action": "menu",
-        "value": "capture"
+        "value": "capture",
+        "icon": "capture",
+        "detail": "Screenshots, recording, colour picker, OCR"
       },
       {
         "label": "Toggle",
         "action": "menu",
-        "value": "toggle"
+        "value": "toggle",
+        "icon": "toggle",
+        "detail": "Bar, gaps, transparency, night light"
       },
       {
         "label": "Hardware",
         "action": "menu",
-        "value": "hardware"
+        "value": "hardware",
+        "icon": "monitor",
+        "detail": "Audio, Bluetooth, network, display"
       },
       {
         "label": "Themes",
         "action": "panel",
-        "value": "themes"
+        "value": "themes",
+        "icon": "palette",
+        "detail": "Palette carousel"
       },
       {
-        "label": "Backgrounds",
-        "action": "menu",
-        "value": "background"
+        "label": "Wallpapers",
+        "action": "panel",
+        "value": "wallpapers",
+        "icon": "image",
+        "detail": "Wallpapers for the current theme"
       },
       {
         "label": "Agent",
         "action": "menu",
-        "value": "agent"
+        "value": "agent",
+        "icon": "sparkle",
+        "detail": "Codex or Claude in ~/dotfiles"
       },
       {
         "label": "Keybindings",
         "action": "menu",
-        "value": "keybindings"
+        "value": "keybindings",
+        "icon": "keyboard",
+        "detail": "Every shortcut, searchable"
+      },
+      {
+        "label": "Settings",
+        "detail": "Island, appearance, motion and more",
+        "icon": "settings",
+        "action": "settings",
+        "value": ""
       },
       {
         "label": "System",
         "action": "panel",
-        "value": "session"
+        "value": "session",
+        "icon": "power",
+        "detail": "Lock, log out, reboot, power off"
       }
     ]
   },
@@ -54,38 +79,44 @@
     "items": [
       {
         "label": "Screenshot region / window",
-        "detail": "Print \u00b7 drag, or Tab / arrows then Enter",
+        "detail": "Print · drag, or Tab / arrows then Enter",
         "action": "capture",
-        "value": "screenshot"
+        "value": "screenshot",
+        "icon": "capture"
       },
       {
         "label": "Screenshot entire monitor",
         "detail": "Ctrl+Return during selection",
         "action": "capture",
-        "value": "full"
+        "value": "full",
+        "icon": "capture"
       },
       {
         "label": "Start / stop recording",
         "detail": "Alt+Print",
         "action": "capture",
-        "value": "record"
+        "value": "record",
+        "icon": "capture"
       },
       {
         "label": "Pick a color",
-        "detail": "Super+Print \u00b7 copies hex color",
+        "detail": "Super+Print · copies hex color",
         "action": "capture",
-        "value": "color"
+        "value": "color",
+        "icon": "capture"
       },
       {
         "label": "Extract text (OCR)",
         "detail": "Super+Ctrl+Print",
         "action": "capture",
-        "value": "text"
+        "value": "text",
+        "icon": "capture"
       },
       {
         "label": "Toggle webcam overlay",
         "action": "webcam",
-        "value": "toggle"
+        "value": "toggle",
+        "icon": "capture"
       }
     ]
   },
@@ -139,28 +170,33 @@
     "items": [
       {
         "label": "Audio",
-        "action": "panel",
-        "value": "controls"
+        "action": "controls",
+        "value": "sound",
+        "icon": "volume"
       },
       {
         "label": "Bluetooth",
-        "action": "panel",
-        "value": "connectivity"
+        "action": "controls",
+        "value": "bluetooth",
+        "icon": "bluetooth"
       },
       {
         "label": "Network",
-        "action": "panel",
-        "value": "connectivity"
+        "action": "controls",
+        "value": "wifi",
+        "icon": "wifi"
       },
       {
         "label": "Display",
-        "action": "panel",
-        "value": "controls"
+        "action": "controls",
+        "value": "display",
+        "icon": "monitor"
       },
       {
-        "label": "Power \u00b7 Performance",
-        "action": "panel",
-        "value": "controls"
+        "label": "Power · Performance",
+        "action": "settings",
+        "value": "system",
+        "icon": "bolt"
       },
       {
         "label": "Activity",
@@ -174,15 +210,24 @@
     ]
   },
   "background": {
-    "title": "Background",
+    "title": "Wallpapers",
     "items": [
       {
-        "label": "Blacksite landscape",
+        "label": "Choose wallpaper",
+        "detail": "Carousel for the current theme",
+        "icon": "image",
+        "action": "panel",
+        "value": "wallpapers"
+      },
+      {
+        "label": "Show wallpaper",
+        "icon": "image",
         "action": "wallpaper",
         "value": "on"
       },
       {
         "label": "Solid theme background",
+        "icon": "palette",
         "action": "wallpaper",
         "value": "off"
       }
@@ -195,18 +240,21 @@
         "label": "Screenshot to clipboard",
         "detail": "Choose a region; paste it into your destination",
         "action": "capture",
-        "value": "screenshot"
+        "value": "screenshot",
+        "icon": "share"
       },
       {
         "label": "Open files",
         "detail": "Choose a file to share with your application",
         "action": "app",
-        "value": "files"
+        "value": "files",
+        "icon": "share"
       },
       {
         "label": "Clipboard history",
         "action": "menu",
-        "value": "clipboard"
+        "value": "clipboard",
+        "icon": "share"
       }
     ]
   },
@@ -217,13 +265,15 @@
         "label": "Codex",
         "detail": "Open in ~/dotfiles with AGENTS.md",
         "action": "app",
-        "value": "codex"
+        "value": "codex",
+        "icon": "sparkle"
       },
       {
         "label": "Claude",
-        "detail": "Requires the Claude CLI \u00b7 reads CLAUDE.md",
+        "detail": "Requires the Claude CLI · reads CLAUDE.md",
         "action": "app",
-        "value": "claude"
+        "value": "claude",
+        "icon": "sparkle"
       }
     ]
   },
@@ -310,15 +360,15 @@
   },
   "reminder": {
     "title": "Set reminder",
-    "input": "Minutes and text \u00b7 e.g. 20 Stretch"
+    "input": "Minutes and text · e.g. 20 Stretch"
   },
   "transcode": {
     "title": "Transcode to MP4",
-    "input": "Local video path \u00b7 source is preserved"
+    "input": "Local video path · source is preserved"
   },
   "weather": {
     "title": "Weather",
-    "input": "City \u00b7 Enter opens wttr.in in Firefox"
+    "input": "City · Enter opens wttr.in in Firefox"
   },
   "worldclock": {
     "title": "World clock",

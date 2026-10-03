@@ -6,6 +6,7 @@ import Quickshell.Networking
 import Quickshell.Bluetooth
 import Quickshell.Hyprland
 import Quickshell.Services.Pipewire
+import Quickshell.Services.SystemTray
 import "../components"
 import "../services"
 import "../theme"
@@ -21,6 +22,16 @@ Item {
  Behavior on implicitHeight { NumberAnimation { duration: Theme.movement*0.8; easing.type: Easing.OutCubic } }
  clip: true
  function open(name) { UiState.controlsPage=name }
+ property bool powerOpen: false
+ property string powerPending: ""
+ // Lock runs at once; log out, reboot and power off need a second click or Confirm.
+ function powerAction(id) {
+  if(id==="lock") { Quickshell.execDetached([Quickshell.env("HOME")+"/dotfiles/scripts/lock"]); UiState.close(); return }
+  if(powerPending!==id) { powerPending=id; return }
+  if(id==="logout") Hyprland.dispatch("hl.dsp.exit()")
+  else Quickshell.execDetached(["systemctl",id==="reboot" ? "reboot" : "poweroff"])
+  UiState.close()
+ }
  Keys.onEscapePressed: page==="main" ? UiState.close() : open("main")
  Component.onDestruction: UiState.controlsPage="main"
 
@@ -67,7 +78,39 @@ Item {
    spacing: 8
    Tile { width: main.tileWidth; symbol: "wifi"; title: "Wi-Fi"; subtitle: NetState.active ? NetState.active.name : Networking.wifiEnabled ? (NetState.label==="Connected" ? "Wired" : "Not connected") : "Off"; on: Networking.wifiEnabled; onClicked: root.open("wifi"); onPressAndHold: Networking.wifiEnabled=!Networking.wifiEnabled }
    Tile { width: main.tileWidth; symbol: "focus"; title: "Focus"; subtitle: UiState.dnd ? "On" : "Off"; on: UiState.dnd; onClicked: UiState.dnd=!UiState.dnd }
-   Tile { symbol: "lock"; onClicked: { Quickshell.execDetached([Quickshell.env("HOME")+"/dotfiles/scripts/lock"]); UiState.close() } Accessible.name: "Lock screen" }
+   // The reference keeps its power menu inside the control center (course
+   // chapter "The Power Menu", Mcjr5T2pHxw 11:54): this button reveals it.
+   Tile { symbol: "lock"; on: root.powerOpen; onClicked: { root.powerOpen=!root.powerOpen; root.powerPending="" } Accessible.name: "Power menu" }
+  }
+  Card {
+   id: power
+   width: parent.width; height: root.powerOpen ? (root.powerPending ? 104 : 64) : 0
+   visible: height>0; clip: true
+   Behavior on height { NumberAnimation { duration: Theme.movement*0.7; easing.type: Easing.OutCubic } }
+   Row {
+    x: 10; y: 10; spacing: (parent.width-20-4*44)/3
+    Repeater {
+     model: [{id:"lock",symbol:"lock",label:"Lock"},{id:"logout",symbol:"logout",label:"Log out"},{id:"reboot",symbol:"refresh",label:"Reboot"},{id:"poweroff",symbol:"power",label:"Power off"}]
+     Column {
+      id: action
+      required property var modelData
+      spacing: 0
+      Tile { anchors.horizontalCenter: parent.horizontalCenter; width: 44; height: 44; symbol: action.modelData.symbol; on: root.powerPending===action.modelData.id; onClicked: root.powerAction(action.modelData.id); Accessible.name: action.modelData.label }
+     }
+    }
+   }
+   Rectangle {
+    visible: root.powerPending!==""
+    x: 10; y: 62; width: parent.width-20; height: 34; radius: 17; color: Qt.alpha(Theme.danger,0.14)
+    ShellText { x: 14; anchors.verticalCenter: parent.verticalCenter; text: ({logout:"Log out",reboot:"Reboot",poweroff:"Power off"})[root.powerPending]+" now?"; font.weight: Font.DemiBold }
+    Rectangle {
+     anchors { right: parent.right; rightMargin: 4; verticalCenter: parent.verticalCenter }
+     width: confirmLabel.implicitWidth+22; height: 26; radius: 13; color: Theme.danger
+     ShellText { id: confirmLabel; anchors.centerIn: parent; text: "Confirm"; color: Theme.notch; font.weight: Font.DemiBold; font.pixelSize: Theme.captionSize+1 }
+     MouseArea { anchors.fill: parent; cursorShape: Qt.PointingHandCursor; onClicked: root.powerAction(root.powerPending) }
+     Accessible.role: Accessible.Button; Accessible.name: "Confirm"
+    }
+   }
   }
   Row {
    spacing: 8
@@ -91,6 +134,13 @@ Item {
     SectionHead { title: "Display"; target: "display" }
     PillSlider { width: parent.width; symbol: "sun"; label: "Brightness"; value: Brightness.value; onMoved: Brightness.setValue(value) }
    }
+  }
+  // Background apps: shown only when the system tray has items.
+  Card {
+   visible: SystemTray.items.values.length>0
+   width: parent.width; height: 44
+   ShellText { x: 14; anchors.verticalCenter: parent.verticalCenter; text: "Running"; color: Theme.muted; font.pixelSize: Theme.captionSize+1 }
+   Tray { anchors { right: parent.right; rightMargin: 12; verticalCenter: parent.verticalCenter } bar: root.QsWindow.window }
   }
   Card {
    visible: Settings.values.ccMedia && !!Media.player
