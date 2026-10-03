@@ -411,6 +411,13 @@ kernel parameters or bootloader edits were applied.
   `raw.githubusercontent.com/.../keys/titan-packager.asc`, gave "Good
   signature" for all three. The database lists `titan-0.2.0-1` and
   `titan-desktop-0.2.0-1`.
-- **Not yet done:** a `pacman -Syu titan-desktop` from this public repository
-  on a clean machine. `vm-test` installs local files; adding a `--from-repo`
-  mode would cover it.
+- **Install from the public repository: passed.**
+  `scripts/vm-test --full --from-repo` followed the documented user steps on a
+  clean Arch cloud VM:
+  - the public key came from raw.githubusercontent.com and was added and
+    locally signed;
+  - `[titan]` was appended to `pacman.conf`;
+  - `pacman -Syu titan-desktop` ran with default signature enforcement;
+  - pacman reported `Validated By: SHA-256 Sum  Signature`.
+
+  All 14 checks passed.

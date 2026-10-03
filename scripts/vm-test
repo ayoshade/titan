@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# vm-test [--full] [--keep] [--memory MB]: install the built Titan packages on a throwaway Arch
+# vm-test [--full] [--keep] [--memory MB] [--from-repo [CHANNEL]]: install the built Titan packages on a throwaway Arch
 # VM and check them. Never touches this machine's system.
 #   - boots Arch's official cloud image (cached in ~/.cache/titan/vm) under
 #     QEMU/KVM, headless, on a disposable overlay disk
@@ -7,11 +7,14 @@
 #   - builds an edge repository from this checkout, installs `titan`
 #     (`titan-desktop` too with --full), runs `titan setup` as the VM user,
 #     verifies the Hyprland config, lints the shell and runs `titan doctor`-style checks
+#   - --from-repo installs instead from the published GitHub repository exactly as
+#     a user would (public key from GitHub, [titan] in pacman.conf, signatures enforced)
 # Requires: qemu-base (sudo pacman -S qemu-base) and /dev/kvm.
 set -euo pipefail
 root=$(cd -- "$(dirname -- "$(readlink -f "${BASH_SOURCE[0]}")")/.." && pwd)
-full=0 keep=0 memory=2048
-while (($#)); do case $1 in --full) full=1; shift ;; --keep) keep=1; shift ;; --memory) memory=$2; shift 2 ;; *) sed -n 2,12p "$0"; exit 2 ;; esac; done
+full=0 keep=0 memory=2048 from=""
+while (($#)); do case $1 in --full) full=1; shift ;; --keep) keep=1; shift ;; --memory) memory=$2; shift 2 ;;
+ --from-repo) from=stable; if [[ ${2:-} == stable || ${2:-} == edge ]]; then from=$2; shift; fi; shift ;; *) sed -n 2,12p "$0"; exit 2 ;; esac; done
 command -v qemu-system-x86_64 >/dev/null || { echo "vm-test: install QEMU first: sudo pacman -S qemu-base" >&2; exit 1; }
 [[ -w /dev/kvm ]] || { echo "vm-test: /dev/kvm is not available" >&2; exit 1; }
 cache=${XDG_CACHE_HOME:-$HOME/.cache}/titan/vm
@@ -47,8 +50,8 @@ users:
     ssh_authorized_keys: [$(cat "$run/key.pub")]
 growpart: {mode: auto, devices: ['/']}
 EOF
-# Packages to test, built from this checkout.
-"$root/scripts/build-repo" --channel edge "$run/repo" >/dev/null
+# Packages to test: built from this checkout, unless testing the published repository.
+if [[ -z $from ]]; then "$root/scripts/build-repo" --channel edge "$run/repo" >/dev/null; fi
 port=$((20000 + RANDOM % 20000)) sshport=$((40000 + RANDOM % 20000))
 python3 -m http.server "$port" --bind 127.0.0.1 --directory "$run/seed" >/dev/null 2>&1 &
 http=$!
@@ -67,13 +70,35 @@ ssh_vm() { ssh -q -i "$run/key" -p "$sshport" -o StrictHostKeyChecking=no -o Use
 echo "Booting the VM…"
 for i in $(seq 1 90); do ssh_vm true 2>/dev/null && break; sleep 3; done
 ssh_vm true || { echo "vm-test: the VM did not come up; console log: $run/console.log" >&2; keep=1; exit 1; }
-scp -q -i "$run/key" -P "$sshport" -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "$run"/repo/*.pkg.tar.zst tester@127.0.0.1:
-pkgs="titan-[0-9]*-any.pkg.tar.zst"; ((full)) && pkgs="titan-[0-9]*-any.pkg.tar.zst titan-desktop-*-any.pkg.tar.zst"
-# The install runs as a detached unit inside the VM: package hooks may restart
-# services and drop SSH, so it must not depend on one connection staying open.
+# The install steps go into a script file: no nested shell quoting.
+{
+ echo 'set -euo pipefail'
+ echo 'pacman-key --init; pacman-key --populate archlinux'
+ echo 'pacman -Syu --noconfirm'
+} >"$run/install.sh"
+if [[ -z $from ]]; then
+ scp -q -i "$run/key" -P "$sshport" -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "$run"/repo/*.pkg.tar.zst tester@127.0.0.1:
+ pkgs="titan-[0-9]*-any.pkg.tar.zst"; ((full)) && pkgs="titan-[0-9]*-any.pkg.tar.zst titan-desktop-*-any.pkg.tar.zst"
+ echo "cd /home/tester && pacman -U --noconfirm $pkgs" >>"$run/install.sh"
+else
+ # The documented user steps (docs/distribution.md), with pacman's default signature checks.
+ slug=$(git -C "$root" remote get-url origin | sed -E 's#(git@github.com:|https://github.com/)##; s#\.git$##')
+ pkgs="titan"; ((full)) && pkgs="titan-desktop"
+ keyid=$(gpg --with-colons --show-keys "$root/keys/titan-packager.asc" 2>/dev/null | awk -F: '/^pub/{print $5; exit}')
+ cat >>"$run/install.sh" <<STEPS
+curl -fsSL -o /root/titan-packager.asc https://raw.githubusercontent.com/$slug/main/keys/titan-packager.asc
+pacman-key --add /root/titan-packager.asc
+pacman-key --lsign-key $keyid
+printf '\n[titan]\nServer = https://github.com/$slug/releases/download/repo-$from\n' >> /etc/pacman.conf
+pacman -Syu --noconfirm $pkgs
+pacman -Qi $pkgs | grep -E '^(Name|Version|Validated By)'
+STEPS
+ echo "Testing the published '$from' repository of $slug (key $keyid)."
+fi
+echo 'touch /var/tmp/titan-install.ok' >>"$run/install.sh"
+scp -q -i "$run/key" -P "$sshport" -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "$run/install.sh" tester@127.0.0.1:
 echo "Installing inside the VM (detached job; full update first)…"
-ssh_vm "sudo systemd-run --unit=titan-vmtest-install --property=Type=oneshot --no-block \
- /bin/bash -c 'set -e; pacman-key --init; pacman-key --populate archlinux; pacman -Syu --noconfirm; cd /home/tester; pacman -U --noconfirm $pkgs; touch /var/tmp/titan-install.ok'"
+ssh_vm "sudo systemd-run --unit=titan-vmtest-install --property=Type=oneshot --no-block /bin/bash /home/tester/install.sh"
 state=activating
 vm_alive() { kill -0 "$(cat "$run/qemu.pid")" 2>/dev/null; }
 for i in $(seq 1 360); do
@@ -87,6 +112,8 @@ if ! ssh_vm test -e /var/tmp/titan-install.ok; then
  ssh_vm sudo journalctl -u titan-vmtest-install --no-pager | tail -40 >&2 || true
  keep=1; exit 1
 fi
+# Show how pacman validated the installed packages (signature, checksum…).
+[[ -n $from ]] && ssh_vm sudo journalctl -u titan-vmtest-install --no-pager -o cat | grep -E '^(Name|Version|Validated By)' || true
 echo "Checking inside the VM…"
 status=0
 ssh_vm bash -s <<EOF || status=$?
@@ -94,7 +121,7 @@ set -euo pipefail
 pass() { printf 'PASS  %s\n' "\$1"; }
 fail() { printf 'FAIL  %s\n' "\$1"; failed=1; }
 failed=0
-pass "pacman installed $pkgs after a full update"
+pass "pacman installed $pkgs after a full update${from:+ from the published $from repository}"
 command -v titan >/dev/null && pass "titan on PATH" || fail "titan on PATH"
 titan version
 titan setup >/dev/null && pass "titan setup (first run)" || fail "titan setup"
