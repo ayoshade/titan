@@ -1,6 +1,6 @@
 ---
 name: titan
-description: REQUIRED for end-user customization of Linux desktop, window manager, or system config. Use when editing ~/.config/hypr/, ~/.config/titan/, ~/.config/alacritty/, ~/.config/foot/, ~/.config/kitty/, or ~/.config/ghostty/. Triggers: Hyprland, window rules, animations, keybindings, monitors, gaps, borders, blur, opacity, titan-shell, bar, terminal config, themes, background, night light, idle, lock screen, screenshots, reminders, layer rules, workspace settings, display config, and user-facing titan commands. Excludes titan source development through `titan dev link` workflows.
+description: 'REQUIRED for end-user customization of Linux desktop, window manager, or system config. Use when editing ~/.config/hypr/, ~/.config/titan/, ~/.config/alacritty/, ~/.config/foot/, ~/.config/kitty/, or ~/.config/ghostty/. Triggers: Hyprland, window rules, animations, keybindings, monitors, gaps, borders, blur, opacity, titan-shell, bar, terminal config, themes, background, night light, idle, lock screen, screenshots, reminders, layer rules, workspace settings, display config, and user-facing titan commands. Excludes titan source development through `titan dev link` workflows.'
 ---
 
 # Customizing a Titan desktop

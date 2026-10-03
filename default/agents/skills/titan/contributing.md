@@ -84,3 +84,8 @@ you could not test.
 Skills live in `~/dotfiles/default/agents/skills/<name>/` and are symlinked into
 `~/.claude/skills/` and `~/.codex/skills/`. Edit them in the repo; the links
 pick the changes up. A new skill needs its own link in both places.
+
+Quote a skill's `description:` in single quotes (doubling any `'`), because
+trigger lists contain `: `, which is invalid in a plain YAML scalar; GitHub
+reports "mapping values are not allowed". Check with a YAML parser before
+committing.

@@ -1,6 +1,6 @@
 ---
 name: diagnose-crash
-description: Diagnose why a program crashed on this machine, from a systemd-coredump core dump. Use when a process has segfaulted, aborted, or otherwise dumped core, when asked why an application crashed or disappeared, or when a "Process crashed:" desktop notification is acted on. Triggers: crash, segfault, SIGSEGV, SIGABRT, core dump, coredumpctl, "why did X crash", "X keeps crashing", backtrace symbolization.
+description: 'Diagnose why a program crashed on this machine, from a systemd-coredump core dump. Use when a process has segfaulted, aborted, or otherwise dumped core, when asked why an application crashed or disappeared, or when a "Process crashed:" desktop notification is acted on. Triggers: crash, segfault, SIGSEGV, SIGABRT, core dump, coredumpctl, "why did X crash", "X keeps crashing", backtrace symbolization.'
 ---
 
 # Diagnose a crash from a core dump
