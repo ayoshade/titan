@@ -71,5 +71,7 @@ kernel parameters or bootloader edits were applied.
   shade and installed Wayland sessions were detected. Demo exited afterward.
 - Preview reported a system locale C warning, benign GTK empty-declaration
   warnings, and missing remembered state before the first real login.
-- A real reboot/login remains to be tested by the user. Select **Hyprland**,
-  without UWSM, then authenticate. No automatic login is configured.
+- Real reboot/login verified on 2026-10-03: greetd opened a session for shade,
+  Hyprland started, and Quickshell/Hypridle launched automatically. Core system
+  services and the repeatable doctor checks passed after reboot. No automatic
+  login is configured.
