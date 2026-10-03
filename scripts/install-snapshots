@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+# install-snapshots [--dry-run]: enable Btrfs snapshots of / with Snapper so
+# every pacman transaction (snap-pac) and every `titan update` can be undone.
+# Additive and reversible: installs snapper + snap-pac, creates the root config
+# (a nested /.snapshots subvolume), sets conservative limits and enables
+# cleanup. Does not change fstab, the bootloader or existing subvolumes.
+# Undo: sudo snapper -c root delete-config && sudo pacman -Rns snap-pac snapper
+set -euo pipefail
+root=$(cd -- "$(dirname -- "$(readlink -f "${BASH_SOURCE[0]}")")/.." && pwd)
+dry=0; [[ ${1:-} == --dry-run ]] && dry=1
+run() { if ((dry)); then printf '  would run: %s\n' "$*"; else "$@"; fi }
+
+fstype=$(findmnt -no FSTYPE /)
+[[ $fstype == btrfs ]] || { echo "install-snapshots: / is $fstype, not btrfs; nothing to do." >&2; exit 1; }
+if ((!dry && EUID != 0)); then exec sudo -- "$root/scripts/install-snapshots" "$@"; fi
+user=${SUDO_USER:-$(id -un)}
+
+echo "Root filesystem: btrfs ($(findmnt -no OPTIONS / | tr ',' '\n' | grep '^subvol=' || echo 'subvol=?'))"
+if [[ -e /etc/snapper/configs/root ]]; then
+ echo "Snapper root config already exists; only limits and cleanup are refreshed."
+elif [[ -e /.snapshots ]]; then
+ echo "install-snapshots: /.snapshots exists without a Snapper config; inspect it before continuing." >&2; exit 1
+fi
+# Install from the already-synced database: a full `titan update` should come
+# first, because Arch does not support partial upgrades (`pacman -Sy pkg`).
+missing=(); for p in snapper snap-pac; do pacman -Q "$p" >/dev/null 2>&1 || missing+=("$p"); done
+((${#missing[@]})) && run pacman -S --needed --noconfirm "${missing[@]}"
+[[ -e /etc/snapper/configs/root ]] || run snapper -c root create-config /
+# No hourly timeline; keep the last 10 numbered (pacman/update) snapshots and 5
+# marked important. The user may list and compare snapshots without sudo.
+run snapper -c root set-config TIMELINE_CREATE=no NUMBER_CLEANUP=yes NUMBER_LIMIT=10 NUMBER_LIMIT_IMPORTANT=5 "ALLOW_USERS=$user"
+run systemctl enable --now snapper-cleanup.timer
+run snapper -c root create -c number -d "titan: snapshots enabled"
+if ((!dry)); then
+ snapper -c root list | tail -3
+ echo "Snapshots enabled. Every pacman transaction now records pre/post snapshots; see docs/snapshots.md."
+fi

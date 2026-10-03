@@ -180,6 +180,9 @@ migration markers). `scripts/apply-theme` writes generated Kitty/Hyprland files
 into state and the choice into the user layer, so theme changes no longer
 dirty Git. Layout changes to existing installs ship as numbered, idempotent
 scripts in `migrations/`, run by `titan migrate` (and `titan update`).
+Snapshots: `scripts/install-snapshots` (user runs it with sudo; `--dry-run` is
+safe for agents) enables Snapper and snap-pac on the Btrfs root; recovery is in
+`docs/snapshots.md`. Never roll back or delete snapshots without the user.
 
 As Titan grows, separate distribution defaults, machine profiles, persistent
 user overrides, runtime state and build outputs. Updates must preserve user

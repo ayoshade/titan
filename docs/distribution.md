@@ -94,7 +94,7 @@ changes); they suggest it to the user.
 | User layer separated from defaults | Done (0.2.0) |
 | Version, migrations, `titan` command | Done (0.2.0) |
 | `titan update` | Done; first real use pending |
-| Snapshots before updates (Snapper on Btrfs) | Script provided (`scripts/install-snapshots`); the user runs it with sudo |
+| Snapshots before updates (Snapper on Btrfs) | `scripts/install-snapshots` written and dry-run tested; the user runs it with sudo (docs/snapshots.md) |
 | Packaging Titan (`titan` package, defaults in `/usr/share/titan`, own repo) | Planned, below |
 | First-run setup (user, owner, theme, network) | Planned |
 

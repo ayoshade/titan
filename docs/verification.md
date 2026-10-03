@@ -332,4 +332,9 @@ kernel parameters or bootloader edits were applied.
   non-Item, so per-app volume tracking got `undefined`. It now uses an id.
 - **Not exercised:** `titan update`, because it needs sudo and the network.
   The user should run it the first time.
+- **Snapshots:** `scripts/install-snapshots --dry-run` on this machine detected
+  btrfs `subvol=/@`, no existing Snapper config, and missing
+  `snapper`/`snap-pac`, and listed the five intended actions. The real run
+  (sudo) is pending the user. Neither `undochange` nor the full rollback in
+  `docs/snapshots.md` has been rehearsed; do that in a VM.
 
