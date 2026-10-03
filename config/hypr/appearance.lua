@@ -5,7 +5,8 @@ hl.config({
   shadow={enabled=true, range=12, render_power=3, color=0x66000000},
   blur={enabled=true, size=3, passes=1, vibrancy=0}},
  animations={enabled=true}, dwindle={preserve_split=true},
- misc={disable_hyprland_logo=true, force_default_wallpaper=0,
+ misc={key_press_enables_dpms=true, mouse_move_enables_dpms=true,
+  disable_hyprland_logo=true, force_default_wallpaper=0,
   background_color="rgba(08090bff)"},
 })
 hl.curve("restrained", {type="bezier", points={{0.2,0.8},{0.2,1}}})
