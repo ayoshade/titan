@@ -6,4 +6,6 @@ if [[ -z ${WAYLAND_DISPLAY:-} ]]; then
 fi
 export QT_QPA_PLATFORM=wayland
 qs -c umbra kill || true
-exec qs -n -d -c umbra
+# Launch through the compositor so logind/polkit see the desktop's session,
+# even when this recovery script was invoked from a different TTY.
+exec hyprctl dispatch 'hl.dsp.exec_cmd("qs -n -d -c umbra")'
