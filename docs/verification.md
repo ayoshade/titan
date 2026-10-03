@@ -293,3 +293,14 @@ kernel parameters or bootloader edits were applied.
 - **Not hands-on tested:** clicks in the power strip and session confirmations
   (deliberately not confirmed), launching apps from the new launcher, menu
   submissions (calculator, reminder), emoji copy, and notification actions.
+
+## Quickshell exit crash, root cause — 2026-10-03
+
+- A symbolized core (`coredumpctl debug 23078`, using Arch's debuginfod)
+  shows `qFatal("QPixmap: Must construct a QGuiApplication before a
+  QPixmap")`. It is raised from `QWindow::unsetCursor()` while
+  `QQuickItem` destructors run after the application object was destroyed.
+  This is an upstream Quickshell 0.3.1 teardown bug, not Titan QML. It explains
+  the SIGABRT and SIGSEGV cores and the occasional hang on `qs kill`; the
+  workaround is the escalating `scripts/shell-restart`. The procedure is
+  recorded in `default/agents/skills/diagnose-crash/SKILL.md`.
