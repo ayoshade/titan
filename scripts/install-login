@@ -1,0 +1,45 @@
+#!/usr/bin/env bash
+set -euo pipefail
+root=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)
+if (( EUID != 0 )); then
+ exec sudo -- "$root/scripts/install-login"
+fi
+# Refuse to replace an unrelated login manager.
+if [[ -L /etc/systemd/system/display-manager.service ]]; then
+ existing=$(readlink -f /etc/systemd/system/display-manager.service)
+ [[ ${existing##*/} == greetd.service ]] || { printf 'Existing login manager: %s\n' "$existing" >&2; exit 1; }
+fi
+python - "$root/system/greetd" <<'CHECK'
+import pathlib,sys,tomllib
+folder=pathlib.Path(sys.argv[1])
+for name in ['config.toml','regreet.toml']:
+ with (folder/name).open('rb') as f: tomllib.load(f)
+CHECK
+mapfile -t packages < "$root/packages/login.txt"
+pacman -Syu --needed "${packages[@]}"
+getent passwd greeter >/dev/null
+for program in /usr/bin/cage /usr/bin/regreet /usr/bin/start-hyprland; do
+ [[ -x "$program" ]] || { printf 'Missing program: %s\n' "$program" >&2; exit 1; }
+done
+# Validate installed CLI options before installing the reviewed configuration.
+/usr/bin/regreet --help | /usr/bin/grep -q -- '--style'
+/usr/bin/regreet --help | /usr/bin/grep -q -- '--config'
+install -d -m 0755 /etc/greetd
+backup=$(mktemp -d /etc/greetd/umbra-backup.XXXXXX)
+for name in config.toml regreet.toml regreet.css; do
+ if [[ -e /etc/greetd/$name || -L /etc/greetd/$name ]]; then
+  cp -a -- "/etc/greetd/$name" "$backup/$name"
+ fi
+ install -o root -g root -m 0644 "$root/system/greetd/$name" "/etc/greetd/$name"
+ cmp -- "$root/system/greetd/$name" "/etc/greetd/$name"
+done
+systemd-tmpfiles --create /usr/lib/tmpfiles.d/regreet.conf
+systemctl daemon-reload
+systemd-analyze verify /usr/lib/systemd/system/greetd.service
+# Enable for the next boot; do not stop the user's current TTY or desktop.
+systemctl enable greetd.service
+systemctl set-default graphical.target
+systemctl is-enabled greetd.service
+printf '\nGraphical login enabled for next boot. Backup: %s\n' "$backup"
+printf 'At login, choose shade and the Hyprland session (without UWSM).\n'
+printf 'The current desktop has not been restarted. Return to Codex when done.\n'

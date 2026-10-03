@@ -57,3 +57,19 @@ AE_NOT_EXIST. This was after the initial black-screen report. The observation
 does not establish a causal connection to Hyprlock. The rtc_cmos driver exists
 and RTC devices rtc0/rtc1 are present. No ACPI overrides, firmware changes,
 kernel parameters or bootloader edits were applied.
+
+## Graphical login setup
+
+- Installed greetd 0.10.3-2, greetd-regreet 0.5.0-1 and Cage 0.3.1-1.
+- TOML parsed successfully; installed ReGreet and Cage CLI options checked.
+- greetd systemd unit validates; display-manager.service points to greetd.
+- greetd enabled, graphical.target default confirmed. The service was not
+  started over the current TTY/desktop.
+- Installed config and greeter stylesheet match the reviewed repository files.
+- greeter account and ReGreet state/log directories exist with correct ownership.
+- ReGreet demo launched and loaded the dark configuration; native login user
+  shade and installed Wayland sessions were detected. Demo exited afterward.
+- Preview reported a system locale C warning, benign GTK empty-declaration
+  warnings, and missing remembered state before the first real login.
+- A real reboot/login remains to be tested by the user. Select **Hyprland**,
+  without UWSM, then authenticate. No automatic login is configured.

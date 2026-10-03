@@ -1,0 +1,17 @@
+/* Original Umbra greeter palette. Keep native GTK focus and accessibility. */
+window { background-color: #08090b; color: #e0e4ea; }
+box { border-radius: 8px; }
+label { color: #e0e4ea; }
+entry, dropdown, button {
+ background-image: none;
+ background-color: #111318;
+ color: #e0e4ea;
+ border: 1px solid #2b3038;
+ border-radius: 8px;
+ box-shadow: none;
+ padding: 10px 14px;
+}
+button:hover { background-color: #1a1d23; }
+button:focus-visible, entry:focus-within { outline: 1px solid #c1cad5; outline-offset: 2px; }
+button.suggested-action { background-color: #353b44; color: #e0e4ea; }
+popover, popover contents { background-color: #111318; color: #e0e4ea; }

@@ -13,7 +13,7 @@ power-profiles-daemon and UFW already configured:
 ~/dotfiles/scripts/install-packages
 ~/dotfiles/scripts/bootstrap
 ~/dotfiles/scripts/doctor
-start-hyprland
+~/dotfiles/scripts/install-login
 ```
 
 Keep the checkout at `~/dotfiles`. Package installation uses a full
@@ -23,9 +23,16 @@ replace existing files. It also sets the GTK dark preference and Inter font.
 Nothing in these scripts partitions disks, changes mount layout, edits the
 bootloader, disables networking, or changes firewall rules.
 
-Launch from a logged-in TTY with `start-hyprland`. There is intentionally no
-automatic login or display manager. Ctrl+Alt+F1 returns to the first console;
-Ctrl+Alt+F2 returns to the desktop started from the second console.
+After `scripts/install-login`, reboot to the dark ReGreet login screen. Choose
+`shade` and the **Hyprland** session (without UWSM), then enter your password.
+The desktop and Quickshell start automatically after authentication. ReGreet
+remembers your user and session after the first successful login. There is no
+automatic login.
+
+If the login manager has not been installed, log into a TTY and run
+`start-hyprland`. Ctrl+Alt+F3 provides a recovery console; desktop VT numbers
+depend on how the session was started. The login installer enables greetd for
+the next boot and preserves the currently running desktop.
 
 ## Keys
 
@@ -71,7 +78,8 @@ dotfiles/
 │   ├── gtk-{3,4}.0/            GTK dark defaults
 │   ├── xdg-desktop-portal/     Hyprland capture + GTK file chooser
 │   └── mimeapps.list          Browser and file manager associations
-├── packages/desktop.txt        Exact direct package manifest
+├── system/greetd/              Reviewed system login configuration
+├── packages/                   Desktop and login package manifests
 ├── scripts/                    Install, link, verify, session, lock, capture
 └── docs/                       Hardware, validation, operating notes
 ```
@@ -145,3 +153,34 @@ profiles, Wi-Fi credentials or machine-wide networking configuration.
 
 API references: [Quickshell 0.3.1](https://quickshell.org/docs/v0.3.1/types/),
 [Hyprland Lua configuration](https://wiki.hypr.land/configuring/core/).
+
+## Graphical login administration
+
+The optional login stack is greetd, ReGreet and Cage. Cage runs only the
+greeter, supports VT switching, and exits when the authenticated desktop starts.
+ReGreet uses the system Hyprland session entry, which executes `start-hyprland`.
+Quickshell remains the desktop shell.
+
+`scripts/install-login` requires sudo, validates the TOML and installed CLI,
+backs up existing `/etc/greetd` configuration into `umbra-backup.*`, installs
+root-owned copies, verifies the systemd unit, and enables greetd for the next
+boot. It does not start or restart greetd in the current session. Config changes
+under `system/greetd/` must be reinstalled with that script to take effect.
+
+If graphical login fails, use Ctrl+Alt+F3, log in, then inspect:
+
+```sh
+systemctl status greetd --no-pager
+journalctl -b -u greetd --no-pager
+```
+
+To return to text login on the next boot:
+
+```sh
+sudo systemctl disable greetd.service
+```
+
+The original enabled getty on tty1 is preserved. Do not stop greetd while you
+have an active desktop launched by it; disabling alone changes future boots.
+Login references: [ReGreet](https://github.com/rharish101/ReGreet),
+[greetd configuration](https://man.archlinux.org/man/greetd.5.en).

@@ -1,0 +1,19 @@
+skip_selection = false
+
+[GTK]
+application_prefer_dark_theme = true
+cursor_theme_name = "Adwaita"
+font_name = "Inter 12"
+icon_theme_name = "Adwaita"
+theme_name = "Adwaita"
+
+[appearance]
+greeting_msg = "UMBRA / ACCESS"
+
+[widget.clock]
+format = "%a %d %b / %H:%M"
+resolution = "1s"
+
+[commands]
+reboot = ["systemctl", "reboot"]
+poweroff = ["systemctl", "poweroff"]
