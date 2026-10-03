@@ -118,6 +118,8 @@ only executes installed desktop entries; it is not a shell-command runner.
 Hyprland launches Quickshell, Hypridle and the small polkit authentication agent.
 GTK portals handle file dialogs; the Hyprland portal handles screen sharing and
 screenshots. PipeWire socket activation and WirePlumber provide audio.
+Hyprlock uses immediate rendering with lock-screen animations disabled to avoid
+the black-screen failure observed during TTY switching.
 Hypridle requests a lock after five minutes and turns off displays after six.
 It requests locking before suspend and waits for the lock using its sleep
 inhibitor. There is no automatic suspend timer. Reboot, power off and logout

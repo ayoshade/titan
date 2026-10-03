@@ -15,7 +15,11 @@
 - Native notification delivered and rendered in retained history.
 - PipeWire sink volume, battery, brightness, and power profile populated.
 - Kitty and Thunar launched; Hyprland reports `xwayland: false` for both.
-- Hyprland DPMS-on Lua dispatcher returned ok.
+- Hyprland explicit DPMS-on Lua dispatcher returned ok and remained on across
+  repeated calls. Idle commands use table arguments with an explicit action.
+- Initial Hyprlock rendering stalled during TTY switching. Immediate rendering
+  and disabled locker animations were applied; visible local authentication
+  remains under verification. No password was collected by the agent.
 - GTK, Hyprland and core XDG portals active.
 - NetworkManager, Bluetooth, power profiles and UFW remain active.
 - Quickshell resident memory observed around 202 MiB after opening all panels;

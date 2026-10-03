@@ -2,4 +2,4 @@
 set -euo pipefail
 exec 9>"${XDG_RUNTIME_DIR:?}/umbra-lock.lock"
 flock -n 9 || exit 0
-exec hyprlock
+exec hyprlock --immediate-render --no-fade-in --config "$HOME/dotfiles/config/hypr/hyprlock.conf"
