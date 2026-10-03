@@ -2,7 +2,8 @@
 # Build from this directory: makepkg -f   (see docs/distribution.md)
 pkgname=titan
 pkgver=0.2.0
-pkgrel=1
+pkgrel=2
+# Maintainer: Cristian Adrian Paredez <itsalltheshade@gmail.com>
 pkgdesc="Titan desktop: Hyprland + Quickshell defaults, shell, tools and migrations"
 arch=('any')
 url="https://github.com/ayoshade/titan"
@@ -19,7 +20,7 @@ package() {
   local share="$pkgdir/usr/share/titan"
   install -d "$share"
   # Defaults and code only: user state never ships.
-  cp -a --no-preserve=ownership "$_root"/{config,scripts,lib,assets,migrations,default,version} "$share/"
+  cp -a --no-preserve=ownership "$_root"/{config,scripts,lib,assets,migrations,default,packages,system,keys,version} "$share/"
   find "$share" -name __pycache__ -prune -exec rm -rf {} +
   install -d "$pkgdir/usr/bin"
   for cmd in titan titan-shell titan-session; do

@@ -1,35 +1,54 @@
 #!/usr/bin/env bash
+# doctor: Titan health check. Static checks (scripts, Python, Hyprland config)
+# always fail hard. In a developer checkout the package set and ~/.config links
+# are required too; on packaged installs they and optional services are warnings.
 set -euo pipefail
-root=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)
+root=$(cd -- "$(dirname -- "$(readlink -f "${BASH_SOURCE[0]}")")/.." && pwd)
+dev=0; [[ -d $root/.git ]] && dev=1
+warn() { printf 'warning: %s\n' "$*" >&2; }
 mapfile -t packages < <(cat "$root/packages/desktop.txt" "$root/packages/workflow.txt")
-pacman -Q "${packages[@]}"
-python -m py_compile "$root/lib/titan/workflow.py"
+if ((dev)); then
+ pacman -Q "${packages[@]}"
+else
+ missing=$(pacman -Q "${packages[@]}" 2>&1 >/dev/null | sed -n "s/^error: package '\(.*\)' was not found/\1/p" | tr '\n' ' ')
+ [[ -z $missing ]] || warn "not installed: $missing(install titan-desktop for the full desktop)"
+fi
+# Parse only: never write bytecode into a packaged, read-only tree.
+python -c 'import ast,sys; ast.parse(open(sys.argv[1]).read(),sys.argv[1])' "$root/lib/titan/workflow.py"
 for script in "$root"/scripts/*; do
  # Check each script with the interpreter its shebang names.
  [[ -f $script ]] || continue
  if head -n1 "$script" | grep -q python; then python -c 'import ast,sys; ast.parse(open(sys.argv[1]).read(),sys.argv[1])' "$script"; else bash -n "$script"; fi
 done
-Hyprland --verify-config -c "$root/config/hypr/hyprland.lua"
-for source in "$root"/config/*; do
- target="${XDG_CONFIG_HOME:-$HOME/.config}/${source##*/}"
- [[ $(readlink -f "$target") == "$source" ]] || { printf 'Missing config link: %s\n' "$target" >&2; exit 1; }
+TITAN_ROOT=$root Hyprland --verify-config -c "$root/config/hypr/hyprland.lua" >/dev/null
+if ((dev)); then
+ for source in "$root"/config/*; do
+  target="${XDG_CONFIG_HOME:-$HOME/.config}/${source##*/}"
+  [[ $(readlink -f "$target") == "$source" ]] || { printf 'Missing config link: %s\n' "$target" >&2; exit 1; }
+ done
+else
+ [[ -e ${XDG_STATE_HOME:-$HOME/.local/state}/titan/setup-version ]] || warn "this account has not run 'titan setup' yet"
+fi
+for unit in NetworkManager bluetooth power-profiles-daemon ufw; do
+ systemctl is-active --quiet "$unit" || warn "system service $unit is not active"
 done
-systemctl is-active NetworkManager bluetooth power-profiles-daemon ufw
-systemctl --user is-active pipewire.socket pipewire-pulse.socket wireplumber
+for unit in pipewire.socket pipewire-pulse.socket wireplumber; do
+ systemctl --user is-active --quiet "$unit" 2>/dev/null || warn "user service $unit is not active"
+done
 if [[ -n ${WAYLAND_DISPLAY:-} ]]; then
- if pgrep -x hypridle >/dev/null; then
+ if pgrep -x hypridle >/dev/null && [[ -f /etc/systemd/logind.conf.d/99-titan-always-awake.conf ]]; then
   printf 'Unexpected hypridle process under always-awake policy\n' >&2; exit 1
  fi
- qs -c umbra list
- hyprctl configerrors
+ qs -c umbra list >/dev/null || warn "the Titan shell is not running"
+ [[ -z $(hyprctl configerrors 2>/dev/null | tr -d '[:space:]') ]] || { hyprctl configerrors >&2; exit 1; }
 fi
 if [[ -f /etc/systemd/logind.conf.d/99-titan-always-awake.conf ]]; then
  for target in sleep.target suspend.target hibernate.target hybrid-sleep.target suspend-then-hibernate.target; do
   [[ $(systemctl is-enabled "$target" 2>/dev/null || true) == masked ]]
  done
- systemctl is-active titan-performance.service
+ systemctl is-active titan-performance.service >/dev/null
  [[ $(busctl --system get-property org.freedesktop.UPower.PowerProfiles /org/freedesktop/UPower/PowerProfiles org.freedesktop.UPower.PowerProfiles ActiveProfile) == 's "performance"' ]]
  [[ $(busctl --system get-property org.freedesktop.UPower.PowerProfiles /org/freedesktop/UPower/PowerProfiles org.freedesktop.UPower.PowerProfiles BatteryAware) == 'b false' ]]
  printf 'Always awake; Performance active; battery-aware switching disabled\n'
 fi
-printf '\nStatic configuration, packages, links, and core services checked.\n'
+printf 'Titan %s (%s): static configuration, packages and services checked.\n' "$(cat "$root/version")" "$( ((dev)) && echo checkout || echo package)"

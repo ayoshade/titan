@@ -421,3 +421,23 @@ kernel parameters or bootloader edits were applied.
   - pacman reported `Validated By: SHA-256 Sum  Signature`.
 
   All 14 checks passed.
+
+## Documentation audit and package release 2 — 2026-10-03
+
+- **Documentation audit:** every repository path in the README, AGENTS.md,
+  docs and skills was checked against the tree (only intentional examples
+  remain). Every `titan-shell ipc`/`ipc call shell` function exists in
+  `shell.qml`, every `scripts/workflow` operation in the dispatcher, every
+  setting in the schema, and the live bind count is 231. The README was
+  rewritten from the current code.
+- **Packaging gap:** the published `titan 0.2.0-1` lacked `packages/`,
+  `system/` and `keys/`. So `titan doctor`, `install-login` and
+  `install-always-awake` could not work on packaged installs. `doctor` also
+  wrote bytecode and required developer links. Release 2 ships those
+  directories, and `doctor` is mode-aware: static checks are fatal, and on
+  packaged installs missing packages, setup and optional services are
+  warnings. On this laptop it behaves as before.
+- **VM test:** `vm-test --full` on the local 0.2.0-2 build passed 16/16,
+  including `titan doctor (package mode)` and the shipped login inputs.
+  0.2.0-2 has not been published yet (it needs the owner's signing
+  passphrase).

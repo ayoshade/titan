@@ -1,4 +1,5 @@
 # Meta-package: Titan plus the complete package set from packages/*.txt.
+# Maintainer: Cristian Adrian Paredez <itsalltheshade@gmail.com>
 pkgname=titan-desktop
 pkgver=0.2.0
 pkgrel=1

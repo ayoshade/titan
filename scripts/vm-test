@@ -136,6 +136,8 @@ TITAN_ROOT=/usr/share/titan Hyprland --verify-config -c /usr/share/titan/config/
 if /usr/lib/qt6/bin/qmllint -I /usr/lib/qt6/qml /usr/share/titan/config/quickshell/umbra/shell.qml 2>&1 | grep -qE "^Error"; then fail "shell QML"; else pass "shell QML parses"; fi
 titan settings set islandWidth 260 && [[ \$(titan settings get islandWidth) == 260 ]] && pass "settings round-trip" || fail "settings"
 titan theme nord >/dev/null && [[ \$(titan theme current) == nord ]] && pass "theme switch" || fail "theme switch"
+titan doctor >/dev/null 2>&1 && pass "titan doctor (package mode)" || fail "titan doctor"
+[[ -e /usr/share/titan/system/greetd/config.toml && -e /usr/share/titan/packages/login.txt ]] && pass "login installer inputs shipped" || fail "login installer inputs"
 exit \$failed
 EOF
 ((status == 0)) && echo "All VM checks passed." || echo "Some VM checks failed."
