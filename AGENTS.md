@@ -160,7 +160,7 @@ wl-clipboard, grim/slurp and suitable XDG portals.
 | `packages/` | Explicit package manifests |
 | `scripts/` | Installation, bootstrap, checks, session and user operations |
 | `system/` | Reviewed templates for privileged system configuration |
-| `default/agents/skills/` | Agent skills shipped as Titan defaults (one `SKILL.md` per skill), symlinked into `~/.claude/skills/` and `~/.codex/skills/`; `titan` covers end-user customization, `diagnose-crash` covers core dumps |
+| `default/agents/skills/` | Agent skills shipped as Titan defaults (one `SKILL.md` per skill), symlinked into `~/.claude/skills/` and `~/.codex/skills/`; `titan` covers end-user customization, `titan-app` new Qt Quick desktop apps, `diagnose-crash` core dumps |
 | `docs/` | Research, hardware, decisions, validation and recovery |
 
 Shell settings are declared once in `theme/settings-schema.json`. The Settings
