@@ -51,7 +51,7 @@ PanelWindow {
      id: loader
      anchors { fill: parent; margins: 14 }
      active: root.visible && UiState.panel!=="themes"
-     source: UiState.panel==="launcher" ? "Launcher.qml" : UiState.panel==="controls" ? "ControlCenter.qml" : UiState.panel==="notifications" ? "NotificationCenter.qml" : UiState.panel==="clock" ? "ClockPanel.qml" : UiState.panel==="appearance" ? "Appearance.qml" : UiState.panel==="media" ? "MediaPanel.qml" : UiState.panel==="connectivity" ? "Connectivity.qml" : "SessionMenu.qml"
+     source: UiState.panel==="commands" ? "CommandPanel.qml" : UiState.panel==="launcher" ? "Launcher.qml" : UiState.panel==="controls" ? "ControlCenter.qml" : UiState.panel==="notifications" ? "NotificationCenter.qml" : UiState.panel==="clock" ? "ClockPanel.qml" : UiState.panel==="appearance" ? "Appearance.qml" : UiState.panel==="media" ? "MediaPanel.qml" : UiState.panel==="connectivity" ? "Connectivity.qml" : "SessionMenu.qml"
      focus: true
      Keys.onEscapePressed: UiState.close()
     }

@@ -39,40 +39,39 @@ the next boot and preserves the currently running desktop.
 
 ## Keys
 
+Titan uses Omarchy's complete shortcut combinations, with native Titan helpers
+and Quickshell menus. Super is the Windows key. Press **Super+K** to search them.
+
 | Key | Action |
 | --- | --- |
-| Super+Return | Kitty terminal |
-| Super+Space | Quickshell application launcher |
-| Super+A | Control center |
+| Super+Return | Terminal |
+| Super+Space / Super+Alt+Space | Titan menu / application launcher |
+| Super+Shift+F / Super+Shift+B / Super+Shift+N | Files / browser / editor |
+| Super+A / C / V / X | Select all / copy / paste / cut |
+| Super+Ctrl+V | Clipboard history |
+| Super+Ctrl+A | Control center |
 | Super+Ctrl+Shift+Space | Theme switcher |
-| Super+N | Notification center |
-| Super+Shift+E | Session menu |
-| Super+E / Super+B | Thunar / Firefox |
-| Super+L | Hyprlock |
+| Super+Shift+Alt+comma | Notification history |
+| Super+Escape | Session menu |
+| Super+Ctrl+L | Lock |
+| Super+L | Workspace layout |
 | Super+W / Super+Q | Close focused window |
 | Alt+Tab / Alt+Shift+Tab | Next / previous window |
-| Super+Tab / Super+Shift+Tab | Next / previous occupied workspace |
-| Super+Ctrl+Tab | Previous workspace |
-| Super+S / Super+Alt+S | Toggle scratchpad / send window there |
-| Super+G / Super+Alt+Tab | Toggle grouping / cycle grouped windows |
-| Super+F / Super+T (or Super+V) | Fullscreen / floating |
-| Super+1…0 | Workspace 1…10 |
-| Super+Shift+1…0 | Move window to workspace |
-| Super+arrows | Focus a neighboring window |
-| Super+Shift+arrows | Swap a window with its neighbor |
-| Super+left/right mouse drag | Move / resize window |
-| Print / Super+Print | Region / full screenshot |
-| Media and brightness keys | Audio / backlight / media |
-| Three-finger horizontal swipe | Change workspace |
+| Super+1…0 / Super+Shift+1…0 | Switch workspace / move window |
+| Super+F / Super+T | Fullscreen / floating |
+| Print / Super+Print / Alt+Print | Screenshot / color picker / recording |
 
-Full shortcut reference and Omarchy mappings: [docs/keybindings.md](docs/keybindings.md).
+Full mappings, optional apps and policy exceptions:
+[docs/keybindings.md](docs/keybindings.md). Desktop helpers and agent interfaces:
+[docs/workflow.md](docs/workflow.md). Always-awake settings remain authoritative;
+close-all requires confirmation. Optional Omarchy applications need separate
+installation. Clipboard history is event driven, bounded to 100 items and stored
+in runtime storage that clears at reboot; marked-sensitive entries are skipped.
 
 Launcher: type to filter, arrows to select, Enter to launch. Escape or clicking
-outside closes a panel. The left circle opens applications; the right circle opens controls. Click the
-island clock for the calendar. Panel header icons switch between applications,
-controls, media, notifications, appearance, and session. Screenshots
-are saved under `~/Pictures/Screenshots` and copied to the Wayland clipboard.
-No clipboard history daemon retains sensitive clipboard content.
+outside closes a panel. The left circle opens applications; the right opens
+controls. Click the island clock for the calendar. Screenshots are saved under
+~/Pictures/Screenshots and copied to the Wayland clipboard.
 
 ## Shell architecture
 

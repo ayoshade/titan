@@ -7,6 +7,8 @@ QtObject {
  readonly property var items: server.trackedNotifications
  property var latest: null
  property bool showToast: false
+ function dismissOne() { const n=items.values[items.values.length-1]; if(n) n.dismiss() }
+ function invokeLast() { const n=items.values[items.values.length-1]; if(n && n.actions.length) n.actions[0].invoke() }
  function dismissAll() { for(const n of items.values.slice()) n.dismiss() }
  property NotificationServer server: NotificationServer {
   actionsSupported: true

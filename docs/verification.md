@@ -132,8 +132,9 @@ kernel parameters or bootloader edits were applied.
 - Moved theme selection to Super+Ctrl+Shift+Space; Super+T now toggles floating.
 - Static compositor validation, live reload/configerrors and doctor passed.
 - Live binding inventory resolves all keys. Only intentional Alt+Tab focus/raise
-  pairs share a chord. Physical code bindings were replaced with US-keyboard
-  keysyms because the installed build exposed unresolved keycodes in its inventory.
+  pairs share a chord. At this earlier stage physical codes were replaced with US keysyms based on
+  an incorrect interpretation of empty exported key/keycode fields. The complete
+  binding audit below corrects that finding: codes are supported internally.
 - No user windows were closed, moved, grouped or resized during verification.
   Actual keypress behavior is a hands-on check; loaded bindings alone do not
   prove every compositor action under all window/layout states.
@@ -156,3 +157,42 @@ kernel parameters or bootloader edits were applied.
   QML syntax passed; no actual sleep/lid test was forced on the running session.
 - Configuration is persistent, but reboot behavior has not been exercised for
   this policy. Power loss and firmware/thermal protections remain physical limits.
+
+## Complete Omarchy binding audit — 2026-10-03
+
+- Pinned reference a85e29abb556816f4644cf975e98da694b486aa8; inspected all
+  six binding files and relevant helper behavior. Executed reference and Titan
+  registration in isolated mocked Lua environments and compared normalized
+  modifier/key/release multisets: 231 expected, 231 actual, no missing or extra
+  chords. Optional preinstalled application keys enabled; voxtype absent in both.
+- Read the installed Hyprland commit's Lua parser: physical codes are stored in
+  sMkKeys, while its exported key/keycode fields can be empty. Restored the exact
+  physical codes from Omarchy. This corrects the earlier inventory interpretation.
+- User installed the official workflow package set. Package checks pass; the
+  event-driven titan-clipboard user service is active. Its initial unsupported
+  size flag was corrected to an explicit bounded read and supported cliphist
+  flags. No existing clipboard content was exposed in diagnostic output.
+- Live picker test added eight scoped bindings, returned 0,0 1366x768 for full
+  monitor selection, and removed all eight bindings on close. No screenshot of
+  the user's working applications was saved as a project artifact.
+- Created an isolated special-workspace test window. Tiled fullscreen on/off,
+  floating/pinning on/off, width save/restore and transparency ran successfully
+  against that address. Only the test window was closed; user windows were not
+  closed or altered by these helper tests.
+- Bounded calculator accepted arithmetic and rejected code execution, indexing
+  and excessive powers. An isolated clipboard database retained exactly 100
+  after 102 stores and excluded a marked-sensitive test item. Real clipboard
+  contents and the user's database were not read for those tests.
+- Eighteen new Quickshell menus opened and closed with no new runtime warnings.
+  Root menu visually inspected at the laptop resolution. User-selected palette
+  and unrelated generated theme changes were preserved.
+- Top-bar visibility was changed through typed IPC, persisted to private state
+  and restored to its original value.
+- Doctor, compositor validation and live configerrors passed. Always-awake
+  targets remain masked, Performance is active, BatteryAware is false and no
+  hypridle process runs. No lock, sleep, logout, shutdown or close-all test ran.
+- Exact chord parity is not a claim of every Omarchy feature/application being
+  present: optional apps, shared panel equivalents, always-awake exceptions,
+  live rather than frozen selection, and transient reminders are documented.
+  Physical keyboard, external monitors, webcam, actual recording/OCR, media
+  output switching and reliable Hyprlock rendering remain hands-on checks.

@@ -1,0 +1,327 @@
+{
+  "root": {
+    "title": "Titan",
+    "items": [
+      {
+        "label": "Applications",
+        "action": "panel",
+        "value": "launcher"
+      },
+      {
+        "label": "Capture",
+        "action": "menu",
+        "value": "capture"
+      },
+      {
+        "label": "Toggle",
+        "action": "menu",
+        "value": "toggle"
+      },
+      {
+        "label": "Hardware",
+        "action": "menu",
+        "value": "hardware"
+      },
+      {
+        "label": "Themes",
+        "action": "panel",
+        "value": "themes"
+      },
+      {
+        "label": "Backgrounds",
+        "action": "menu",
+        "value": "background"
+      },
+      {
+        "label": "Agent",
+        "action": "menu",
+        "value": "agent"
+      },
+      {
+        "label": "Keybindings",
+        "action": "menu",
+        "value": "keybindings"
+      },
+      {
+        "label": "System",
+        "action": "panel",
+        "value": "session"
+      }
+    ]
+  },
+  "capture": {
+    "title": "Capture",
+    "items": [
+      {
+        "label": "Screenshot region / window",
+        "detail": "Print \u00b7 drag, or Tab / arrows then Enter",
+        "action": "capture",
+        "value": "screenshot"
+      },
+      {
+        "label": "Screenshot entire monitor",
+        "detail": "Ctrl+Return during selection",
+        "action": "capture",
+        "value": "full"
+      },
+      {
+        "label": "Start / stop recording",
+        "detail": "Alt+Print",
+        "action": "capture",
+        "value": "record"
+      },
+      {
+        "label": "Pick a color",
+        "detail": "Super+Print \u00b7 copies hex color",
+        "action": "capture",
+        "value": "color"
+      },
+      {
+        "label": "Extract text (OCR)",
+        "detail": "Super+Ctrl+Print",
+        "action": "capture",
+        "value": "text"
+      },
+      {
+        "label": "Toggle webcam overlay",
+        "action": "webcam",
+        "value": "toggle"
+      }
+    ]
+  },
+  "toggle": {
+    "title": "Toggle",
+    "items": [
+      {
+        "label": "Top bar",
+        "detail": "Super+Shift+Space",
+        "action": "bar"
+      },
+      {
+        "label": "Window transparency",
+        "action": "transparency"
+      },
+      {
+        "label": "Window gaps",
+        "action": "gaps"
+      },
+      {
+        "label": "Single-window square aspect",
+        "action": "square"
+      },
+      {
+        "label": "Full screen desktop",
+        "action": "desktop"
+      },
+      {
+        "label": "Silence notifications",
+        "action": "dnd"
+      },
+      {
+        "label": "Nightlight",
+        "action": "nightlight"
+      },
+      {
+        "label": "Touchpad",
+        "action": "touchpad",
+        "value": "toggle"
+      },
+      {
+        "label": "Idle locking",
+        "detail": "Disabled by your always-awake policy",
+        "action": "policy",
+        "value": "idle"
+      }
+    ]
+  },
+  "hardware": {
+    "title": "Hardware",
+    "items": [
+      {
+        "label": "Audio",
+        "action": "panel",
+        "value": "controls"
+      },
+      {
+        "label": "Bluetooth",
+        "action": "panel",
+        "value": "connectivity"
+      },
+      {
+        "label": "Network",
+        "action": "panel",
+        "value": "connectivity"
+      },
+      {
+        "label": "Display",
+        "action": "panel",
+        "value": "controls"
+      },
+      {
+        "label": "Power \u00b7 Performance",
+        "action": "panel",
+        "value": "controls"
+      },
+      {
+        "label": "Activity",
+        "action": "app",
+        "value": "activity"
+      },
+      {
+        "label": "Mirror external display",
+        "action": "mirror"
+      }
+    ]
+  },
+  "background": {
+    "title": "Background",
+    "items": [
+      {
+        "label": "Blacksite landscape",
+        "action": "wallpaper",
+        "value": "on"
+      },
+      {
+        "label": "Solid theme background",
+        "action": "wallpaper",
+        "value": "off"
+      }
+    ]
+  },
+  "share": {
+    "title": "Share",
+    "items": [
+      {
+        "label": "Screenshot to clipboard",
+        "detail": "Choose a region; paste it into your destination",
+        "action": "capture",
+        "value": "screenshot"
+      },
+      {
+        "label": "Open files",
+        "detail": "Choose a file to share with your application",
+        "action": "app",
+        "value": "files"
+      },
+      {
+        "label": "Clipboard history",
+        "action": "menu",
+        "value": "clipboard"
+      }
+    ]
+  },
+  "agent": {
+    "title": "Agent",
+    "items": [
+      {
+        "label": "Codex",
+        "detail": "Open in ~/dotfiles with AGENTS.md",
+        "action": "app",
+        "value": "codex"
+      },
+      {
+        "label": "Claude",
+        "detail": "Requires the Claude CLI \u00b7 reads CLAUDE.md",
+        "action": "app",
+        "value": "claude"
+      }
+    ]
+  },
+  "close-all": {
+    "title": "Close all windows?",
+    "items": [
+      {
+        "label": "Cancel",
+        "detail": "Keep all applications open",
+        "action": "close"
+      },
+      {
+        "label": "Close all windows",
+        "detail": "Applications may have unsaved work",
+        "action": "close-all-confirmed"
+      }
+    ]
+  },
+  "tmux-help": {
+    "title": "Tmux keys",
+    "items": [
+      {
+        "label": "Ctrl+B then C",
+        "detail": "New terminal window",
+        "action": "none"
+      },
+      {
+        "label": "Ctrl+B then N / P",
+        "detail": "Next / previous terminal window",
+        "action": "none"
+      },
+      {
+        "label": "Ctrl+B then % / \"",
+        "detail": "Split horizontally / vertically",
+        "action": "none"
+      },
+      {
+        "label": "Ctrl+B then arrows",
+        "detail": "Focus neighboring pane",
+        "action": "none"
+      },
+      {
+        "label": "Ctrl+B then D",
+        "detail": "Detach session",
+        "action": "none"
+      },
+      {
+        "label": "Ctrl+B then ?",
+        "detail": "Show all tmux bindings",
+        "action": "none"
+      }
+    ]
+  },
+  "herdr-help": {
+    "title": "Herdr",
+    "items": [
+      {
+        "label": "Open Herdr",
+        "detail": "Optional Omarchy app; install Herdr separately",
+        "action": "app",
+        "value": "herdr"
+      }
+    ]
+  },
+  "clipboard": {
+    "title": "Clipboard",
+    "items": []
+  },
+  "emojis": {
+    "title": "Emojis",
+    "items": []
+  },
+  "keybindings": {
+    "title": "Keybindings",
+    "items": []
+  },
+  "reminders": {
+    "title": "Reminders",
+    "items": []
+  },
+  "calculator": {
+    "title": "Calculator",
+    "input": "e.g. (24 * 60) / 7 or pi * 2"
+  },
+  "reminder": {
+    "title": "Set reminder",
+    "input": "Minutes and text \u00b7 e.g. 20 Stretch"
+  },
+  "transcode": {
+    "title": "Transcode to MP4",
+    "input": "Local video path \u00b7 source is preserved"
+  },
+  "weather": {
+    "title": "Weather",
+    "input": "City \u00b7 Enter opens wttr.in in Firefox"
+  },
+  "worldclock": {
+    "title": "World clock",
+    "items": []
+  }
+}

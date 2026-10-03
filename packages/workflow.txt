@@ -1,0 +1,12 @@
+python
+tmux
+neovim
+btop
+hyprpicker
+wf-recorder
+wlsunset
+tesseract
+tesseract-data-eng
+ffmpeg
+mpv
+cliphist

@@ -1,13 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
-folder="${XDG_PICTURES_DIR:-$HOME/Pictures}/Screenshots"
-mkdir -p "$folder"
-file=$(mktemp "$folder/$(date +%Y-%m-%d_%H-%M-%S)-XXXXXX.png")
-trap '[[ -s "$file" ]] || rm -f -- "$file"' EXIT
+root=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)
 case "${1:-region}" in
- region) geometry=$(slurp) || exit 0; grim -g "$geometry" "$file" ;;
- full) grim "$file" ;;
+ region) exec "$root/scripts/workflow" capture screenshot ;;
+ full) exec "$root/scripts/workflow" capture full ;;
  *) exit 2 ;;
 esac
-wl-copy --type image/png < "$file"
-notify-send 'Screenshot saved' "$file"

@@ -20,6 +20,17 @@ instead of maintaining two competing instruction sets.
   name; `umbra` is also the laptop hostname, and `shade` is the local user.
   Plan a compatible branding migration rather than blindly renaming paths,
   IPC targets, services, namespaces, commands, or the machine's identity.
+- Keyboard combinations now match all six Omarchy binding files at commit
+  `a85e29abb556816f4644cf975e98da694b486aa8`: 231 active registrations when
+  voxtype is absent. Read `docs/keybindings.md` and `docs/workflow.md` before
+  changing shortcuts. Super+A/C/V/X are universal editing, Super+L changes
+  workspace layout, and Super+Ctrl+L locks. Keep chords exact unless the user
+  requests a change. Titan owns the implementation and Quickshell UI.
+- `scripts/workflow` is the shared desktop-operation interface; implementations
+  live under `lib/titan/`. Workflow packages have their own manifest and installer.
+  User state lives outside Git. Clipboard labels contain private content; never
+  dump clipboard-list into logs. Optional Omarchy apps are not bundled. Do not
+  mistake an assigned shortcut for an installed app or complete feature parity.
 - The development laptop runs Arch, systemd-boot, Btrfs, NetworkManager,
   PipeWire/WirePlumber, Bluetooth, power-profiles-daemon and UFW. It has Intel
   graphics and a 1366×768 internal display. Inspect actual hardware before

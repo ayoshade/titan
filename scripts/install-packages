@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 root=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)
-mapfile -t packages < "$root/packages/desktop.txt"
+mapfile -t packages < <(cat "$root/packages/desktop.txt" "$root/packages/workflow.txt")
 # A full transaction avoids an unsupported Arch partial upgrade.
 sudo pacman -Syu --needed "${packages[@]}"
 pacman -Q "${packages[@]}" > "$root/docs/installed-versions.txt"

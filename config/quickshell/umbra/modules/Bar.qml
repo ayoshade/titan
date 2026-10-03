@@ -12,6 +12,7 @@ PanelWindow {
  id: bar
  required property var modelData
  screen: modelData
+ visible: UiState.barVisible
  anchors { top: true; left: true; right: true }
  readonly property int workspaceCount: Math.max(5,...Hyprland.workspaces.values.filter(w=>w.id>0 && w.id<=10).map(w=>w.id))
  readonly property bool expanded: UiState.context!=="" || (hover.hovered && !!Media.player)
@@ -90,13 +91,13 @@ PanelWindow {
  }
  IconButton {
   id: launcher; anchors { right: island.left; rightMargin: 8; top: parent.top; topMargin: 8 }
-  symbol: "apps"; label: "Applications · Super+Space"; size: 32
+  symbol: "apps"; label: "Applications · Super+Alt+Space"; size: 32
   background: Rectangle { radius: 16; color: launcher.hovered ? Theme.raised : Theme.shell; border.width: 1; border.color: Theme.raised }
   onClicked: UiState.toggle("launcher")
  }
  IconButton {
   id: notifications; anchors { left: island.right; leftMargin: 8; top: parent.top; topMargin: 8 }
-  symbol: "controls"; label: "Control center · Super+A"; size: 32
+  symbol: "controls"; label: "Control center · Super+Ctrl+A"; size: 32
   background: Rectangle { radius: 16; color: notifications.hovered ? Theme.raised : Theme.shell; border.width: 1; border.color: Theme.raised; Rectangle { visible: Notices.items.values.length>0; width: 4; height: 4; radius: 2; x: parent.width-8; y: 6; color: Theme.accent } }
   onClicked: UiState.toggle("controls")
  }

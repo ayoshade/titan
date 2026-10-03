@@ -1,0 +1,1157 @@
+[
+  {
+    "key": "SUPER + Return",
+    "description": "Open terminal",
+    "release": false
+  },
+  {
+    "key": "SUPER + SHIFT + Return",
+    "description": "Open browser",
+    "release": false
+  },
+  {
+    "key": "SUPER + SHIFT + F",
+    "description": "Open files",
+    "release": false
+  },
+  {
+    "key": "SUPER + ALT + SHIFT + F",
+    "description": "Open files-cwd",
+    "release": false
+  },
+  {
+    "key": "SUPER + SHIFT + B",
+    "description": "Open browser",
+    "release": false
+  },
+  {
+    "key": "SUPER + SHIFT + ALT + B",
+    "description": "Open browser-private",
+    "release": false
+  },
+  {
+    "key": "SUPER + SHIFT + N",
+    "description": "Open editor",
+    "release": false
+  },
+  {
+    "key": "SUPER + ALT + Return",
+    "description": "Open tmux",
+    "release": false
+  },
+  {
+    "key": "SUPER + CTRL + Return",
+    "description": "Open herdr",
+    "release": false
+  },
+  {
+    "key": "SUPER + SHIFT + M",
+    "description": "Open spotify",
+    "release": false
+  },
+  {
+    "key": "SUPER + SHIFT + ALT + M",
+    "description": "Open cliamp",
+    "release": false
+  },
+  {
+    "key": "SUPER + SHIFT + D",
+    "description": "Open docker",
+    "release": false
+  },
+  {
+    "key": "SUPER + SHIFT + G",
+    "description": "Open signal",
+    "release": false
+  },
+  {
+    "key": "SUPER + SHIFT + O",
+    "description": "Open obsidian",
+    "release": false
+  },
+  {
+    "key": "SUPER + SHIFT + W",
+    "description": "Open omawrite",
+    "release": false
+  },
+  {
+    "key": "SUPER + SHIFT + slash",
+    "description": "Open passwords",
+    "release": false
+  },
+  {
+    "key": "SUPER + SHIFT + A",
+    "description": "Open chatgpt",
+    "release": false
+  },
+  {
+    "key": "SUPER + SHIFT + ALT + A",
+    "description": "Open grok",
+    "release": false
+  },
+  {
+    "key": "SUPER + SHIFT + C",
+    "description": "Open calendar",
+    "release": false
+  },
+  {
+    "key": "SUPER + SHIFT + E",
+    "description": "Open email",
+    "release": false
+  },
+  {
+    "key": "SUPER + SHIFT + ALT + E",
+    "description": "Open email-new",
+    "release": false
+  },
+  {
+    "key": "SUPER + SHIFT + Y",
+    "description": "Open youtube",
+    "release": false
+  },
+  {
+    "key": "SUPER + SHIFT + ALT + G",
+    "description": "Open whatsapp",
+    "release": false
+  },
+  {
+    "key": "SUPER + SHIFT + CTRL + G",
+    "description": "Open messages",
+    "release": false
+  },
+  {
+    "key": "SUPER + SHIFT + P",
+    "description": "Open photos",
+    "release": false
+  },
+  {
+    "key": "SUPER + SHIFT + S",
+    "description": "Open maps",
+    "release": false
+  },
+  {
+    "key": "SUPER + SHIFT + X",
+    "description": "Open x",
+    "release": false
+  },
+  {
+    "key": "SUPER + SHIFT + ALT + X",
+    "description": "Open x-post",
+    "release": false
+  },
+  {
+    "key": "SUPER + W",
+    "description": "Close window",
+    "release": false
+  },
+  {
+    "key": "SUPER + Q",
+    "description": "Close window",
+    "release": false
+  },
+  {
+    "key": "CTRL + ALT + Delete",
+    "description": "Close all windows",
+    "release": false
+  },
+  {
+    "key": "SUPER + J",
+    "description": "Toggle window split",
+    "release": false
+  },
+  {
+    "key": "SUPER + P",
+    "description": "Pseudo window",
+    "release": false
+  },
+  {
+    "key": "SUPER + T",
+    "description": "Toggle window floating/tiling",
+    "release": false
+  },
+  {
+    "key": "SUPER + F",
+    "description": "Full screen",
+    "release": false
+  },
+  {
+    "key": "SUPER + CTRL + F",
+    "description": "Tiled full screen",
+    "release": false
+  },
+  {
+    "key": "SUPER + ALT + F",
+    "description": "Full width",
+    "release": false
+  },
+  {
+    "key": "SUPER + O",
+    "description": "Pop window out (float & pin)",
+    "release": false
+  },
+  {
+    "key": "SUPER + ALT + Home",
+    "description": "Save window width",
+    "release": false
+  },
+  {
+    "key": "SUPER + Home",
+    "description": "Restore window width",
+    "release": false
+  },
+  {
+    "key": "SUPER + L",
+    "description": "Toggle workspace layout",
+    "release": false
+  },
+  {
+    "key": "SUPER + left",
+    "description": "Focus window left",
+    "release": false
+  },
+  {
+    "key": "SUPER + SHIFT + left",
+    "description": "Swap window left",
+    "release": false
+  },
+  {
+    "key": "SUPER + SHIFT + ALT + left",
+    "description": "Move workspace to monitor left",
+    "release": false
+  },
+  {
+    "key": "SUPER + ALT + left",
+    "description": "Move window into group left",
+    "release": false
+  },
+  {
+    "key": "SUPER + right",
+    "description": "Focus window right",
+    "release": false
+  },
+  {
+    "key": "SUPER + SHIFT + right",
+    "description": "Swap window right",
+    "release": false
+  },
+  {
+    "key": "SUPER + SHIFT + ALT + right",
+    "description": "Move workspace to monitor right",
+    "release": false
+  },
+  {
+    "key": "SUPER + ALT + right",
+    "description": "Move window into group right",
+    "release": false
+  },
+  {
+    "key": "SUPER + up",
+    "description": "Focus window up",
+    "release": false
+  },
+  {
+    "key": "SUPER + SHIFT + up",
+    "description": "Swap window up",
+    "release": false
+  },
+  {
+    "key": "SUPER + SHIFT + ALT + up",
+    "description": "Move workspace to monitor up",
+    "release": false
+  },
+  {
+    "key": "SUPER + ALT + up",
+    "description": "Move window into group up",
+    "release": false
+  },
+  {
+    "key": "SUPER + down",
+    "description": "Focus window down",
+    "release": false
+  },
+  {
+    "key": "SUPER + SHIFT + down",
+    "description": "Swap window down",
+    "release": false
+  },
+  {
+    "key": "SUPER + SHIFT + ALT + down",
+    "description": "Move workspace to monitor down",
+    "release": false
+  },
+  {
+    "key": "SUPER + ALT + down",
+    "description": "Move window into group down",
+    "release": false
+  },
+  {
+    "key": "SUPER + code:10",
+    "description": "Switch to workspace 1",
+    "release": false
+  },
+  {
+    "key": "SUPER + SHIFT + code:10",
+    "description": "Move window to workspace 1",
+    "release": false
+  },
+  {
+    "key": "SUPER + SHIFT + ALT + code:10",
+    "description": "Move window silently to workspace 1",
+    "release": false
+  },
+  {
+    "key": "SUPER + code:11",
+    "description": "Switch to workspace 2",
+    "release": false
+  },
+  {
+    "key": "SUPER + SHIFT + code:11",
+    "description": "Move window to workspace 2",
+    "release": false
+  },
+  {
+    "key": "SUPER + SHIFT + ALT + code:11",
+    "description": "Move window silently to workspace 2",
+    "release": false
+  },
+  {
+    "key": "SUPER + code:12",
+    "description": "Switch to workspace 3",
+    "release": false
+  },
+  {
+    "key": "SUPER + SHIFT + code:12",
+    "description": "Move window to workspace 3",
+    "release": false
+  },
+  {
+    "key": "SUPER + SHIFT + ALT + code:12",
+    "description": "Move window silently to workspace 3",
+    "release": false
+  },
+  {
+    "key": "SUPER + code:13",
+    "description": "Switch to workspace 4",
+    "release": false
+  },
+  {
+    "key": "SUPER + SHIFT + code:13",
+    "description": "Move window to workspace 4",
+    "release": false
+  },
+  {
+    "key": "SUPER + SHIFT + ALT + code:13",
+    "description": "Move window silently to workspace 4",
+    "release": false
+  },
+  {
+    "key": "SUPER + code:14",
+    "description": "Switch to workspace 5",
+    "release": false
+  },
+  {
+    "key": "SUPER + SHIFT + code:14",
+    "description": "Move window to workspace 5",
+    "release": false
+  },
+  {
+    "key": "SUPER + SHIFT + ALT + code:14",
+    "description": "Move window silently to workspace 5",
+    "release": false
+  },
+  {
+    "key": "SUPER + code:15",
+    "description": "Switch to workspace 6",
+    "release": false
+  },
+  {
+    "key": "SUPER + SHIFT + code:15",
+    "description": "Move window to workspace 6",
+    "release": false
+  },
+  {
+    "key": "SUPER + SHIFT + ALT + code:15",
+    "description": "Move window silently to workspace 6",
+    "release": false
+  },
+  {
+    "key": "SUPER + code:16",
+    "description": "Switch to workspace 7",
+    "release": false
+  },
+  {
+    "key": "SUPER + SHIFT + code:16",
+    "description": "Move window to workspace 7",
+    "release": false
+  },
+  {
+    "key": "SUPER + SHIFT + ALT + code:16",
+    "description": "Move window silently to workspace 7",
+    "release": false
+  },
+  {
+    "key": "SUPER + code:17",
+    "description": "Switch to workspace 8",
+    "release": false
+  },
+  {
+    "key": "SUPER + SHIFT + code:17",
+    "description": "Move window to workspace 8",
+    "release": false
+  },
+  {
+    "key": "SUPER + SHIFT + ALT + code:17",
+    "description": "Move window silently to workspace 8",
+    "release": false
+  },
+  {
+    "key": "SUPER + code:18",
+    "description": "Switch to workspace 9",
+    "release": false
+  },
+  {
+    "key": "SUPER + SHIFT + code:18",
+    "description": "Move window to workspace 9",
+    "release": false
+  },
+  {
+    "key": "SUPER + SHIFT + ALT + code:18",
+    "description": "Move window silently to workspace 9",
+    "release": false
+  },
+  {
+    "key": "SUPER + code:19",
+    "description": "Switch to workspace 10",
+    "release": false
+  },
+  {
+    "key": "SUPER + SHIFT + code:19",
+    "description": "Move window to workspace 10",
+    "release": false
+  },
+  {
+    "key": "SUPER + SHIFT + ALT + code:19",
+    "description": "Move window silently to workspace 10",
+    "release": false
+  },
+  {
+    "key": "SUPER + S",
+    "description": "Toggle scratchpad",
+    "release": false
+  },
+  {
+    "key": "SUPER + grave",
+    "description": "Toggle scratchpad",
+    "release": false
+  },
+  {
+    "key": "SUPER + ALT + S",
+    "description": "Move window to scratchpad",
+    "release": false
+  },
+  {
+    "key": "SUPER + SHIFT + grave",
+    "description": "Move window to scratchpad",
+    "release": false
+  },
+  {
+    "key": "SUPER + Tab",
+    "description": "Next workspace",
+    "release": false
+  },
+  {
+    "key": "SUPER + SHIFT + Tab",
+    "description": "Previous workspace",
+    "release": false
+  },
+  {
+    "key": "SUPER + CTRL + Tab",
+    "description": "Former workspace",
+    "release": false
+  },
+  {
+    "key": "ALT + Tab",
+    "description": "Focus next window",
+    "release": false
+  },
+  {
+    "key": "ALT + Tab",
+    "description": "Reveal active window on top",
+    "release": false
+  },
+  {
+    "key": "ALT + SHIFT + Tab",
+    "description": "Focus previous window",
+    "release": false
+  },
+  {
+    "key": "ALT + SHIFT + Tab",
+    "description": "Reveal active window on top",
+    "release": false
+  },
+  {
+    "key": "CTRL + ALT + Tab",
+    "description": "Focus next monitor",
+    "release": false
+  },
+  {
+    "key": "CTRL + ALT + SHIFT + Tab",
+    "description": "Focus previous monitor",
+    "release": false
+  },
+  {
+    "key": "SUPER + code:20",
+    "description": "Resize horizontally -100px",
+    "release": false
+  },
+  {
+    "key": "SUPER + code:21",
+    "description": "Resize horizontally 100px",
+    "release": false
+  },
+  {
+    "key": "SUPER + SHIFT + code:20",
+    "description": "Resize vertically -100px",
+    "release": false
+  },
+  {
+    "key": "SUPER + SHIFT + code:21",
+    "description": "Resize vertically 100px",
+    "release": false
+  },
+  {
+    "key": "SUPER + ALT + code:20",
+    "description": "Resize horizontally -25px",
+    "release": false
+  },
+  {
+    "key": "SUPER + ALT + code:21",
+    "description": "Resize horizontally 25px",
+    "release": false
+  },
+  {
+    "key": "SUPER + ALT + SHIFT + code:20",
+    "description": "Resize vertically -25px",
+    "release": false
+  },
+  {
+    "key": "SUPER + ALT + SHIFT + code:21",
+    "description": "Resize vertically 25px",
+    "release": false
+  },
+  {
+    "key": "SUPER + CTRL + code:20",
+    "description": "Resize horizontally -300px",
+    "release": false
+  },
+  {
+    "key": "SUPER + CTRL + code:21",
+    "description": "Resize horizontally 300px",
+    "release": false
+  },
+  {
+    "key": "SUPER + CTRL + SHIFT + code:20",
+    "description": "Resize vertically -300px",
+    "release": false
+  },
+  {
+    "key": "SUPER + CTRL + SHIFT + code:21",
+    "description": "Resize vertically 300px",
+    "release": false
+  },
+  {
+    "key": "SUPER + mouse_down",
+    "description": "Scroll workspace forward",
+    "release": false
+  },
+  {
+    "key": "SUPER + mouse_up",
+    "description": "Scroll workspace backward",
+    "release": false
+  },
+  {
+    "key": "SUPER + mouse:272",
+    "description": "Move window",
+    "release": false
+  },
+  {
+    "key": "SUPER + mouse:273",
+    "description": "Resize window",
+    "release": false
+  },
+  {
+    "key": "SUPER + G",
+    "description": "Toggle window grouping",
+    "release": false
+  },
+  {
+    "key": "SUPER + ALT + G",
+    "description": "Move window out of group",
+    "release": false
+  },
+  {
+    "key": "SUPER + ALT + Tab",
+    "description": "Next window in group",
+    "release": false
+  },
+  {
+    "key": "SUPER + CTRL + Right",
+    "description": "Next window in group",
+    "release": false
+  },
+  {
+    "key": "SUPER + ALT + mouse_down",
+    "description": "Next window in group",
+    "release": false
+  },
+  {
+    "key": "SUPER + ALT + SHIFT + Tab",
+    "description": "Previous window in group",
+    "release": false
+  },
+  {
+    "key": "SUPER + CTRL + Left",
+    "description": "Previous window in group",
+    "release": false
+  },
+  {
+    "key": "SUPER + ALT + mouse_up",
+    "description": "Previous window in group",
+    "release": false
+  },
+  {
+    "key": "SUPER + ALT + code:10",
+    "description": "Switch to group window 1",
+    "release": false
+  },
+  {
+    "key": "SUPER + ALT + code:11",
+    "description": "Switch to group window 2",
+    "release": false
+  },
+  {
+    "key": "SUPER + ALT + code:12",
+    "description": "Switch to group window 3",
+    "release": false
+  },
+  {
+    "key": "SUPER + ALT + code:13",
+    "description": "Switch to group window 4",
+    "release": false
+  },
+  {
+    "key": "SUPER + ALT + code:14",
+    "description": "Switch to group window 5",
+    "release": false
+  },
+  {
+    "key": "SUPER + slash",
+    "description": "Monitor scaling up",
+    "release": false
+  },
+  {
+    "key": "SUPER + ALT + slash",
+    "description": "Monitor scaling down",
+    "release": false
+  },
+  {
+    "key": "SUPER + Space",
+    "description": "Titan menu",
+    "release": false
+  },
+  {
+    "key": "SUPER + ALT + Space",
+    "description": "Apps menu",
+    "release": false
+  },
+  {
+    "key": "SUPER + CTRL + E",
+    "description": "Emojis",
+    "release": false
+  },
+  {
+    "key": "SUPER + CTRL + C",
+    "description": "Capture menu",
+    "release": false
+  },
+  {
+    "key": "SUPER + CTRL + O",
+    "description": "Toggle menu",
+    "release": false
+  },
+  {
+    "key": "SUPER + CTRL + H",
+    "description": "Hardware menu",
+    "release": false
+  },
+  {
+    "key": "SUPER + SHIFT + code:201",
+    "description": "Titan menu",
+    "release": false
+  },
+  {
+    "key": "SUPER + Escape",
+    "description": "System menu",
+    "release": false
+  },
+  {
+    "key": "SUPER + K",
+    "description": "Keybindings",
+    "release": false
+  },
+  {
+    "key": "SUPER + ALT + K",
+    "description": "Tmux keybindings",
+    "release": false
+  },
+  {
+    "key": "SUPER + CTRL + K",
+    "description": "Herdr keybindings",
+    "release": false
+  },
+  {
+    "key": "SUPER + CTRL + Q",
+    "description": "Calculator",
+    "release": false
+  },
+  {
+    "key": "XF86Calculator",
+    "description": "Calculator",
+    "release": false
+  },
+  {
+    "key": "SUPER + CTRL + Space",
+    "description": "Background switcher",
+    "release": false
+  },
+  {
+    "key": "SUPER + CTRL + S",
+    "description": "Share",
+    "release": false
+  },
+  {
+    "key": "SUPER + CTRL + period",
+    "description": "Transcode",
+    "release": false
+  },
+  {
+    "key": "SUPER + CTRL + R",
+    "description": "Set reminder",
+    "release": false
+  },
+  {
+    "key": "SUPER + CTRL + ALT + R",
+    "description": "Show reminders",
+    "release": false
+  },
+  {
+    "key": "SUPER + CTRL + ALT + E",
+    "description": "World clock",
+    "release": false
+  },
+  {
+    "key": "SUPER + SHIFT + CTRL + A",
+    "description": "Agent",
+    "release": false
+  },
+  {
+    "key": "XF86PowerOff",
+    "description": "Power menu",
+    "release": false
+  },
+  {
+    "key": "SUPER + SHIFT + Space",
+    "description": "Toggle top bar",
+    "release": false
+  },
+  {
+    "key": "SUPER + SHIFT + CTRL + Space",
+    "description": "Theme menu",
+    "release": false
+  },
+  {
+    "key": "SUPER + BackSpace",
+    "description": "Toggle window transparency",
+    "release": false
+  },
+  {
+    "key": "SUPER + SHIFT + BackSpace",
+    "description": "Toggle window gaps",
+    "release": false
+  },
+  {
+    "key": "SUPER + CTRL + BackSpace",
+    "description": "Toggle single-window square aspect",
+    "release": false
+  },
+  {
+    "key": "SUPER + CTRL + ALT + F",
+    "description": "Toggle full screen desktop",
+    "release": false
+  },
+  {
+    "key": "SUPER + comma",
+    "description": "Dismiss last notification",
+    "release": false
+  },
+  {
+    "key": "SUPER + SHIFT + comma",
+    "description": "Dismiss all notifications",
+    "release": false
+  },
+  {
+    "key": "SUPER + CTRL + comma",
+    "description": "Toggle silencing notifications",
+    "release": false
+  },
+  {
+    "key": "SUPER + ALT + comma",
+    "description": "Invoke last notification",
+    "release": false
+  },
+  {
+    "key": "SUPER + SHIFT + ALT + comma",
+    "description": "Open notification history",
+    "release": false
+  },
+  {
+    "key": "SUPER + CTRL + I",
+    "description": "Toggle locking on idle (always-awake policy)",
+    "release": false
+  },
+  {
+    "key": "SUPER + CTRL + N",
+    "description": "Toggle nightlight",
+    "release": false
+  },
+  {
+    "key": "SUPER + CTRL + Delete",
+    "description": "Toggle laptop display (always-awake policy)",
+    "release": false
+  },
+  {
+    "key": "SUPER + CTRL + ALT + Delete",
+    "description": "Toggle laptop display mirroring",
+    "release": false
+  },
+  {
+    "key": "switch:on:Lid Switch",
+    "description": "Lid closed: keep desktop awake",
+    "release": false
+  },
+  {
+    "key": "switch:off:Lid Switch",
+    "description": "Lid opened: keep desktop awake",
+    "release": false
+  },
+  {
+    "key": "Print",
+    "description": "Screenshot",
+    "release": false
+  },
+  {
+    "key": "ALT + Print",
+    "description": "Screenrecording",
+    "release": false
+  },
+  {
+    "key": "SUPER + ALT + code:34",
+    "description": "Make webcam overlay smaller",
+    "release": false
+  },
+  {
+    "key": "SUPER + ALT + code:35",
+    "description": "Make webcam overlay larger",
+    "release": false
+  },
+  {
+    "key": "SUPER + Print",
+    "description": "Color picker",
+    "release": false
+  },
+  {
+    "key": "SUPER + CTRL + Print",
+    "description": "Extract text (OCR) from screenshot",
+    "release": false
+  },
+  {
+    "key": "SUPER + SHIFT + CTRL + R",
+    "description": "Clear reminders",
+    "release": false
+  },
+  {
+    "key": "SUPER + CTRL + ALT + T",
+    "description": "Show time",
+    "release": false
+  },
+  {
+    "key": "SUPER + CTRL + ALT + B",
+    "description": "Show battery remaining",
+    "release": false
+  },
+  {
+    "key": "SUPER + CTRL + ALT + W",
+    "description": "Toggle weather",
+    "release": false
+  },
+  {
+    "key": "SUPER + CTRL + A",
+    "description": "Audio",
+    "release": false
+  },
+  {
+    "key": "SUPER + CTRL + B",
+    "description": "Bluetooth",
+    "release": false
+  },
+  {
+    "key": "SUPER + CTRL + D",
+    "description": "Display",
+    "release": false
+  },
+  {
+    "key": "SUPER + CTRL + ALT + D",
+    "description": "Calendar",
+    "release": false
+  },
+  {
+    "key": "SUPER + CTRL + W",
+    "description": "Network",
+    "release": false
+  },
+  {
+    "key": "SUPER + CTRL + P",
+    "description": "Power",
+    "release": false
+  },
+  {
+    "key": "SUPER + CTRL + T",
+    "description": "Activity",
+    "release": false
+  },
+  {
+    "key": "SUPER + CTRL + code:10",
+    "description": "Bar panel 1",
+    "release": false
+  },
+  {
+    "key": "SUPER + CTRL + code:11",
+    "description": "Bar panel 2",
+    "release": false
+  },
+  {
+    "key": "SUPER + CTRL + code:12",
+    "description": "Bar panel 3",
+    "release": false
+  },
+  {
+    "key": "SUPER + CTRL + code:13",
+    "description": "Bar panel 4",
+    "release": false
+  },
+  {
+    "key": "SUPER + CTRL + code:14",
+    "description": "Bar panel 5",
+    "release": false
+  },
+  {
+    "key": "SUPER + CTRL + code:15",
+    "description": "Bar panel 6",
+    "release": false
+  },
+  {
+    "key": "SUPER + CTRL + code:16",
+    "description": "Bar panel 7",
+    "release": false
+  },
+  {
+    "key": "SUPER + CTRL + code:17",
+    "description": "Bar panel 8",
+    "release": false
+  },
+  {
+    "key": "SUPER + CTRL + code:18",
+    "description": "Bar panel 9",
+    "release": false
+  },
+  {
+    "key": "SUPER + CTRL + Z",
+    "description": "Zoom in",
+    "release": false
+  },
+  {
+    "key": "SUPER + CTRL + ALT + Z",
+    "description": "Reset zoom",
+    "release": false
+  },
+  {
+    "key": "SUPER + CTRL + L",
+    "description": "Lock system",
+    "release": false
+  },
+  {
+    "key": "SUPER + A",
+    "description": "Select all",
+    "release": false
+  },
+  {
+    "key": "SUPER + C",
+    "description": "Universal copy",
+    "release": false
+  },
+  {
+    "key": "SUPER + V",
+    "description": "Universal paste",
+    "release": false
+  },
+  {
+    "key": "SUPER + X",
+    "description": "Universal cut",
+    "release": false
+  },
+  {
+    "key": "SUPER + CTRL + V",
+    "description": "Clipboard manager",
+    "release": false
+  },
+  {
+    "key": "XF86AudioRaiseVolume",
+    "description": "Volume up",
+    "release": false
+  },
+  {
+    "key": "XF86AudioLowerVolume",
+    "description": "Volume down",
+    "release": false
+  },
+  {
+    "key": "ALT + XF86AudioRaiseVolume",
+    "description": "Volume up precise",
+    "release": false
+  },
+  {
+    "key": "ALT + XF86AudioLowerVolume",
+    "description": "Volume down precise",
+    "release": false
+  },
+  {
+    "key": "XF86MonBrightnessUp",
+    "description": "Brightness up",
+    "release": false
+  },
+  {
+    "key": "XF86MonBrightnessDown",
+    "description": "Brightness down",
+    "release": false
+  },
+  {
+    "key": "SHIFT + XF86MonBrightnessUp",
+    "description": "Brightness maximum",
+    "release": false
+  },
+  {
+    "key": "SHIFT + XF86MonBrightnessDown",
+    "description": "Brightness minimum",
+    "release": false
+  },
+  {
+    "key": "ALT + XF86MonBrightnessUp",
+    "description": "Brightness up precise",
+    "release": false
+  },
+  {
+    "key": "ALT + XF86MonBrightnessDown",
+    "description": "Brightness down precise",
+    "release": false
+  },
+  {
+    "key": "XF86KbdBrightnessUp",
+    "description": "Keyboard brightness up",
+    "release": false
+  },
+  {
+    "key": "XF86KbdBrightnessDown",
+    "description": "Keyboard brightness down",
+    "release": false
+  },
+  {
+    "key": "XF86AudioMute",
+    "description": "Mute",
+    "release": false
+  },
+  {
+    "key": "XF86AudioMicMute",
+    "description": "Mute microphone",
+    "release": false
+  },
+  {
+    "key": "XF86KbdLightOnOff",
+    "description": "Keyboard backlight cycle",
+    "release": false
+  },
+  {
+    "key": "XF86TouchpadToggle",
+    "description": "Toggle touchpad",
+    "release": false
+  },
+  {
+    "key": "XF86TouchpadOn",
+    "description": "Enable touchpad",
+    "release": false
+  },
+  {
+    "key": "XF86TouchpadOff",
+    "description": "Disable touchpad",
+    "release": false
+  },
+  {
+    "key": "XF86AudioNext",
+    "description": "Next track",
+    "release": false
+  },
+  {
+    "key": "ALT + XF86AudioPlay",
+    "description": "Next track",
+    "release": false
+  },
+  {
+    "key": "XF86AudioPause",
+    "description": "Pause",
+    "release": false
+  },
+  {
+    "key": "XF86AudioPlay",
+    "description": "Play",
+    "release": false
+  },
+  {
+    "key": "XF86AudioPrev",
+    "description": "Previous track",
+    "release": false
+  },
+  {
+    "key": "ALT + SHIFT + XF86AudioPlay",
+    "description": "Previous track",
+    "release": false
+  },
+  {
+    "key": "XF86Eject",
+    "description": "Eject media",
+    "release": false
+  },
+  {
+    "key": "SHIFT + XF86AudioMute",
+    "description": "Switch audio output",
+    "release": false
+  },
+  {
+    "key": "SHIFT + XF86AudioPause",
+    "description": "Switch media source",
+    "release": false
+  },
+  {
+    "key": "SHIFT + XF86AudioPlay",
+    "description": "Switch media source",
+    "release": false
+  }
+]
