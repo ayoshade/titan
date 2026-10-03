@@ -44,21 +44,28 @@ the next boot and preserves the currently running desktop.
 | Super+Return | Kitty terminal |
 | Super+Space | Quickshell application launcher |
 | Super+A | Control center |
-| Super+T | Theme switcher |
+| Super+Ctrl+Shift+Space | Theme switcher |
 | Super+N | Notification center |
 | Super+Shift+E | Session menu |
 | Super+E / Super+B | Thunar / Firefox |
 | Super+L | Hyprlock |
-| Super+Q | Close focused window |
-| Super+F / Super+V | Fullscreen / floating |
+| Super+W / Super+Q | Close focused window |
+| Alt+Tab / Alt+Shift+Tab | Next / previous window |
+| Super+Tab / Super+Shift+Tab | Next / previous occupied workspace |
+| Super+Ctrl+Tab | Previous workspace |
+| Super+S / Super+Alt+S | Toggle scratchpad / send window there |
+| Super+G / Super+Alt+Tab | Toggle grouping / cycle grouped windows |
+| Super+F / Super+T (or Super+V) | Fullscreen / floating |
 | Super+1…0 | Workspace 1…10 |
 | Super+Shift+1…0 | Move window to workspace |
 | Super+arrows | Focus a neighboring window |
-| Super+Shift+arrows | Move a window |
+| Super+Shift+arrows | Swap a window with its neighbor |
 | Super+left/right mouse drag | Move / resize window |
 | Print / Super+Print | Region / full screenshot |
 | Media and brightness keys | Audio / backlight / media |
 | Three-finger horizontal swipe | Change workspace |
+
+Full shortcut reference and Omarchy mappings: [docs/keybindings.md](docs/keybindings.md).
 
 Launcher: type to filter, arrows to select, Enter to launch. Escape or clicking
 outside closes a panel. The left circle opens applications; the right circle opens controls. Click the
@@ -128,7 +135,7 @@ restart the shell:
 ```
 
 Tune colors, spacing, radii, font defaults and durations in `theme/Theme.qml`.
-Super+T opens a searchable horizontal theme carousel inspired by the referenced
+Super+Ctrl+Shift+Space opens a searchable horizontal theme carousel inspired by the referenced
 saneAspect video. Left/Right selects a card; Enter applies it, Escape closes it.
 Click selects; double-click applies. Nine dark palettes update the shell, Kitty
 and compositor borders together. Theme changes persist across login. GTK apps

@@ -121,3 +121,18 @@ kernel parameters or bootloader edits were applied.
   swap GTK themes, browser styling or wallpapers.
 - Shell restart now waits for the old instance to release its single-instance
   lock, preventing the replacement from exiting during a restart race.
+
+## Omarchy-inspired shortcuts
+
+- Inspected current Omarchy application, tiling and utility bindings from its
+  public quattro branch; sources and Titan mappings are in docs/keybindings.md.
+- Added focused-window close, window/workspace cycling, scratchpad, grouping,
+  swaps, resizing and installed-application aliases using native Hyprland Lua.
+- Moved theme selection to Super+Ctrl+Shift+Space; Super+T now toggles floating.
+- Static compositor validation, live reload/configerrors and doctor passed.
+- Live binding inventory resolves all keys. Only intentional Alt+Tab focus/raise
+  pairs share a chord. Physical code bindings were replaced with US-keyboard
+  keysyms because the installed build exposed unresolved keycodes in its inventory.
+- No user windows were closed, moved, grouped or resized during verification.
+  Actual keypress behavior is a hands-on check; loaded bindings alone do not
+  prove every compositor action under all window/layout states.
