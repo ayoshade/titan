@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# vm-test [--full] [--keep]: install the built Titan packages on a throwaway Arch
+# vm-test [--full] [--keep] [--memory MB]: install the built Titan packages on a throwaway Arch
 # VM and check them. Never touches this machine's system.
 #   - boots Arch's official cloud image (cached in ~/.cache/titan/vm) under
 #     QEMU/KVM, headless, on a disposable overlay disk
@@ -10,13 +10,21 @@
 # Requires: qemu-base (sudo pacman -S qemu-base) and /dev/kvm.
 set -euo pipefail
 root=$(cd -- "$(dirname -- "$(readlink -f "${BASH_SOURCE[0]}")")/.." && pwd)
-full=0 keep=0
-for a in "$@"; do case $a in --full) full=1 ;; --keep) keep=1 ;; *) sed -n 2,12p "$0"; exit 2 ;; esac; done
+full=0 keep=0 memory=2048
+while (($#)); do case $1 in --full) full=1; shift ;; --keep) keep=1; shift ;; --memory) memory=$2; shift 2 ;; *) sed -n 2,12p "$0"; exit 2 ;; esac; done
 command -v qemu-system-x86_64 >/dev/null || { echo "vm-test: install QEMU first: sudo pacman -S qemu-base" >&2; exit 1; }
 [[ -w /dev/kvm ]] || { echo "vm-test: /dev/kvm is not available" >&2; exit 1; }
 cache=${XDG_CACHE_HOME:-$HOME/.cache}/titan/vm
-run=$(mktemp -d "${TMPDIR:-/tmp}/titan-vm.XXXXXX")
-mkdir -p "$cache"
+mkdir -p "$cache/runs"
+# The overlay disk grows by gigabytes: keep it on disk, never in a RAM-backed /tmp.
+run=$(mktemp -d "$cache/runs/run.XXXXXX")
+# The host must keep enough memory for itself, or its OOM killer ends the VM.
+available=$(awk '/MemAvailable/{print int($2/1024)}' /proc/meminfo)
+if (( available < memory + 1024 )); then
+ echo "vm-test: only ${available} MB available; need ${memory} MB for the VM plus 1 GB for this machine." >&2
+ echo "         Close some applications or use --memory with a smaller value (at least 1536)." >&2
+ rm -rf "$run"; exit 1
+fi
 image=$cache/Arch-Linux-x86_64-cloudimg.qcow2
 base=https://geo.mirror.pkgbuild.com/images/latest
 if [[ ! -e $image ]]; then
@@ -50,7 +58,7 @@ cleanup() {
  ((keep)) || rm -rf "$run"
 }
 trap cleanup EXIT
-qemu-system-x86_64 -enable-kvm -cpu host -m 4096 -smp 4 -display none -daemonize -pidfile "$run/qemu.pid" \
+qemu-system-x86_64 -enable-kvm -cpu host -m "$memory" -smp 4 -display none -daemonize -pidfile "$run/qemu.pid" \
  -drive file="$run/disk.qcow2",if=virtio \
  -nic user,model=virtio-net-pci,hostfwd=tcp:127.0.0.1:$sshport-:22 \
  -smbios type=1,serial="ds=nocloud;s=http://10.0.2.2:$port/" \
@@ -60,16 +68,33 @@ echo "Booting the VM…"
 for i in $(seq 1 90); do ssh_vm true 2>/dev/null && break; sleep 3; done
 ssh_vm true || { echo "vm-test: the VM did not come up; console log: $run/console.log" >&2; keep=1; exit 1; }
 scp -q -i "$run/key" -P "$sshport" -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "$run"/repo/*.pkg.tar.zst tester@127.0.0.1:
-pkgs="titan-*-any.pkg.tar.zst"; ((full)) && pkgs="titan-[0-9]*-any.pkg.tar.zst titan-desktop-*-any.pkg.tar.zst"
-echo "Installing and checking inside the VM…"
-ssh_vm bash -s <<EOF
+pkgs="titan-[0-9]*-any.pkg.tar.zst"; ((full)) && pkgs="titan-[0-9]*-any.pkg.tar.zst titan-desktop-*-any.pkg.tar.zst"
+# The install runs as a detached unit inside the VM: package hooks may restart
+# services and drop SSH, so it must not depend on one connection staying open.
+echo "Installing inside the VM (detached job; full update first)…"
+ssh_vm "sudo systemd-run --unit=titan-vmtest-install --property=Type=oneshot --no-block \
+ /bin/bash -c 'set -e; pacman-key --init; pacman-key --populate archlinux; pacman -Syu --noconfirm; cd /home/tester; pacman -U --noconfirm $pkgs; touch /var/tmp/titan-install.ok'"
+state=activating
+vm_alive() { kill -0 "$(cat "$run/qemu.pid")" 2>/dev/null; }
+for i in $(seq 1 360); do
+ vm_alive || { echo "vm-test: the VM stopped during the install. Check the host log for an OOM kill: journalctl -k | grep -i oom" >&2; keep=1; exit 1; }
+ state=$(ssh_vm systemctl is-active titan-vmtest-install 2>/dev/null || true)
+ [[ $state == activating || -z $state ]] || break
+ sleep 5
+done
+if ! ssh_vm test -e /var/tmp/titan-install.ok; then
+ echo "vm-test: the install job did not succeed (state: ${state:-unknown}). Its log:" >&2
+ ssh_vm sudo journalctl -u titan-vmtest-install --no-pager | tail -40 >&2 || true
+ keep=1; exit 1
+fi
+echo "Checking inside the VM…"
+status=0
+ssh_vm bash -s <<EOF || status=$?
 set -euo pipefail
 pass() { printf 'PASS  %s\n' "\$1"; }
 fail() { printf 'FAIL  %s\n' "\$1"; failed=1; }
 failed=0
-sudo pacman-key --init >/dev/null 2>&1; sudo pacman-key --populate archlinux >/dev/null 2>&1
-sudo pacman -Syu --noconfirm >/dev/null
-sudo pacman -U --noconfirm $pkgs >/dev/null && pass "pacman installs $pkgs" || fail "pacman install"
+pass "pacman installed $pkgs after a full update"
 command -v titan >/dev/null && pass "titan on PATH" || fail "titan on PATH"
 titan version
 titan setup >/dev/null && pass "titan setup (first run)" || fail "titan setup"
@@ -86,6 +111,5 @@ titan settings set islandWidth 260 && [[ \$(titan settings get islandWidth) == 2
 titan theme nord >/dev/null && [[ \$(titan theme current) == nord ]] && pass "theme switch" || fail "theme switch"
 exit \$failed
 EOF
-status=$?
 ((status == 0)) && echo "All VM checks passed." || echo "Some VM checks failed."
 exit $status

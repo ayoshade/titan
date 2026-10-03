@@ -95,7 +95,7 @@ changes); they suggest it to the user.
 | Version, migrations, `titan` command | Done (0.2.0) |
 | `titan update` | Done; first real run by the user on 2026-10-03 (hyprland and libutf8proc upgraded, no kernel change) |
 | Snapshots before updates (Snapper on Btrfs) | Enabled on this machine 2026-10-03 (`scripts/install-snapshots`; see docs/snapshots.md) |
-| Packaging Titan (`titan` package, defaults in `/usr/share/titan`, own repo) | Built and tested in a throwaway root; VM run pending QEMU (below) |
+| Packaging Titan (`titan` package, defaults in `/usr/share/titan`, own repo) | Done: `scripts/vm-test --full` passed 14/14 on a clean Arch VM. Hosting, signing and license are open owner decisions |
 | First-run setup | `titan setup` plus the shell's Welcome screen; tested in a throwaway home |
 
 ### Packaging (0.2.0)
@@ -109,7 +109,7 @@ changes); they suggest it to the user.
 | `titan setup` | Per user, idempotent, never overwrites. Creates the user layer; copies `mimeapps.list` and GTK settings once; writes a thin `~/.config/kitty/kitty.conf` in package mode; marks migrations on fresh installs (applies them otherwise); generates the theme; sets GTK dark preferences; enables PipeWire user units; records `setup-version` |
 | Welcome screen | The shell opens it on startup while `~/.local/state/titan/welcome-done` is missing. It lists theme, wallpapers, Wi-Fi, keys and Settings; "Get started" writes the marker. Reopen with `titan-shell ipc welcome`. Migration `1791060868-first-run-markers` marks existing installs |
 | `scripts/build-repo [--channel stable\|edge] [--sign KEY] [OUT]` | Builds both packages and runs `repo-add` into `~/.cache/titan/repo/CHANNEL`. Stable requires a clean checkout. Unsigned repositories are for testing only |
-| `scripts/vm-test [--full] [--keep]` | Boots Arch's official cloud image under QEMU/KVM on a throwaway overlay, injects a key through cloud-init, installs the built packages and runs about 14 checks. Needs `qemu-base` |
+| `scripts/vm-test [--full] [--keep] [--memory MB]` | Boots Arch's official cloud image under QEMU/KVM on a throwaway overlay (kept on disk in `~/.cache/titan/vm/runs`), injects a key through cloud-init, installs the built packages through a detached job and runs 14 checks. Needs `qemu-base`; refuses to start without enough free memory (2 GB VM plus 1 GB) |
 | `titan update` in package mode | No Git: pacman's full upgrade updates `titan` from the configured repo. The shell restarts when the version changes |
 
 Developer mode (this laptop) keeps the `~/.config → ~/dotfiles` symlinks
@@ -123,8 +123,7 @@ Still open before others can install Titan:
 - Create a packager GPG key for signing (`build-repo --sign`).
 - Decide where the repository is hosted (for example GitHub Pages or a VPS),
   and document the `pacman.conf` entry plus key import.
-- Run `scripts/vm-test --full` and a graphical VM login (Phase 2 installer
-  work).
+- A graphical VM login to the Titan session (Phase 2 installer work).
 
 ### Phase 2 onwards
 

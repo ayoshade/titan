@@ -376,8 +376,21 @@ kernel parameters or bootloader edits were applied.
   but set values it already had.
 - **Repository:** `build-repo --channel edge` produced a valid repository
   database. A stable build correctly refused uncommitted changes.
-- **`vm-test`:** it parses, and it stops with install guidance because QEMU
-  is missing. **The VM run itself is pending** (`sudo pacman -S qemu-base`,
-  then `scripts/vm-test`). A graphical login of the Titan session has not been
-  tested.
+- **`vm-test --full`: passed all 14 checks** on Arch's official cloud image
+  (QEMU/KVM, 2 GB, kernel 7.2.7) after `qemu-base` was installed.
+  - A full `pacman -Syu`, then `titan` and `titan-desktop` with all 40
+    dependencies installed.
+  - `titan setup` worked on the first run and on a repeat.
+  - The default theme is graphite, and no migrations were pending.
+  - The user layer, thin Kitty config, `/etc/xdg` shell and Titan session
+    file were all present.
+  - Hyprland accepted the packaged config, and the shell QML parsed.
+  - Settings and theme round-trips worked.
 
+  Two earlier attempts failed because this laptop's OOM killer ended QEMU:
+  the VM had 4 GB on a 7.5 GB host, and its overlay disk was in the
+  RAM-backed `/tmp`. `vm-test` now keeps runs under `~/.cache/titan/vm/runs`,
+  defaults to 2 GB (`--memory`), refuses to start without enough free memory,
+  and stops at once if QEMU dies. Package installs run as a detached
+  `systemd-run` job polled over short SSH calls. A graphical login to the
+  Titan session is still untested (Phase 2).
