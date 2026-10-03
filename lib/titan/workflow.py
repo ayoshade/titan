@@ -191,13 +191,20 @@ def mirror():
     evaluate(f'hl.monitor({{output={lua(external["name"])},mode="preferred",position="auto",scale=1,mirror={lua(internal["name"] if enabled else "")}}})')
     data['mirror']=enabled; save_state(data)
 
-def nightlight():
+def nightlight(action='toggle'):
+    # Temperature comes from Settings → System/Display (nightlightTemp, kelvin).
     require('wlsunset')
-    if subprocess.run(['systemctl','--user','is-active','--quiet','titan-nightlight.service']).returncode==0:
-        run('systemctl','--user','stop','titan-nightlight.service'); notify('Nightlight disabled')
-    else:
-        run('systemd-run','--user','--collect','--unit=titan-nightlight','--setenv=WAYLAND_DISPLAY='+os.environ.get('WAYLAND_DISPLAY','wayland-1'),
-            'wlsunset','-T','4501','-t','4500','-S','00:00','-s','23:59',stdout=subprocess.DEVNULL); notify('Nightlight enabled')
+    active=subprocess.run(['systemctl','--user','is-active','--quiet','titan-nightlight.service']).returncode==0
+    try: temp=int(json.loads((STATE/'settings.json').read_text()).get('nightlightTemp',4500))
+    except (FileNotFoundError,json.JSONDecodeError,ValueError,TypeError): temp=4500
+    temp=max(2500,min(6000,temp))
+    if action=='apply' and not active: return
+    if active: run('systemctl','--user','stop','titan-nightlight.service')
+    if action=='toggle' and active: notify('Nightlight disabled'); return
+    if action=='off': return
+    run('systemd-run','--user','--collect','--unit=titan-nightlight','--setenv=WAYLAND_DISPLAY='+os.environ.get('WAYLAND_DISPLAY','wayland-1'),
+        'wlsunset','-T',str(temp+1),'-t',str(temp),'-S','00:00','-s','23:59',stdout=subprocess.DEVNULL)
+    if action=='toggle': notify('Nightlight enabled',f'{temp} K')
 
 OPS={ast.Add:operator.add,ast.Sub:operator.sub,ast.Mult:operator.mul,ast.Div:operator.truediv,ast.Mod:operator.mod,ast.Pow:operator.pow,ast.FloorDiv:operator.floordiv}
 GAME_OPTIONS=('animations:enabled','decoration:blur:enabled','decoration:shadow:enabled')
@@ -216,9 +223,14 @@ def game_mode():
         atomic(path,json.dumps({name:option(name) for name in GAME_OPTIONS})+'\n')
         evaluate('hl.config({animations={enabled=false},decoration={blur={enabled=false},shadow={enabled=false}}})')
         notify('Game mode enabled','Animations, blur and shadows are off until toggled again or Hyprland reloads.')
-def toggles():
+def toggle_state():
     nightlight=subprocess.run(['systemctl','--user','is-active','--quiet','titan-nightlight.service']).returncode==0
-    print(json.dumps({'nightlight':nightlight,'gameMode':game_mode_active()}))
+    return {'nightlight':nightlight,'gameMode':game_mode_active()}
+def publish_toggles():
+    # The shell watches this file, so changes from keys or agents show up at once.
+    atomic(RUNTIME/'toggles.json',json.dumps(toggle_state())+'\n')
+def toggles():
+    state=toggle_state(); atomic(RUNTIME/'toggles.json',json.dumps(state)+'\n'); print(json.dumps(state))
 
 SCHEMA=ROOT/'config/quickshell/umbra/theme/settings-schema.json'
 def settings_valid(spec,value):
@@ -448,8 +460,8 @@ def main(argv):
         else: run('playerctl',args[0])
     elif name=='scale': scale(args[0])
     elif name=='mirror': mirror()
-    elif name=='nightlight': nightlight()
-    elif name=='game-mode': game_mode()
+    elif name=='nightlight': nightlight(args[0] if args else 'toggle'); publish_toggles()
+    elif name=='game-mode': game_mode(); publish_toggles()
     elif name=='toggles': toggles()
     elif name=='settings': settings(args[0] if args else 'get',args[1:])
     elif name=='wallpaper': wallpaper(args[0] if args else 'current',args[1:])

@@ -1,59 +1,382 @@
 {
   "version": 1,
   "sections": [
-    { "id": "island", "label": "Bar & Island", "icon": "island", "description": "Shape and size of the island and the notch.",
-      "groups": [ { "label": "", "keys": ["notchMode", "notchFlare", "islandHeight", "islandWidth", "islandGap"] } ] },
-    { "id": "media", "label": "Media", "icon": "music", "description": "Now-playing controls in the island dashboard.",
-      "groups": [ { "label": "", "keys": ["dashboardMedia", "mediaPlayer"] } ] },
-    { "id": "clock", "label": "Clock & Date", "icon": "clock", "description": "Time format and how weeks are laid out.",
-      "groups": [ { "label": "", "keys": ["clock24", "weekStart"] } ] },
-    { "id": "appearance", "label": "Appearance", "icon": "palette", "description": "Theme, wallpaper, fonts, corners and surface depth.",
+    {
+      "id": "island",
+      "label": "Bar & Island",
+      "icon": "island",
+      "description": "Shape and size of the island and the notch.",
       "groups": [
-        { "label": "", "keys": ["@theme", "@wallpaper", "wallpaperEnabled"] },
-        { "label": "Accent", "keys": ["@accent", "accentCustom"] },
-        { "label": "Type", "keys": ["fontSize", "bodyFont", "displayFont"] },
-        { "label": "Shape & depth", "keys": ["cornerRadius", "panelRadius"] }
-      ] },
-    { "id": "motion", "label": "Motion", "icon": "motion", "description": "How fast the shell animates, or whether it animates at all.",
-      "groups": [ { "label": "", "keys": ["reduceMotion", "movementMs", "fadeMs", "hoverMs", "bounce"] } ] },
-    { "id": "launcher", "label": "Launcher", "icon": "search", "description": "Application search and results.",
-      "groups": [ { "label": "", "keys": ["launcherDescriptions", "launcherResults"] } ] },
-    { "id": "notifications", "label": "Notifications", "icon": "bell", "description": "Pop-ups, history and quiet hours.",
-      "groups": [ { "label": "", "keys": ["@dnd", "toastSeconds", "@clearNotifications"] } ] },
-    { "id": "control", "label": "Control Center", "icon": "controls", "description": "What the control center shows.",
-      "groups": [ { "label": "", "keys": ["ccMedia", "ccNotifications"] } ] },
-    { "id": "lock", "label": "Lock Screen", "icon": "lock", "description": "Hyprlock and the idle policy.",
-      "groups": [ { "label": "", "keys": ["@lockNow", "@idlePolicy"] } ] },
-    { "id": "system", "label": "System", "icon": "settings", "description": "Power, display comfort and shell maintenance.",
-      "groups": [ { "label": "", "keys": ["@powerProfile", "@nightlight", "@gameMode", "@restartShell", "@doctor", "@about"] } ] }
+        {
+          "label": "",
+          "keys": [
+            "notchMode",
+            "notchFlare",
+            "islandHeight",
+            "islandWidth",
+            "islandGap"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "media",
+      "label": "Media",
+      "icon": "music",
+      "description": "Now-playing controls in the island dashboard.",
+      "groups": [
+        {
+          "label": "",
+          "keys": [
+            "dashboardMedia",
+            "mediaPlayer"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "clock",
+      "label": "Clock & Date",
+      "icon": "clock",
+      "description": "Time format and how weeks are laid out.",
+      "groups": [
+        {
+          "label": "",
+          "keys": [
+            "clock24",
+            "weekStart"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "appearance",
+      "label": "Appearance",
+      "icon": "palette",
+      "description": "Theme, wallpaper, fonts, corners and surface depth.",
+      "groups": [
+        {
+          "label": "",
+          "keys": [
+            "@theme",
+            "@wallpaper",
+            "wallpaperEnabled"
+          ]
+        },
+        {
+          "label": "Accent",
+          "keys": [
+            "@accent",
+            "accentCustom"
+          ]
+        },
+        {
+          "label": "Type",
+          "keys": [
+            "fontSize",
+            "bodyFont",
+            "displayFont"
+          ]
+        },
+        {
+          "label": "Shape & depth",
+          "keys": [
+            "cornerRadius",
+            "panelRadius"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "motion",
+      "label": "Motion",
+      "icon": "motion",
+      "description": "How fast the shell animates, or whether it animates at all.",
+      "groups": [
+        {
+          "label": "",
+          "keys": [
+            "reduceMotion",
+            "movementMs",
+            "fadeMs",
+            "hoverMs",
+            "bounce"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "launcher",
+      "label": "Launcher",
+      "icon": "search",
+      "description": "Application search and results.",
+      "groups": [
+        {
+          "label": "",
+          "keys": [
+            "launcherDescriptions",
+            "launcherResults"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "notifications",
+      "label": "Notifications",
+      "icon": "bell",
+      "description": "Pop-ups, history and quiet hours.",
+      "groups": [
+        {
+          "label": "",
+          "keys": [
+            "@dnd",
+            "toastSeconds",
+            "@clearNotifications"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "control",
+      "label": "Control Center",
+      "icon": "controls",
+      "description": "What the control center shows.",
+      "groups": [
+        {
+          "label": "",
+          "keys": [
+            "ccMedia",
+            "ccNotifications"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "lock",
+      "label": "Lock Screen",
+      "icon": "lock",
+      "description": "Hyprlock and the idle policy.",
+      "groups": [
+        {
+          "label": "",
+          "keys": [
+            "@lockNow",
+            "@idlePolicy"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "system",
+      "label": "System",
+      "icon": "settings",
+      "description": "Power, display comfort and shell maintenance.",
+      "groups": [
+        {
+          "label": "",
+          "keys": [
+            "@powerProfile",
+            "@nightlight",
+            "nightlightTemp",
+            "@gameMode",
+            "@restartShell",
+            "@doctor",
+            "@about"
+          ]
+        }
+      ]
+    }
   ],
   "settings": {
-    "notchMode": { "type": "bool", "default": false, "label": "Notch mode", "hint": "Attach the island to the top edge" },
-    "notchFlare": { "type": "int", "default": 14, "min": 0, "max": 32, "unit": "px", "label": "Notch flare" },
-    "islandHeight": { "type": "int", "default": 33, "min": 26, "max": 44, "unit": "px", "label": "Bar height" },
-    "islandWidth": { "type": "int", "default": 230, "min": 180, "max": 360, "unit": "px", "label": "Collapsed width" },
-    "islandGap": { "type": "int", "default": 11, "min": 0, "max": 24, "unit": "px", "label": "Gap from screen edge" },
-    "dashboardMedia": { "type": "bool", "default": true, "label": "Show media in the dashboard" },
-    "mediaPlayer": { "type": "string", "default": "", "label": "Preferred player", "placeholder": "Any (e.g. spotify)" },
-    "clock24": { "type": "bool", "default": true, "label": "24-hour clock" },
-    "weekStart": { "type": "choice", "default": "locale", "options": ["locale", "sunday", "monday"], "label": "Week starts on" },
-    "wallpaperEnabled": { "type": "bool", "default": true, "label": "Show wallpaper" },
-    "accentCustom": { "type": "color", "default": "", "label": "Custom (#rrggbb)" },
-    "fontSize": { "type": "int", "default": 12, "min": 10, "max": 16, "unit": "px", "label": "Font size" },
-    "bodyFont": { "type": "string", "default": "Inter", "label": "Body font" },
-    "displayFont": { "type": "string", "default": "Inter", "label": "Display font" },
-    "cornerRadius": { "type": "int", "default": 16, "min": 4, "max": 24, "unit": "px", "label": "Small radius" },
-    "panelRadius": { "type": "int", "default": 26, "min": 10, "max": 36, "unit": "px", "label": "Panel radius" },
-    "reduceMotion": { "type": "bool", "default": false, "label": "Reduce motion" },
-    "movementMs": { "type": "int", "default": 330, "min": 100, "max": 800, "unit": "ms", "label": "Movement (size / position)" },
-    "fadeMs": { "type": "int", "default": 200, "min": 50, "max": 600, "unit": "ms", "label": "Fades & colour" },
-    "hoverMs": { "type": "int", "default": 150, "min": 50, "max": 400, "unit": "ms", "label": "Hover response" },
-    "bounce": { "type": "int", "default": 45, "min": 0, "max": 100, "unit": "%", "label": "Bounce" },
-    "launcherDescriptions": { "type": "bool", "default": true, "label": "Show descriptions" },
-    "launcherResults": { "type": "int", "default": 8, "min": 4, "max": 16, "unit": "", "label": "Visible results" },
-    "toastSeconds": { "type": "int", "default": 5, "min": 2, "max": 15, "unit": "s", "label": "Pop-up duration" },
-    "ccMedia": { "type": "bool", "default": true, "label": "Show media" },
-    "ccNotifications": { "type": "bool", "default": true, "label": "Show notifications" },
-    "wallpapers": { "type": "map", "default": {}, "label": "Wallpaper per theme", "hidden": true }
+    "notchMode": {
+      "type": "bool",
+      "default": false,
+      "label": "Notch mode",
+      "hint": "Attach the island to the top edge"
+    },
+    "notchFlare": {
+      "type": "int",
+      "default": 14,
+      "min": 0,
+      "max": 32,
+      "unit": "px",
+      "label": "Notch flare"
+    },
+    "islandHeight": {
+      "type": "int",
+      "default": 33,
+      "min": 26,
+      "max": 44,
+      "unit": "px",
+      "label": "Bar height"
+    },
+    "islandWidth": {
+      "type": "int",
+      "default": 230,
+      "min": 180,
+      "max": 360,
+      "unit": "px",
+      "label": "Collapsed width"
+    },
+    "islandGap": {
+      "type": "int",
+      "default": 11,
+      "min": 0,
+      "max": 24,
+      "unit": "px",
+      "label": "Gap from screen edge"
+    },
+    "dashboardMedia": {
+      "type": "bool",
+      "default": true,
+      "label": "Show media in the dashboard"
+    },
+    "mediaPlayer": {
+      "type": "string",
+      "default": "",
+      "label": "Preferred player",
+      "placeholder": "Any (e.g. spotify)"
+    },
+    "clock24": {
+      "type": "bool",
+      "default": true,
+      "label": "24-hour clock"
+    },
+    "weekStart": {
+      "type": "choice",
+      "default": "locale",
+      "options": [
+        "locale",
+        "sunday",
+        "monday"
+      ],
+      "label": "Week starts on"
+    },
+    "wallpaperEnabled": {
+      "type": "bool",
+      "default": true,
+      "label": "Show wallpaper"
+    },
+    "accentCustom": {
+      "type": "color",
+      "default": "",
+      "label": "Custom (#rrggbb)"
+    },
+    "fontSize": {
+      "type": "int",
+      "default": 12,
+      "min": 10,
+      "max": 16,
+      "unit": "px",
+      "label": "Font size"
+    },
+    "bodyFont": {
+      "type": "string",
+      "default": "Inter",
+      "label": "Body font"
+    },
+    "displayFont": {
+      "type": "string",
+      "default": "Inter",
+      "label": "Display font"
+    },
+    "cornerRadius": {
+      "type": "int",
+      "default": 16,
+      "min": 4,
+      "max": 24,
+      "unit": "px",
+      "label": "Small radius"
+    },
+    "panelRadius": {
+      "type": "int",
+      "default": 26,
+      "min": 10,
+      "max": 36,
+      "unit": "px",
+      "label": "Panel radius"
+    },
+    "reduceMotion": {
+      "type": "bool",
+      "default": false,
+      "label": "Reduce motion"
+    },
+    "movementMs": {
+      "type": "int",
+      "default": 330,
+      "min": 100,
+      "max": 800,
+      "unit": "ms",
+      "label": "Movement (size / position)"
+    },
+    "fadeMs": {
+      "type": "int",
+      "default": 200,
+      "min": 50,
+      "max": 600,
+      "unit": "ms",
+      "label": "Fades & colour"
+    },
+    "hoverMs": {
+      "type": "int",
+      "default": 150,
+      "min": 50,
+      "max": 400,
+      "unit": "ms",
+      "label": "Hover response"
+    },
+    "bounce": {
+      "type": "int",
+      "default": 45,
+      "min": 0,
+      "max": 100,
+      "unit": "%",
+      "label": "Bounce"
+    },
+    "launcherDescriptions": {
+      "type": "bool",
+      "default": true,
+      "label": "Show descriptions"
+    },
+    "launcherResults": {
+      "type": "int",
+      "default": 8,
+      "min": 4,
+      "max": 16,
+      "unit": "",
+      "label": "Visible results"
+    },
+    "toastSeconds": {
+      "type": "int",
+      "default": 5,
+      "min": 2,
+      "max": 15,
+      "unit": "s",
+      "label": "Pop-up duration"
+    },
+    "ccMedia": {
+      "type": "bool",
+      "default": true,
+      "label": "Show media"
+    },
+    "ccNotifications": {
+      "type": "bool",
+      "default": true,
+      "label": "Show notifications"
+    },
+    "wallpapers": {
+      "type": "map",
+      "default": {},
+      "label": "Wallpaper per theme",
+      "hidden": true
+    },
+    "nightlightTemp": {
+      "type": "int",
+      "default": 4500,
+      "min": 2500,
+      "max": 6000,
+      "unit": "K",
+      "label": "Night light temperature"
+    }
   }
 }

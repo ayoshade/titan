@@ -417,7 +417,9 @@ Item {
      }
     }
    }
-   ListRow { symbol: "moon"; title: "Night Light"; subtitle: Toggles.nightlight ? "On · warm 4500 K" : "Off"; selected: Toggles.nightlight; onClicked: Toggles.toggle("nightlight") }
+   ListRow { symbol: "moon"; title: "Night Light"; subtitle: Toggles.nightlight ? "On · "+Settings.values.nightlightTemp+" K" : "Off"; selected: Toggles.nightlight; onClicked: Toggles.toggle("nightlight") }
+   // Warmer toward the right, as in the reference Display page.
+   PillSlider { width: parent.width; symbol: "moon"; label: "Night light temperature"; value: (6000-Settings.values.nightlightTemp)/3500; onMoved: Settings.set("nightlightTemp",Math.round((6000-value*3500)/100)*100) }
    Caption { text: "Scale: Super+/ and Super+Alt+/. Resolution changes stay in the Hyprland monitor profile."; width: parent.width; wrapMode: Text.Wrap }
   }
  }

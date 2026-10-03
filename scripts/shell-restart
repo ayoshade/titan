@@ -5,11 +5,17 @@ if [[ -z ${WAYLAND_DISPLAY:-} ]]; then
  export HYPRLAND_INSTANCE_SIGNATURE WAYLAND_DISPLAY
 fi
 export QT_QPA_PLATFORM=wayland
-qs -c umbra kill || true
-# Wait for the old process to release the single-instance lock.
-for attempt in {1..30}; do
- if ! qs -c umbra list | grep -q "^Instance "; then break; fi
- sleep 0.1
+pids=$(qs -c umbra list 2>/dev/null | awk '/Process ID:/{print $3}' || true)
+# Quickshell 0.3.1 can deadlock while exiting after `qs kill` (seen 2026-10-03),
+# which left the old instance holding the lock. Ask politely, then escalate.
+timeout 3 qs -c umbra kill >/dev/null 2>&1 || true
+for signal in none TERM KILL; do
+ [[ $signal == none ]] || for pid in $pids; do kill -s "$signal" "$pid" 2>/dev/null || true; done
+ for attempt in {1..20}; do
+  alive=0; for pid in $pids; do kill -0 "$pid" 2>/dev/null && alive=1; done
+  ((alive)) || break 2
+  sleep 0.1
+ done
 done
 # Launch through the compositor so logind/polkit see the desktop's session,
 # even when this recovery script was invoked from a different TTY.

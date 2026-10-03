@@ -20,6 +20,8 @@ PanelWindow {
  readonly property bool islandOpen: UiState.islandScreen===modelData.name
  readonly property bool dashboard: islandOpen && UiState.islandView==="dashboard"
  readonly property bool calendar: islandOpen && UiState.islandView==="calendar"
+ // Game mode turns the notch into a full-width bar, as in the reference (5cp6DkClAuM 0:38).
+ readonly property bool gameBar: Toggles.gameMode
  // Fixed height fits the tallest island state and its shadow, so the surface is not
  // reconfigured on every animation frame. Input is limited by the mask.
  implicitHeight: Theme.islandTop+Math.max(Theme.dashboardHeight,Theme.calendarHeight)+32
@@ -40,7 +42,7 @@ PanelWindow {
  component Flare: Shape {
   id: flare
   property bool mirrored: false
-  visible: Theme.notchMode && Theme.notchFlare>0
+  visible: Theme.notchMode && Theme.notchFlare>0 && !bar.gameBar
   width: Theme.notchFlare; height: Theme.notchFlare
   y: 0
   preferredRendererType: Shape.CurveRenderer
@@ -57,13 +59,13 @@ PanelWindow {
  Flare { x: island.x+island.width; mirrored: true }
  Rectangle {
   id: island
-  anchors { top: parent.top; topMargin: Theme.islandTop; horizontalCenter: parent.horizontalCenter }
+  anchors { top: parent.top; topMargin: bar.gameBar && state==="" ? 0 : Theme.islandTop; horizontalCenter: parent.horizontalCenter }
   // Hovering the compact pill widens it slightly, as in the reference.
-  property real bump: state==="" && hover.hovered ? 10 : 0
+  property real bump: state==="" && hover.hovered && !bar.gameBar ? 10 : 0
   Behavior on bump { NumberAnimation { duration: Theme.hover; easing.type: Easing.OutCubic } }
-  width: Theme.islandWidth+(bar.workspaceCount-5)*11+bump
+  width: bar.gameBar ? bar.width : Theme.islandWidth+(bar.workspaceCount-5)*11+bump
   height: Theme.islandHeight
-  radius: height/2
+  radius: bar.gameBar ? 0 : height/2
   color: Theme.notch
   clip: true
   state: bar.dashboard ? "dashboard" : bar.calendar ? "calendar" : UiState.context!=="" ? "osd" : ""
@@ -99,7 +101,7 @@ PanelWindow {
   ]
   // Notch mode squares the top corners so the island meets the screen edge.
   Rectangle {
-   visible: Theme.notchMode
+   visible: Theme.notchMode || bar.gameBar
    width: parent.width; height: Math.min(parent.radius,parent.height/2); color: parent.color
   }
   HoverHandler {
