@@ -22,7 +22,7 @@ PanelWindow {
  Rectangle {
   id: card
   width: Math.min(UiState.panel==="themes" ? 580 : UiState.panel==="launcher" ? Theme.launcherWidth : Theme.panelWidth,root.width-32)
-  height: Math.min(UiState.panel==="themes" ? 164 : UiState.panel==="clock" ? 400 : UiState.panel==="session" ? 430 : UiState.panel==="appearance" ? 400 : 640,root.height-40)
+  height: Math.min(UiState.panel==="themes" ? 164 : UiState.panel==="session" ? 430 : UiState.panel==="appearance" ? 400 : 640,root.height-40)
   anchors { top: parent.top; topMargin: 8; horizontalCenter: parent.horizontalCenter }
   color: Theme.shell; radius: Theme.panelRadius; border.width: 1; border.color: Theme.border
   MouseArea { anchors.fill: parent; onClicked: {} }
@@ -51,7 +51,7 @@ PanelWindow {
      id: loader
      anchors { fill: parent; margins: 14 }
      active: root.visible && UiState.panel!=="themes"
-     source: UiState.panel==="commands" ? "CommandPanel.qml" : UiState.panel==="launcher" ? "Launcher.qml" : UiState.panel==="controls" ? "ControlCenter.qml" : UiState.panel==="notifications" ? "NotificationCenter.qml" : UiState.panel==="clock" ? "ClockPanel.qml" : UiState.panel==="appearance" ? "Appearance.qml" : UiState.panel==="media" ? "MediaPanel.qml" : UiState.panel==="connectivity" ? "Connectivity.qml" : "SessionMenu.qml"
+     source: UiState.panel==="commands" ? "CommandPanel.qml" : UiState.panel==="launcher" ? "Launcher.qml" : UiState.panel==="controls" ? "ControlCenter.qml" : UiState.panel==="notifications" ? "NotificationCenter.qml" : UiState.panel==="appearance" ? "Appearance.qml" : UiState.panel==="media" ? "MediaPanel.qml" : UiState.panel==="connectivity" ? "Connectivity.qml" : "SessionMenu.qml"
      focus: true
      Keys.onEscapePressed: UiState.close()
     }

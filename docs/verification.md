@@ -226,3 +226,16 @@ kernel parameters or bootloader edits were applied.
 - Not hands-on tested: the media row with a live MPRIS player (none was playing),
   pointer hover/leave collapse, Escape, the Night light chip (it would start
   wlsunset), clicking workspace rows, and a dashboard on a second monitor.
+
+## Island calendar morph — 2026-10-03
+
+- Measured the reference calendar state from 30 fps frames (J8s7O2IGogE
+  10:37.4–10:39.3). It is 336×280, and pointer leave collapses it to compact.
+- Live checks: the calendar was opened through IPC from the dashboard. Rapid
+  grim captures showed 648×167 → 334 (undershoot) → 336×280. Closing narrowed
+  first, then dropped height to 230×33. The calendar matched the reference
+  side by side at 1:1.
+- Found and fixed: the fixed-height layer surface clipped the calendar at 199 px
+  until it was sized to the tallest state.
+- Not hands-on tested: pointer clicks on the month buttons, wheel paging,
+  Left/Right keys and Super+Ctrl+Alt+D.

@@ -57,7 +57,8 @@ direction, not a spec.
 | Expanded 3-column dashboard | Implemented (`modules/IslandDashboard.qml`) at 648×167, radius 30, same column positions; compared with 10:41 at matched scale |
 | Dashboard week strip, today box, faded edge days | Matched. Weekend red uses the palette's `danger` colour, which is muted in some palettes |
 | Workspace list | Shows five rows plus “+” (first empty workspace). With more than five workspaces, the list follows the active workspace instead of scrolling |
-| Hover row highlight, calendar hover box | Implemented. The calendar opens Titan's existing clock panel instead of morphing the island into a month view |
+| Hover row highlight, calendar hover box | Implemented |
+| Calendar morph | Implemented (`modules/IslandCalendar.qml`). The island reshapes to 336×280 (reference 10:37.67–10:38.0: undershoot to ~332, then settle). It has a locale-first-day six-week grid, ←/→ month buttons, a title that returns to the current month, and wheel or Left/Right month paging. Pointer leave collapses it to the compact pill, as in the reference |
 | Status rows | Battery, network (SSID/strength or “Wired”), Bluetooth (device name when connected), volume and mic, notification count. Rows open the matching panel |
 | Night light / Game mode | Implemented through `scripts/workflow nightlight` / `game-mode`. Game mode is Titan's own runtime toggle; his implementation has not been reviewed |
 | Hover media expansion | Removed. Media now lives in the dashboard, as in the reference |

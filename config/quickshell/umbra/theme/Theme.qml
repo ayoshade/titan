@@ -48,6 +48,9 @@ QtObject {
  readonly property int dashboardWidth: 648
  readonly property int dashboardHeight: 167
  readonly property int dashboardRadius: 30
+ // Calendar morph (10:37.8–10:38.5).
+ readonly property int calendarWidth: 336
+ readonly property int calendarHeight: 280
  readonly property int expandedIslandWidth: 370
  readonly property int expandedIslandHeight: 78
  readonly property int panelWidth: 420

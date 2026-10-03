@@ -15,7 +15,9 @@ QtObject {
  // Expanded island dashboard, shown on one screen at a time.
  property string islandScreen: ""
  function focusedScreen() { return Hyprland.focusedMonitor ? Hyprland.focusedMonitor.name : (Quickshell.screens.length ? Quickshell.screens[0].name : "") }
- function toggleIsland(screen) { const target=screen || focusedScreen(); islandScreen=islandScreen===target ? "" : target; if(islandScreen) panel="" }
+ property string islandView: "dashboard"
+ function toggleIsland(screen) { const target=screen || focusedScreen(); const close=islandScreen===target && islandView==="dashboard"; islandView="dashboard"; islandScreen=close ? "" : target; if(islandScreen) panel="" }
+ function toggleCalendar(screen) { const target=screen || focusedScreen(); const close=islandScreen===target && islandView==="calendar"; islandView="calendar"; islandScreen=close ? "" : target; if(islandScreen) panel="" }
  function closeIsland() { islandScreen="" }
  function menu(kind) {
   if(kind==="apps") { toggle("launcher"); return }
@@ -37,6 +39,8 @@ QtObject {
   onLoaded: { try { root.barVisible=JSON.parse(text()).barVisible!==false } catch(e) {} }
  }
  function toggle(name) {
+  // The calendar is an island state, not an overlay panel.
+  if (name === "clock") { toggleCalendar(""); return }
   panelScreen = Hyprland.focusedMonitor ? Hyprland.focusedMonitor.name : (Quickshell.screens.length ? Quickshell.screens[0].name : "")
   panel = panel === name ? "" : name
   if (panel) islandScreen = ""

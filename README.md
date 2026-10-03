@@ -71,7 +71,8 @@ in runtime storage that clears at reboot; marked-sensitive entries are skipped.
 Launcher: type to filter, arrows to select, Enter to launch. Escape or clicking
 outside closes a panel. Click the island to expand its dashboard (focused
 window, workspaces, clock, week, media, status, Night light and Game mode); click
-the dashboard clock for the calendar. The island's battery and signal icons open
+the dashboard clock to morph the island into a month calendar (←/→, wheel or
+arrow keys change month). The island's battery and signal icons open
 controls. Screenshots are saved under
 ~/Pictures/Screenshots and copied to the Wayland clipboard.
 

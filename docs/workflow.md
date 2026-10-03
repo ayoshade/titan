@@ -17,7 +17,8 @@ interpolation of user text, filenames or calculator expressions.
 - New IPC: bar, setBar BOOL, dnd, dismissOne, dismissAll, invokeLast,
   cycleAudio, cycleMedia and panelAt INDEX.
 - `qs -c umbra ipc call shell island`: toggle the expanded island dashboard on
-  the focused monitor. Escape or moving the pointer away closes it.
+  the focused monitor. `clock` (and `panelAt 3`) toggles the island's calendar
+  view; the overlay clock panel was removed. Escape or moving the pointer away closes it.
 - `scripts/workflow toggles`: JSON `{"nightlight":BOOL,"gameMode":BOOL}`; safe as
   a diagnostic. `scripts/workflow nightlight` and `game-mode` change the desktop.
   Game mode turns Hyprland animations, blur and shadows off at runtime. It saves

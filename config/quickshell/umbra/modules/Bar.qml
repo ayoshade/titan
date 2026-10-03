@@ -16,14 +16,16 @@ PanelWindow {
  visible: UiState.barVisible
  anchors { top: true; left: true; right: true }
  readonly property int workspaceCount: Math.max(5,...Hyprland.workspaces.values.filter(w=>w.id>0 && w.id<=10).map(w=>w.id))
- readonly property bool dashboard: UiState.islandScreen===modelData.name
- // Fixed height fits the dashboard and its shadow, so the surface is not
+ readonly property bool islandOpen: UiState.islandScreen===modelData.name
+ readonly property bool dashboard: islandOpen && UiState.islandView==="dashboard"
+ readonly property bool calendar: islandOpen && UiState.islandView==="calendar"
+ // Fixed height fits the tallest island state and its shadow, so the surface is not
  // reconfigured on every animation frame. Input is limited by the mask.
- implicitHeight: Theme.islandTop+Theme.dashboardHeight+32
+ implicitHeight: Theme.islandTop+Math.max(Theme.dashboardHeight,Theme.calendarHeight)+32
  exclusiveZone: Theme.barHeight
  color: "transparent"
  WlrLayershell.namespace: "umbra-bar"
- WlrLayershell.keyboardFocus: dashboard ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
+ WlrLayershell.keyboardFocus: islandOpen ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
  mask: Region { item: island }
  RectangularShadow {
   anchors.fill: island; radius: island.radius
@@ -41,16 +43,18 @@ PanelWindow {
   radius: height/2
   color: Theme.notch
   clip: true
-  state: bar.dashboard ? "dashboard" : UiState.context!=="" ? "osd" : ""
+  state: bar.dashboard ? "dashboard" : bar.calendar ? "calendar" : UiState.context!=="" ? "osd" : ""
   states: [
    State { name: "osd"; PropertyChanges { island.width: Theme.expandedIslandWidth; island.height: Theme.expandedIslandHeight; island.radius: 22 } },
-   State { name: "dashboard"; PropertyChanges { island.width: Theme.dashboardWidth; island.height: Theme.dashboardHeight; island.radius: Theme.dashboardRadius } }
+   State { name: "dashboard"; PropertyChanges { island.width: Theme.dashboardWidth; island.height: Theme.dashboardHeight; island.radius: Theme.dashboardRadius } },
+   State { name: "calendar"; PropertyChanges { island.width: Theme.calendarWidth; island.height: Theme.calendarHeight; island.radius: Theme.dashboardRadius } }
   ]
   // Measured at 30 fps: opening overshoots ~1% and settles in ~330 ms;
-  // closing drops the height first, then narrows.
+  // closing drops the height first, then narrows. The calendar morph uses the
+  // same spring; collapsing from it shrinks both axes together (~370 ms).
   transitions: [
    Transition {
-    to: "dashboard"
+    to: "dashboard,calendar"
     NumberAnimation { properties: "width,height,radius"; duration: Theme.motion ? 330 : 0; easing.type: Easing.OutBack; easing.overshoot: 0.45 }
    },
    Transition {
@@ -60,23 +64,32 @@ PanelWindow {
      NumberAnimation { property: "width"; duration: Theme.motion ? 380 : 0; easing.type: Easing.OutCubic }
     }
    },
+   Transition {
+    from: "calendar"
+    ParallelAnimation {
+     NumberAnimation { property: "width"; duration: Theme.motion ? 240 : 0; easing.type: Easing.OutCubic }
+     NumberAnimation { properties: "height,radius"; duration: Theme.motion ? 370 : 0; easing.type: Easing.InOutCubic }
+    }
+   },
    Transition { NumberAnimation { properties: "width,height,radius"; duration: Theme.duration; easing.type: Easing.OutCubic } }
   ]
   HoverHandler {
    id: hover
-   onHoveredChanged: if(bar.dashboard) { if(hovered) leave.stop(); else leave.restart() }
+   onHoveredChanged: if(bar.islandOpen) { if(hovered) leave.stop(); else leave.restart() }
   }
   Timer { id: leave; interval: 350; onTriggered: if(!hover.hovered) UiState.closeIsland() }
   Item {
    anchors.fill: parent
-   focus: bar.dashboard
+   focus: bar.islandOpen
    Keys.onEscapePressed: UiState.closeIsland()
+   Keys.onLeftPressed: if(bar.calendar) calendarView.shift(-1)
+   Keys.onRightPressed: if(bar.calendar) calendarView.shift(1)
   }
   Item {
    id: compact
    anchors { top: parent.top; left: parent.left; right: parent.right; leftMargin: Theme.islandPadding; rightMargin: Theme.islandPadding }
    height: Theme.islandHeight
-   opacity: bar.dashboard ? 0 : 1
+   opacity: bar.islandOpen ? 0 : 1
    visible: opacity>0
    Behavior on opacity { NumberAnimation { duration: Theme.motion ? 120 : 0 } }
    MouseArea {
@@ -131,6 +144,14 @@ PanelWindow {
    opacity: bar.dashboard ? 1 : 0
    visible: opacity>0
    Behavior on opacity { NumberAnimation { duration: Theme.motion ? (bar.dashboard ? 220 : 90) : 0 } }
+  }
+  IslandCalendar {
+   id: calendarView
+   anchors { top: parent.top; horizontalCenter: parent.horizontalCenter }
+   open: bar.calendar
+   opacity: bar.calendar ? 1 : 0
+   visible: opacity>0
+   Behavior on opacity { NumberAnimation { duration: Theme.motion ? (bar.calendar ? 160 : 110) : 0 } }
   }
   RowLayout {
    anchors { left: parent.left; right: parent.right; bottom: parent.bottom; leftMargin: 18; rightMargin: 18; bottomMargin: 13 }

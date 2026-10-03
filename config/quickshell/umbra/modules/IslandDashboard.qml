@@ -104,8 +104,8 @@ Item {
   x: 214; y: 6; width: 220; height: 80; radius: 14
   color: Qt.alpha(Theme.text,calendarMouse.containsMouse ? 0.05 : 0)
   Behavior on color { ColorAnimation { duration: Theme.duration } }
-  MouseArea { id: calendarMouse; anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor; onClicked: UiState.toggle("clock") }
-  Accessible.role: Accessible.Button; Accessible.name: "Open calendar"; Accessible.onPressAction: UiState.toggle("clock")
+  MouseArea { id: calendarMouse; anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor; onClicked: UiState.toggleCalendar(root.screenName) }
+  Accessible.role: Accessible.Button; Accessible.name: "Open calendar"; Accessible.onPressAction: UiState.toggleCalendar(root.screenName)
  }
  ShellText {
   anchors.horizontalCenter: parent.horizontalCenter; y: 13
