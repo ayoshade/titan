@@ -17,6 +17,14 @@ QtObject {
  // Settings window state; the window is created on first open.
  property bool settingsOpen: false
  property string settingsSection: "island"
+ // First-login welcome: shown while ~/.local/state/titan/welcome-done is missing.
+ property FileView welcomeMarker: FileView {
+  path: (Quickshell.env("XDG_STATE_HOME")||Quickshell.env("HOME")+"/.local/state")+"/titan/welcome-done"
+  __printErrors: false
+  onLoadFailed: root.welcomeTimer.start()
+ }
+ property Timer welcomeTimer: Timer { interval: 1500; onTriggered: if(root.panel==="") root.toggle("welcome") }
+ function finishWelcome() { welcomeMarker.setText(new Date().toISOString()+"\n"); close() }
  function openSettings(section) { if (section) settingsSection = section; settingsOpen = true; panel = "" }
  // Expanded island dashboard, shown on one screen at a time.
  property string islandScreen: ""

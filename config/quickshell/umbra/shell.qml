@@ -20,6 +20,7 @@ ShellRoot {
   function media(): void { UiState.toggle("media") }
   function clock(): void { UiState.toggle("clock") }
   function island(): void { UiState.toggleIsland("") }
+  function welcome(): void { UiState.toggle("welcome") }
   function settings(section: string): void { UiState.openSettings(section) }
   function connectivity(): void { UiState.toggle("connectivity") }
   function session(): void { UiState.toggle("session") }

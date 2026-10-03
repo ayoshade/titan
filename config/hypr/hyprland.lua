@@ -4,7 +4,7 @@ TITAN_ROOT = os.getenv("TITAN_ROOT")
  or (exists("/usr/share/titan/version") and "/usr/share/titan")
  or (os.getenv("HOME") .. "/dotfiles")
 hl.env("TITAN_ROOT", TITAN_ROOT)   -- inherited by the shell and every launched script
-local base = os.getenv("HOME") .. "/.config/hypr/"
+local base = TITAN_ROOT .. "/config/hypr/"   -- works for the checkout and /usr/share/titan alike
 dofile(base .. "appearance.lua")
 dofile(base .. "input.lua")
 dofile(base .. "bindings.lua")
