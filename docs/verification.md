@@ -343,4 +343,14 @@ kernel parameters or bootloader edits were applied.
   `apply-theme` through `Paths.script()`. The root menu opened, and the shell
   log was free of Titan warnings. Not exercised: key-triggered lock and
   session-start, which run at the next login.
+- **First real update and snapshot setup (run by the user, checked
+  read-only):**
+  - `titan update` upgraded hyprland 0.56.2-3→-4 and libutf8proc; the kernel
+    was unchanged, so no reboot was needed.
+  - `scripts/install-snapshots` installed snapper 0.13.2 and snap-pac 3.0.1,
+    created the `root` config and took snapshot 1 ("titan: snapshots enabled").
+  - Config check: TIMELINE_CREATE=no, NUMBER_LIMIT=10/5, ALLOW_USERS=shade,
+    and `snapper-cleanup.timer` is active. `snapper-timeline.timer` is enabled
+    but creates nothing while the timeline is off.
+  - snap-pac's pre/post pair appears at the next pacman transaction.
 
