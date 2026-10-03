@@ -444,3 +444,78 @@ kernel parameters or bootloader edits were applied.
   contents did not change.
 - **Install from the published repository:** `vm-test --full --from-repo`
   passed 16/16, with `Validated By: SHA-256 Sum  Signature`.
+
+## Phase 2: experimental ISO and dedicated-disk installation — 2026-10-03
+
+- **Development version:** 0.3.0-1, not published or signed. Stable remains
+  0.2.0-2. The new installer checks repository version before erase and refuses
+  the older stable channel; these installation tests used an explicit unsigned
+  repository available only to the disposable QEMU guest.
+- **Complete install and independent boot: passed.**
+  `scripts/vm-install-test` booted the newly built UEFI ISO using OVMF and a
+  blank 40 GiB qcow2 disk. The real installer:
+  - accepted the exact erase confirmation and terminal password prompts;
+  - created GPT, 1 GiB FAT32 EFI and Btrfs `@`, `@home`, `@log`, `@pkg`;
+  - installed Arch base, hardware packages, `titan` and `titan-desktop` 0.3.0-1;
+  - generated locale/fstab, created a wheel account, locked root password
+    login, enabled login/network/Bluetooth/power services and installed
+    systemd-boot and the Titan Plymouth hook/theme;
+  - unmounted its target without requesting a reboot.
+
+  The harness added test-only SSH access, stopped that VM, **detached the ISO**
+  and booted its installed disk. Btrfs root and active greetd were checked over
+  SSH. ReGreet authenticated a new account into `titan-session`; Hyprland had
+  no config errors; Quickshell IPC returned `panel=welcome`, `theme=graphite`,
+  `screen=Virtual-1`. Setup-version exists and welcome-done does not.
+- **Visual review:** QEMU screenshots at 1280×800 showed the centered Titan
+  wordmark/progress dots, dark ReGreet login, wallpaper and first-login Welcome.
+  Eighty boot frames were captured and inspected as contact sheets, with the
+  splash, greeter and Welcome also viewed at full size. There is a brief
+  libseat seatd-probe message before Cage falls back successfully to logind.
+  This boot handoff still needs polish; it was not hidden or mistaken for a
+  failed login. No host application screenshots were taken or committed.
+- **Runtime limits:** the installed shell log has a BlueZ object-manager
+  warning (the VM has no Bluetooth adapter) and a Qt portal app-registration
+  warning. Configuration loaded and IPC responded. The earlier cloud-image
+  test also warned about missing network/UPower/power-profile services; the
+  complete desktop now declares those packages in `packages/services.txt`.
+  The installed-disk shell no longer reports those missing backends.
+- **Package regression:** the final `vm-test --full --reuse …` passed **17/17**
+  on 0.3.0-1, including the explicit requested-version check, setup repeat,
+  theme/settings preservation and round-trips, packaged Hyprland/QML and doctor.
+  Reuse previously selected old archives already in the guest's home: it now
+  installs exact current-version filenames from a dedicated test directory.
+- **First-login regression:** `titan-session` creates the state directory and
+  setup.log before setup. Treating that directory as an existing installation
+  ran the legacy welcome-marker migration on a fresh user. Setup now ignores a
+  lone setup.log when deciding freshness. A real fresh login shows Welcome;
+  a throwaway-home regression verifies fresh markers, repeat behavior and
+  preservation of an existing Hyprland override without touching host services
+  or applying a theme.
+- **Safety/unit checks:** 11 tests cover whole-disk boundaries, nested mounts,
+  swap, storage holders, read-only/small/loop targets, non-live/non-QEMU apply
+  rejection, development repository bounds, account/timezone validation,
+  first-login detection and Intel/AMD/virtual/NVIDIA/unknown hardware selection.
+  Host `scripts/doctor`, live `hyprctl configerrors`, script/Python syntax and
+  `git diff --check` passed. The internal mounted NVMe was rejected by the
+  read-only planner; no host partition or boot changes were made.
+- **ISO build:** Archiso 91-1, built as root inside the isolated QEMU build
+  guest, UEFI systemd-boot profile, zstd SquashFS. The ISO is ≈1.6 GiB and its
+  SHA-256 check passes. An early launch failed because Archiso normalizes file
+  permissions; the executable is now explicitly declared in file_permissions.
+  A separate launch was interrupted by editing the running Bash harness;
+  the successful run used a syntax-checked file. No disk writes happened in
+  either of those failed launches.
+
+  Local test image: `~/.cache/titan/vm/runs/run.mkTYG7/iso/`.
+  Passing installed-disk artifacts: `~/.cache/titan/vm/runs/install.QsLfLe/`
+  (install plan/log, hardware, shell status/logs, UI screenshots and boot
+  frames). The final ISO already contained the overlaid installer module;
+  the harness used the same source. Test images contain an ephemeral SSH
+  public key and must not be distributed. All QEMU processes were stopped
+  after verification.
+- **Still open:** encryption, dual boot/manual partitioning, wider VM and
+  multi-monitor coverage, real GPU/laptop tests (especially NVIDIA), smoother
+  splash-to-greeter handoff, signed 0.3.0 channel testing, ISO source/license
+  review and a public image without test access. Suspend/lock rendering on the
+  development laptop remains untested under its always-awake policy.

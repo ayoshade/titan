@@ -8,13 +8,18 @@ interpolation of user text, filenames or calculator expressions.
 
 ## Agent interfaces
 
-- `titan version|setup|migrate|update|doctor|theme|settings|wallpaper|shell`
+- `titan version|setup|migrate|update|doctor|hardware|theme|settings|wallpaper|shell`
   (`scripts/titan`) is the top-level command. `titan doctor` (`scripts/doctor`)
   always fails on static errors: scripts, Python, Hyprland config, and live
   `configerrors`. In a checkout it also requires the package set and
   `~/.config` links. On packaged installs missing packages, `titan setup` and
   optional services are warnings. `titan setup` is safe to repeat;
   `titan update` needs the user (sudo).
+- `titan hardware --json`: versioned read-only CPU/GPU/laptop inventory and
+  conservative installer package selection. `--packages` prints package names
+  and exits nonzero for unsupported GPU profiles. It never installs packages
+  or changes configuration. Installer/ISO commands and their QEMU-only apply
+  boundary are described in [installation.md](installation.md).
 - `titan-shell ipc welcome` opens the first-login Welcome screen.
 - `titan-shell status|restart|ipc METHOD [ARG…]|functions|log [-f]|open PANEL|close`
   (`scripts/titan-shell`, linked into `~/.local/bin` by `scripts/bootstrap`) is

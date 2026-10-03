@@ -18,6 +18,7 @@ Usage: titan COMMAND [ARGS]
   setup                   Per-user first-run setup (idempotent; never overwrites)
   update [--no-system]    Snapshot, update Titan and Arch packages, migrate, check
   doctor                  Health check
+  hardware [--json|--packages]  Read-only hardware inventory and installer profile
   theme [list|current|ID] Show or apply a theme
   settings …              Same as: scripts/workflow settings …
   wallpaper …             Same as: scripts/workflow wallpaper …
@@ -49,8 +50,11 @@ migrate() {
 }
 
 setup() {
- local config=${XDG_CONFIG_HOME:-$HOME/.config} fresh=0
- [[ -d $state ]] || fresh=1
+ local config=${XDG_CONFIG_HOME:-$HOME/.config} fresh=1
+ # titan-session creates the directory and setup.log before calling us.
+ # Those alone are not an existing install; running legacy migrations on a
+ # fresh login would mark Welcome as already dismissed.
+ if [[ -d $state && -n $(find "$state" -mindepth 1 -maxdepth 1 ! -name setup.log -print -quit) ]]; then fresh=0; fi
  mkdir -p "$config/titan" "$state"; chmod 700 "$config/titan" "$state"
  # The user layer: created once, then only the user (or a migration) changes it.
  [[ -e $config/titan/hypr.lua ]] || printf -- '-- Your Hyprland overrides, loaded after Titan defaults.\n' >"$config/titan/hypr.lua"
@@ -120,6 +124,7 @@ case "${1:-help}" in
  migrate) shift; migrate "$@" ;;
  update) shift; update "$@" ;;
  doctor) exec "$root/scripts/doctor" ;;
+ hardware) shift; exec "$root/scripts/titan-hardware" "$@" ;;
  theme)
   case "${2:-current}" in
    list) python3 -c "import json,sys;[print(p['id']) for p in json.load(open(sys.argv[1]))]" "$root/config/quickshell/umbra/theme/palettes.json" ;;

@@ -1,0 +1,15 @@
+base
+linux
+btrfs-progs
+dosfstools
+sudo
+networkmanager
+bluez
+power-profiles-daemon
+upower
+pipewire
+pipewire-pulse
+wireplumber
+ufw
+python
+plymouth

@@ -1,0 +1,9 @@
+networkmanager
+bluez
+bluez-utils
+power-profiles-daemon
+upower
+pipewire
+pipewire-pulse
+wireplumber
+ufw

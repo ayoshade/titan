@@ -6,7 +6,7 @@ set -euo pipefail
 root=$(cd -- "$(dirname -- "$(readlink -f "${BASH_SOURCE[0]}")")/.." && pwd)
 dev=0; [[ -d $root/.git ]] && dev=1
 warn() { printf 'warning: %s\n' "$*" >&2; }
-mapfile -t packages < <(cat "$root/packages/desktop.txt" "$root/packages/workflow.txt")
+mapfile -t packages < <(cat "$root/packages/desktop.txt" "$root/packages/workflow.txt" "$root/packages/services.txt")
 if ((dev)); then
  pacman -Q "${packages[@]}"
 else
@@ -14,7 +14,11 @@ else
  [[ -z $missing ]] || warn "not installed: $missing(install titan-desktop for the full desktop)"
 fi
 # Parse only: never write bytecode into a packaged, read-only tree.
-python -c 'import ast,sys; ast.parse(open(sys.argv[1]).read(),sys.argv[1])' "$root/lib/titan/workflow.py"
+python - "$root/lib" <<'PYTHON'
+import ast,pathlib,sys
+for source in pathlib.Path(sys.argv[1]).rglob('*.py'):
+ ast.parse(source.read_text(),str(source))
+PYTHON
 for script in "$root"/scripts/*; do
  # Check each script with the interpreter its shebang names.
  [[ -f $script ]] || continue

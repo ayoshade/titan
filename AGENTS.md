@@ -17,8 +17,10 @@ instead of maintaining two competing instruction sets.
 - Titan is owned by **Cristian Adrian Paredez** (GitHub `ayoshade`) and licensed
   Apache-2.0 (`LICENSE`, `NOTICE`). The public repository is
   `github.com/ayoshade/titan`. Titan 0.2.0 ships as signed Arch packages
-  (`titan`, `titan-desktop`) through GitHub releases; there is no installer or
-  ISO yet. The owner's development checkout is `~/dotfiles` on the laptop
+  (`titan`, `titan-desktop`) through GitHub releases. The 0.3.0 development
+  tree adds an experimental UEFI ISO/installer, currently confined to live
+  QEMU VMs; it is not published. See `docs/installation.md`. The owner's
+  development checkout is `~/dotfiles` on the laptop
   `umbra`, local user `shade`.
 - **Titan** is the product name. **Umbra** is the existing shell/configuration
   name; `umbra` is also the laptop hostname, and `shade` is the local user.
@@ -165,6 +167,8 @@ wl-clipboard, grim/slurp and suitable XDG portals.
 | `packages/` | Explicit package manifests |
 | `scripts/` | Installation, bootstrap, checks, session and user operations |
 | `system/` | Reviewed templates for privileged system configuration |
+| `installation/`, `lib/titan/install.py` | Experimental QEMU-only dedicated-disk installer and its base packages |
+| `system/hardware/profiles.json`, `lib/titan/hardware.py` | Read-only detection and conservative hardware package selection (`titan hardware`) |
 | `default/agents/skills/` | Agent skills shipped as Titan defaults (one `SKILL.md` per skill), symlinked into `~/.claude/skills/` and `~/.codex/skills/`; `titan` covers end-user customization, `titan-app` new Qt Quick desktop apps, `diagnose-crash` core dumps |
 | `docs/` | Research, hardware, decisions, validation and recovery |
 
@@ -191,6 +195,17 @@ Titan is Apache-2.0 (`LICENSE`, `NOTICE`: record any third-party material
 there). `scripts/publish-repo` publishes GitHub releases. Publishing is public:
 run it with `--yes` only when the owner asks, and never handle the signing key
 or its passphrase.
+Phase 2 tooling: `scripts/vm-test --graphical --stay` prepares a build VM;
+`scripts/vm-build-iso RUN` builds there; stop only that VM before
+`scripts/vm-install-test RUN` tests the ISO on a new virtual disk. Keep runs on
+disk, one 2 GiB VM at a time on this laptop. Test ISOs contain a temporary SSH
+public key: never distribute them. `scripts/build-iso` full builds and
+`scripts/titan-install --apply` are guarded to QEMU; do not remove those guards
+to try the installer on this daily-use machine. The initial prototype is
+unencrypted, UEFI/Btrfs and US/en_US.UTF-8; encryption, dual boot and physical
+NVIDIA/laptop testing remain open. The Plymouth template is applied only to a
+new target, never the laptop's bootloader or initramfs. The installed plan goes
+to `/etc/titan/install-plan.json`; user overrides keep their existing paths.
 Never hard-code `~/dotfiles`: Lua uses the `TITAN_ROOT` global, shell QML uses
 `Paths.root`/`Paths.script()`, and scripts resolve their own location.
 Snapshots: `scripts/install-snapshots` (user runs it with sudo; `--dry-run` is

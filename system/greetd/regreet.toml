@@ -8,7 +8,7 @@ icon_theme_name = "Adwaita"
 theme_name = "Adwaita"
 
 [appearance]
-greeting_msg = "UMBRA / ACCESS"
+greeting_msg = "TITAN / ACCESS"
 
 [widget.clock]
 format = "%a %d %b / %H:%M"

@@ -1,0 +1,29 @@
+#!/usr/bin/env python3
+"""Inspect hardware; no packages or machine settings are changed."""
+import argparse
+import json
+from pathlib import Path
+import sys
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "lib/titan"))
+from hardware import detect
+
+parser = argparse.ArgumentParser(description=__doc__)
+parser.add_argument("--json", action="store_true", help="print the versioned inventory")
+parser.add_argument("--packages", action="store_true", help="print installer hardware packages")
+args = parser.parse_args()
+inventory = detect()
+if args.json:
+    print(json.dumps(inventory, indent=2))
+elif args.packages:
+    print("\n".join(inventory["packages"]))
+    if not inventory["installer_supported"]:
+        print("Automatic installation is unsupported for: " + ", ".join(inventory["unsupported_gpus"]), file=sys.stderr)
+        sys.exit(1)
+else:
+    print(f"CPU: {inventory['cpu_vendor']} ({inventory['architecture']})")
+    print("GPU: " + (", ".join(f"{g['vendor']} / {g['driver'] or 'no driver'}" for g in inventory["gpus"]) or "none detected"))
+    print("Profile: " + ("laptop" if inventory["laptop"] else "desktop / virtual machine"))
+    print("Packages: " + " ".join(inventory["packages"]))
+    if not inventory["installer_supported"]:
+        print("Automatic installation needs a reviewed GPU profile: " + ", ".join(inventory["unsupported_gpus"]))

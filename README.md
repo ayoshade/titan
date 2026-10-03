@@ -7,8 +7,10 @@ dark black-and-graphite style modelled on saneAspect's designs. Everything is
 original code: no Waybar, no prebuilt rice, no separate launcher or
 notification daemon. The shell's internal name is **umbra**.
 
-Status: **Titan 0.2.0**, published as signed Arch packages. An installer and ISO
-are planned (see [docs/distribution.md](docs/distribution.md)). Licensed under
+Released: **Titan 0.2.0**, published as signed Arch packages. The **0.3.0
+development tree** adds an experimental QEMU-only UEFI installer and live ISO,
+hardware profiles and a boot splash (see [docs/installation.md](docs/installation.md)).
+It has not been published. Licensed under
 [Apache-2.0](LICENSE); attributions are in [NOTICE](NOTICE).
 
 ## Features
@@ -129,6 +131,7 @@ titan settings get | set KEY VALUE | reset KEY | schema
 titan wallpaper list | next | set PATH
 titan shell status | restart | ipc METHOD | open PANEL
 titan doctor                        # health check
+titan hardware --json                # read-only hardware inventory and installer packages
 titan update                        # snapshot, full upgrade, migrations (asks for sudo)
 ```
 
@@ -175,11 +178,14 @@ titan update                        # snapshot, full upgrade, migrations (asks f
 scripts/build-repo --channel edge                         # local pacman repository
 scripts/vm-test --full                                    # install local builds on a throwaway Arch VM (needs qemu-base)
 scripts/vm-test --full --from-repo                        # install from the published repository, as a user would
+scripts/vm-test --graphical                               # real greeter authentication and first-login shell checks
 scripts/publish-repo --channel stable --sign KEYID --yes  # GitHub release repo-stable
 ```
 
 Release, signing and user setup are documented in
 [docs/distribution.md](docs/distribution.md).
+The experimental ISO builder and installation tests run inside QEMU; see
+[docs/installation.md](docs/installation.md) for the complete sequence.
 
 ## Layout
 
@@ -275,6 +281,7 @@ sudo systemctl disable greetd.service   # return to text login next boot
 | --- | --- |
 | [AGENTS.md](AGENTS.md) | Rules and context for AI agents (Claude Code, Codex) |
 | [docs/distribution.md](docs/distribution.md) | Layers, migrations, updates, packaging, releasing, roadmap |
+| [docs/installation.md](docs/installation.md) | Experimental UEFI ISO, installer, hardware profiles and QEMU testing |
 | [docs/workflow.md](docs/workflow.md) | Command and IPC interfaces |
 | [docs/keybindings.md](docs/keybindings.md) | Complete shortcut reference |
 | [docs/snapshots.md](docs/snapshots.md) | Snapshots and recovery |

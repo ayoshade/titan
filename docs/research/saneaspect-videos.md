@@ -90,3 +90,8 @@ frame passes of Ob98KFByTec and ZS6syCYFKPE. YouTube returned HTTP 429 for capti
 | [6f9JYW20Hek](https://www.youtube.com/watch?v=6f9JYW20Hek) | Ghostty: Is This the Future of Hyprland Terminals? | 17:12 |  |  |  |
 | [qZlbBf6jwiY](https://www.youtube.com/watch?v=qZlbBf6jwiY) | Stop Building Your Hyprland Setups in Your Head | 15:04 |  |  |  |
 | [gtwc7fbExF8](https://www.youtube.com/watch?v=gtwc7fbExF8) | Hyprland's Window Rules Explained | 17:56 |  |  |  |
+
+Phase 2 installation work (2026-10-03) added original Titan boot branding and
+retained the existing login design. No additional video reviews were performed;
+the remaining catalog above is still open. Visual verification is recorded in
+`shell-panels.md` and `../verification.md`.

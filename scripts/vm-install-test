@@ -1,0 +1,114 @@
+#!/usr/bin/env bash
+# vm-install-test BUILD_RUN: boot that run's test ISO under UEFI, install onto
+# a new 40 GiB virtual disk, then boot it and test graphical login. Host disks
+# are never passed to QEMU. Artifacts are kept; both VMs stop when finished.
+set -euo pipefail
+root=$(cd -- "$(dirname -- "$(readlink -f "${BASH_SOURCE[0]}")")/.." && pwd)
+[[ -f $root/tests/vm_install_driver.py && -f $root/packaging/titan/PKGBUILD ]] || { echo 'vm-install-test: use a Titan development checkout' >&2; exit 1; }
+[[ $# == 1 ]] || { echo 'Usage: vm-install-test BUILD_RUN_DIRECTORY' >&2; exit 2; }
+source_run=$(realpath "$1")
+cache=${XDG_CACHE_HOME:-$HOME/.cache}/titan/vm
+[[ $source_run == "$(realpath "$cache/runs")/"run.* && -f $source_run/key ]] || { echo 'vm-install-test: provide a kept ISO build run' >&2; exit 2; }
+mapfile -t images < <(find "$source_run/iso" -maxdepth 1 -name '*.iso')
+[[ ${#images[@]} == 1 ]] || { echo 'vm-install-test: need exactly one test ISO' >&2; exit 2; }
+image=${images[0]}
+firmware=/usr/share/edk2/x64
+[[ -e $firmware/OVMF_CODE.4m.fd ]] || { echo 'vm-install-test: install edk2-ovmf first' >&2; exit 1; }
+available=$(awk '/MemAvailable/{print int($2/1024)}' /proc/meminfo)
+((available >= 3072)) || { echo 'vm-install-test: stop the build VM first; need 3 GiB available' >&2; exit 1; }
+run=$(mktemp -d "$cache/runs/install.XXXXXX")
+echo "Installer VM artifacts: $run"
+cp "$source_run/key" "$source_run/key.pub" "$run/"
+cp "$firmware/OVMF_VARS.4m.fd" "$run/OVMF_VARS.fd"
+qemu-img create -q -f qcow2 "$run/disk.qcow2" 40G
+mkdir "$run/http"
+"$root/scripts/build-repo" --channel edge "$run/http/repo" >/dev/null
+port=$((20000 + RANDOM % 20000)); sshport=$((40000 + RANDOM % 20000))
+python3 -m http.server "$port" --bind 127.0.0.1 --directory "$run/http" >/dev/null 2>&1 &
+http=$!
+cleanup() {
+ kill "$http" 2>/dev/null || true
+ [[ ! -e $run/qemu.pid ]] || kill "$(cat "$run/qemu.pid")" 2>/dev/null || true
+ echo "Installer artifacts kept: $run"
+}
+trap cleanup EXIT
+boot_vm() {
+ local media=(); [[ ${1:-} == live ]] && media=(-cdrom "$image" -boot order=d)
+ rm -f "$run/qemu.pid" "$run/qmp.sock"
+ qemu-system-x86_64 -enable-kvm -cpu host -machine q35 -m 2048 -smp 4 -display none -daemonize \
+  -pidfile "$run/qemu.pid" -vga std -device qemu-xhci -device usb-tablet \
+  -qmp unix:"$run/qmp.sock",server=on,wait=off \
+  -drive if=pflash,format=raw,readonly=on,file="$firmware/OVMF_CODE.4m.fd" \
+  -drive if=pflash,format=raw,file="$run/OVMF_VARS.fd" \
+  -drive file="$run/disk.qcow2",if=virtio \
+  -nic user,model=virtio-net-pci,hostfwd=tcp:127.0.0.1:$sshport-:22 \
+  -serial file:"$run/console.log" "${media[@]}"
+}
+sshargs=(-q -i "$run/key" -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ConnectTimeout=5)
+ssh_vm() { ssh "${sshargs[@]}" -p "$sshport" root@127.0.0.1 "$@"; }
+wait_ssh() {
+ for i in $(seq 1 90); do
+  kill -0 "$(cat "$run/qemu.pid")" 2>/dev/null || { echo 'vm-install-test: QEMU stopped' >&2; exit 1; }
+  ssh_vm true 2>/dev/null && return; sleep 3
+ done
+ echo 'vm-install-test: SSH did not come up; inspect console.log' >&2; exit 1
+}
+boot_vm live
+echo 'Booting the live ISO with UEFI…'
+wait_ssh
+ssh_vm 'test -d /sys/firmware/efi && test -d /run/archiso/bootmnt'
+# Overlay the current installer for development iterations; the final ISO
+# build must contain these same files before recording an ISO release check.
+scp "${sshargs[@]}" -P "$sshport" "$root/lib/titan/install.py" root@127.0.0.1:/usr/share/titan-installer/lib/titan/install.py
+ssh_vm 'titan-install --disk /dev/vda --user tester --json' >"$run/install-plan.json"
+scp "${sshargs[@]}" -P "$sshport" "$root/tests/vm_install_driver.py" root@127.0.0.1:/root/
+ssh_vm "systemd-run --unit=titan-install-test --property=Type=oneshot --no-block /usr/bin/python3 /root/vm_install_driver.py http://10.0.2.2:$port/repo"
+echo 'Installing onto the blank virtual disk…'
+state=activating
+for i in $(seq 1 360); do
+ kill -0 "$(cat "$run/qemu.pid")" 2>/dev/null || { echo 'vm-install-test: QEMU stopped during installation' >&2; exit 1; }
+ state=$(ssh_vm systemctl is-active titan-install-test 2>/dev/null || true)
+ [[ $state == activating || -z $state ]] || break
+ sleep 5
+done
+ssh_vm journalctl -u titan-install-test --no-pager -o cat >"$run/install.log"
+[[ $(ssh_vm systemctl show titan-install-test -p Result --value) == success ]] || { tail -40 "$run/install.log" >&2; exit 1; }
+# Add test-only SSH access for checking the installed system. The installer
+# itself never enables SSH, installs keys, or grants passwordless sudo.
+ssh_vm bash -s <<'TESTACCESS'
+set -euo pipefail
+mkdir /mnt/titan-check
+mount -o subvol=@ /dev/vda2 /mnt/titan-check
+mount /dev/vda1 /mnt/titan-check/boot
+arch-chroot /mnt/titan-check pacman -Syu --needed --noconfirm openssh
+install -Dm600 /root/.ssh/authorized_keys /mnt/titan-check/root/.ssh/authorized_keys
+arch-chroot /mnt/titan-check systemctl enable sshd
+test -e /mnt/titan-check/boot/loader/entries/titan.conf
+test -e /mnt/titan-check/etc/titan/install-plan.json
+umount --recursive /mnt/titan-check
+sync
+TESTACCESS
+echo 'PASS  Installer creates an independent UEFI + Btrfs system'
+live_pid=$(cat "$run/qemu.pid")
+kill "$live_pid"
+for i in $(seq 1 50); do kill -0 "$live_pid" 2>/dev/null || break; sleep .1; done
+boot_vm
+mkdir "$run/boot-frames"
+python3 - "$root" "$run" <<'CAPTURE' &
+from pathlib import Path
+import sys,time
+sys.path.insert(0,str(Path(sys.argv[1])/'lib/titan'))
+from vm_qmp import Monitor
+run=Path(sys.argv[2]); monitor=Monitor(run/'qmp.sock')
+for i in range(80):
+ monitor.screenshot(run/'boot-frames'/f'{i:03d}.png')
+ time.sleep(.2)
+CAPTURE
+capture=$!
+echo 'Booting the installed disk with the ISO detached…'
+wait_ssh
+wait "$capture"
+ssh_vm 'findmnt -no FSTYPE / | grep -qx btrfs && systemctl is-active --quiet greetd && titan hardware --json' >"$run/hardware.json"
+export TITAN_VM_RUN=$run TITAN_VM_SSH_PORT=$sshport TITAN_VM_SSH_USER=root
+"$root/scripts/vm-graphical"
+echo 'All installer and installed-disk graphical checks passed.'

@@ -1,0 +1,79 @@
+#!/usr/bin/env bash
+# Build Titan's experimental UEFI live installer from Archiso's installed
+# releng profile. Run only in a disposable build VM; never writes host disks.
+# --prepare stages the profile without running mkarchiso (no root required).
+set -euo pipefail
+root=$(cd -- "$(dirname -- "$(readlink -f "${BASH_SOURCE[0]}")")/.." && pwd)
+prepare=0 key="" base=""
+while (($#)); do
+ case $1 in
+  --prepare) prepare=1; shift ;;
+  --ssh-key) key=$2; shift 2 ;;
+  -h|--help) echo 'Usage: build-iso [--prepare] [--ssh-key PUBLIC_KEY] BUILD_DIRECTORY'; exit 0 ;;
+  *) [[ -z $base ]] || { echo 'build-iso: unexpected argument' >&2; exit 2; }; base=$1; shift ;;
+ esac
+done
+[[ -n $base ]] || { echo 'build-iso: provide a new build directory' >&2; exit 2; }
+[[ -d /usr/share/archiso/configs/releng ]] || { echo 'build-iso: install archiso in the build VM first' >&2; exit 1; }
+if ((!prepare)); then
+ ((EUID == 0)) || { echo 'build-iso: mkarchiso needs root; run this in the build VM' >&2; exit 1; }
+ case $(systemd-detect-virt) in qemu|kvm) ;; *) echo 'build-iso: full builds are confined to QEMU VMs' >&2; exit 1 ;; esac
+fi
+[[ ! -e $base ]] || { echo 'build-iso: use a new build directory (never remove a mounted Archiso work tree blindly)' >&2; exit 1; }
+if [[ -n $key ]]; then
+ [[ -f $key ]] && [[ $(wc -l <"$key") == 1 ]] && grep -qE '^ssh-ed25519 [A-Za-z0-9+/=]+( |$)' "$key" || { echo 'build-iso: --ssh-key requires a single public ed25519 key' >&2; exit 2; }
+fi
+mkdir -p "$base"
+base=$(realpath "$base")
+profile=$base/profile
+cp -a /usr/share/archiso/configs/releng "$profile"
+version=$(cat "$root/version")
+cat >>"$profile/profiledef.sh" <<EOF
+
+# Titan's overrides; upstream boot paths remain compatible with Archiso.
+iso_name="titan"
+iso_label="TITAN_\$(date +%Y%m%d)"
+iso_publisher="Titan <https://github.com/ayoshade/titan>"
+iso_application="Titan experimental live installer (QEMU only)"
+iso_version="$version-\$(date +%Y.%m.%d)"
+bootmodes=('uefi.systemd-boot')
+airootfs_image_tool_options=('-comp' 'zstd' '-Xcompression-level' '6' '-b' '1M')
+file_permissions["/usr/share/titan-installer/scripts/titan-install"]="0:0:755"
+EOF
+printf '\npython\n' >>"$profile/packages.x86_64"
+live=$profile/airootfs
+installer=$live/usr/share/titan-installer
+install -d "$installer"/{scripts,lib/titan,system/hardware,keys,installation} "$live/usr/local/bin"
+install -m755 "$root/scripts/titan-install" "$installer/scripts/"
+install -m644 "$root/lib/titan/"{install,hardware}.py "$installer/lib/titan/"
+install -m644 "$root/system/hardware/profiles.json" "$installer/system/hardware/"
+install -m644 "$root/keys/titan-packager.asc" "$installer/keys/"
+install -m644 "$root/installation/packages.txt" "$installer/installation/"
+install -m644 "$root/"{LICENSE,NOTICE,version} "$installer/"
+ln -s /usr/share/titan-installer/scripts/titan-install "$live/usr/local/bin/titan-install"
+cat >"$live/etc/motd" <<'MOTD'
+TITAN / LIVE INSTALLER
+
+Experimental UEFI + Btrfs installer, currently limited to disposable QEMU VMs.
+Connect to the network (iwctl for Wi-Fi), then inspect disks: titan-install
+Preview: titan-install --disk /dev/vda --user titan --timezone UTC
+Install: repeat with --apply; the exact erase confirmation is required.
+The initial VM prototype is unencrypted. It never reboots automatically.
+MOTD
+find "$profile/efiboot" -type f -name '*.conf' -exec sed -i 's/Arch Linux/Titan live installer/g' {} +
+if [[ -n $key ]]; then
+ install -d -m700 "$live/root/.ssh"
+ install -m600 "$key" "$live/root/.ssh/authorized_keys"
+ cat >>"$profile/profiledef.sh" <<'PERMISSIONS'
+file_permissions["/root/.ssh"]="0:0:700"
+file_permissions["/root/.ssh/authorized_keys"]="0:0:600"
+PERMISSIONS
+ install -d "$live/etc/systemd/system/multi-user.target.wants"
+ ln -sf /usr/lib/systemd/system/sshd.service "$live/etc/systemd/system/multi-user.target.wants/sshd.service"
+ echo 'TEST IMAGE: contains a VM SSH public key. Do not distribute.' >"$base/TEST-IMAGE"
+fi
+printf 'Titan %s\nArchiso %s\nSource %s\n' "$version" "$(pacman -Q archiso)" "$(git -C "$root" rev-parse HEAD 2>/dev/null || echo package)" >"$base/build-inputs.txt"
+if ((prepare)); then echo "Profile prepared: $profile"; exit 0; fi
+mkarchiso -v -w "$base/work" -o "$base/out" "$profile"
+(cd "$base/out" && sha256sum ./*.iso >SHA256SUMS)
+echo "ISO and checksum: $base/out"

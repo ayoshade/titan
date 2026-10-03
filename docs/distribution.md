@@ -9,7 +9,7 @@ layout, installation or updates.
 
 | Layer | Location | Owner | Updates may |
 | --- | --- | --- | --- |
-| Defaults | The checkout (`~/dotfiles`) today; a package (`/usr/share/titan`) later | Titan | Replace freely |
+| Defaults | The checkout (`~/dotfiles`) or package (`/usr/share/titan`) | Titan | Replace freely |
 | User layer | `~/.config/titan/` | The user | Never overwrite. Change only through migrations, and keep a copy when moving data |
 | Machine state | `~/.local/state/titan/` | Titan, on this machine | Regenerate |
 | Runtime | `$XDG_RUNTIME_DIR/titan/` | The current session | Discard at logout or reboot |
@@ -173,7 +173,33 @@ Install with `sudo pacman -Syu titan-desktop`. From then on, `titan update`
 (a full `pacman -Syu`) keeps Titan current. For edge, use `repo-edge` and add
 `SigLevel = Optional TrustAll` only on test machines while edge is unsigned.
 
-Still open: graphical-login testing in a VM (Phase 2 installer work).
+Graphical first-login now has a QEMU test, including real authentication,
+Welcome and live shell IPC. See the 0.3.0 development work below.
+
+### Phase 2: 0.3.0 development (not published)
+
+The experimental installer, ISO builder, hardware catalog, login branding and
+Plymouth template are described in [installation.md](installation.md). Apply
+is guarded to live QEMU VMs; no physical installation is supported yet. The
+public stable repository remains 0.2.0, and the new installer rejects that older
+version before writes. Use the explicit local VM repository for development.
+The UEFI ISO → dedicated-disk install → ISO-detached boot → ReGreet
+authentication → fresh-account Welcome path passed in QEMU. Local package
+regression checks passed 17/17. See [verification.md](verification.md) for
+exact observations and runtime/visual limitations.
+
+`titan-desktop` now includes the network, Bluetooth, power and audio service
+packages from `packages/services.txt`. `install-login --no-packages` configures
+a target whose package transaction is already complete. Login guidance names
+the user's account and Titan session rather than the development laptop user.
+The setup code distinguishes a session-created `setup.log` from existing user
+state, preserving Welcome on a genuine first login.
+
+Still open before release: encryption, dual boot, physical GPU/laptop profiles,
+signed 0.3.0 repository/ISO testing, wider boot/login coverage and distribution
+license/source review. The initial VM prototype uses UEFI, an unencrypted
+Btrfs root and US/en_US.UTF-8. This milestone does not complete those broader
+Phase 2 requirements.
 
 ### Phase 2 onwards
 

@@ -12,21 +12,35 @@
 # Requires: qemu-base (sudo pacman -S qemu-base) and /dev/kvm.
 set -euo pipefail
 root=$(cd -- "$(dirname -- "$(readlink -f "${BASH_SOURCE[0]}")")/.." && pwd)
-full=0 keep=0 memory=2048 from=""
+usage() { echo 'Usage: vm-test [--full] [--graphical] [--from-repo [stable|edge]] [--keep] [--stay] [--reuse RUN] [--memory MB]'; }
+[[ -f $root/packaging/titan/PKGBUILD ]] || { echo 'vm-test: use a Titan development checkout' >&2; exit 1; }
+full=0 keep=0 stay=0 graphical=0 memory=2048 from="" reuse=""
 while (($#)); do case $1 in --full) full=1; shift ;; --keep) keep=1; shift ;; --memory) memory=$2; shift 2 ;;
- --from-repo) from=stable; if [[ ${2:-} == stable || ${2:-} == edge ]]; then from=$2; shift; fi; shift ;; *) sed -n 2,12p "$0"; exit 2 ;; esac; done
+ --graphical) graphical=1; full=1; keep=1; shift ;;
+ --reuse) reuse=$2; keep=1; shift 2 ;;
+ --stay) stay=1; keep=1; shift ;;
+ --from-repo) from=stable; if [[ ${2:-} == stable || ${2:-} == edge ]]; then from=$2; shift; fi; shift ;;
+ -h|--help) usage; exit 0 ;; *) usage >&2; exit 2 ;; esac; done
 command -v qemu-system-x86_64 >/dev/null || { echo "vm-test: install QEMU first: sudo pacman -S qemu-base" >&2; exit 1; }
+[[ $memory =~ ^[0-9]+$ ]] && ((memory >= 1536)) || { echo "vm-test: --memory must be at least 1536 MB" >&2; exit 2; }
 [[ -w /dev/kvm ]] || { echo "vm-test: /dev/kvm is not available" >&2; exit 1; }
 cache=${XDG_CACHE_HOME:-$HOME/.cache}/titan/vm
 mkdir -p "$cache/runs"
 # The overlay disk grows by gigabytes: keep it on disk, never in a RAM-backed /tmp.
-run=$(mktemp -d "$cache/runs/run.XXXXXX")
+if [[ -n $reuse ]]; then
+ run=$(realpath "$reuse")
+ [[ $run == "$cache/runs/"run.* && -e $run/disk.qcow2 && -e $run/key ]] || { echo 'vm-test: --reuse needs a kept Titan VM run directory' >&2; exit 2; }
+ [[ ! -e $run/qemu.pid ]] || ! kill -0 "$(cat "$run/qemu.pid")" 2>/dev/null || { echo 'vm-test: this VM is already running' >&2; exit 1; }
+else
+ run=$(mktemp -d "$cache/runs/run.XXXXXX")
+fi
+echo "VM artifacts: $run"
 # The host must keep enough memory for itself, or its OOM killer ends the VM.
 available=$(awk '/MemAvailable/{print int($2/1024)}' /proc/meminfo)
 if (( available < memory + 1024 )); then
  echo "vm-test: only ${available} MB available; need ${memory} MB for the VM plus 1 GB for this machine." >&2
  echo "         Close some applications or use --memory with a smaller value (at least 1536)." >&2
- rm -rf "$run"; exit 1
+ [[ -n $reuse ]] || rm -rf "$run"; exit 1
 fi
 image=$cache/Arch-Linux-x86_64-cloudimg.qcow2
 base=https://geo.mirror.pkgbuild.com/images/latest
@@ -37,8 +51,10 @@ if [[ ! -e $image ]]; then
  (cd "$cache" && sed 's/  .*/  Arch-Linux-x86_64-cloudimg.qcow2.part/' image.SHA256 | sha256sum -c --quiet)
  mv "$image.part" "$image"
 fi
-qemu-img create -q -f qcow2 -b "$image" -F qcow2 "$run/disk.qcow2" 24G
-ssh-keygen -q -t ed25519 -N '' -f "$run/key"
+if [[ -z $reuse ]]; then
+ qemu-img create -q -f qcow2 -b "$image" -F qcow2 "$run/disk.qcow2" 24G
+ ssh-keygen -q -t ed25519 -N '' -f "$run/key"
+fi
 mkdir -p "$run/seed"
 printf 'instance-id: titan-vm-test\nlocal-hostname: titan-test\n' >"$run/seed/meta-data"
 cat >"$run/seed/user-data" <<EOF
@@ -57,11 +73,12 @@ python3 -m http.server "$port" --bind 127.0.0.1 --directory "$run/seed" >/dev/nu
 http=$!
 cleanup() {
  kill "$http" 2>/dev/null || true
- [[ -e $run/qemu.pid ]] && kill "$(cat "$run/qemu.pid")" 2>/dev/null || true
- ((keep)) || rm -rf "$run"
+ ((stay)) || { [[ -e $run/qemu.pid ]] && kill "$(cat "$run/qemu.pid")" 2>/dev/null || true; }
+ if ((keep)); then echo "VM artifacts kept: $run"; else rm -rf "$run"; fi
 }
 trap cleanup EXIT
 qemu-system-x86_64 -enable-kvm -cpu host -m "$memory" -smp 4 -display none -daemonize -pidfile "$run/qemu.pid" \
+ -vga std -device qemu-xhci -device usb-tablet -qmp unix:"$run/qmp.sock",server=on,wait=off \
  -drive file="$run/disk.qcow2",if=virtio \
  -nic user,model=virtio-net-pci,hostfwd=tcp:127.0.0.1:$sshport-:22 \
  -smbios type=1,serial="ds=nocloud;s=http://10.0.2.2:$port/" \
@@ -77,9 +94,17 @@ ssh_vm true || { echo "vm-test: the VM did not come up; console log: $run/consol
  echo 'pacman -Syu --noconfirm'
 } >"$run/install.sh"
 if [[ -z $from ]]; then
- scp -q -i "$run/key" -P "$sshport" -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "$run"/repo/*.pkg.tar.zst tester@127.0.0.1:
- pkgs="titan-[0-9]*-any.pkg.tar.zst"; ((full)) && pkgs="titan-[0-9]*-any.pkg.tar.zst titan-desktop-*-any.pkg.tar.zst"
- echo "cd /home/tester && pacman -U --noconfirm $pkgs" >>"$run/install.sh"
+ files=("$run"/repo/titan-"$(cat "$root/version")"-*-any.pkg.tar.zst)
+ ((full)) && files+=("$run"/repo/titan-desktop-"$(cat "$root/version")"-*-any.pkg.tar.zst)
+ ssh_vm 'mkdir -p /home/tester/titan-vm-packages'
+ scp -q -i "$run/key" -P "$sshport" -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "${files[@]}" tester@127.0.0.1:titan-vm-packages/
+ printf 'pacman -U --noconfirm ' >>"$run/install.sh"
+ pkgs=""
+ for file in "${files[@]}"; do
+  printf '%q ' "/home/tester/titan-vm-packages/${file##*/}" >>"$run/install.sh"
+  pkgs+="${file##*/} "
+ done
+ printf '\n' >>"$run/install.sh"
 else
  # The documented user steps (docs/distribution.md), with pacman's default signature checks.
  slug=$(git -C "$root" remote get-url origin | sed -E 's#(git@github.com:|https://github.com/)##; s#\.git$##')
@@ -96,6 +121,14 @@ STEPS
  echo "Testing the published '$from' repository of $slug (key $keyid)."
 fi
 echo 'touch /var/tmp/titan-install.ok' >>"$run/install.sh"
+if ((graphical)); then
+ # Use the real login installer, without a second package transaction/prompt.
+ sed -i '$d' "$run/install.sh"
+ cat >>"$run/install.sh" <<'GRAPHICAL'
+/usr/share/titan/scripts/install-login --no-packages
+touch /var/tmp/titan-install.ok
+GRAPHICAL
+fi
 scp -q -i "$run/key" -P "$sshport" -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "$run/install.sh" tester@127.0.0.1:
 echo "Installing inside the VM (detached job; full update first)…"
 ssh_vm "sudo systemd-run --unit=titan-vmtest-install --property=Type=oneshot --no-block /bin/bash /home/tester/install.sh"
@@ -124,9 +157,14 @@ failed=0
 pass "pacman installed $pkgs after a full update${from:+ from the published $from repository}"
 command -v titan >/dev/null && pass "titan on PATH" || fail "titan on PATH"
 titan version
+if [[ -z "$from" ]]; then
+ [[ \$(cat /usr/share/titan/version) == "$(cat "$root/version")" ]] && pass "installed the requested checkout version" || fail "installed version differs from the checkout"
+fi
+theme_before=\$(titan theme current)
+width_before=\$(titan settings get islandWidth)
 titan setup >/dev/null && pass "titan setup (first run)" || fail "titan setup"
 titan setup >/dev/null && pass "titan setup is repeatable" || fail "titan setup repeat"
-[[ \$(titan theme current) == graphite ]] && pass "default theme graphite" || fail "default theme"
+[[ \$(titan theme current) == \$theme_before ]] && pass "setup preserves theme (graphite on fresh installs)" || fail "theme preservation"
 titan migrate --status | grep -q pending && fail "migrations pending on a fresh install" || pass "fresh install has no pending migrations"
 [[ -e ~/.config/titan/preferences.json && -e ~/.local/state/titan/generated/kitty-theme.conf ]] && pass "user layer and generated theme" || fail "user layer"
 grep -q /usr/share/titan/config/kitty/kitty.conf ~/.config/kitty/kitty.conf && pass "thin Kitty config" || fail "thin Kitty config"
@@ -138,7 +176,14 @@ titan settings set islandWidth 260 && [[ \$(titan settings get islandWidth) == 2
 titan theme nord >/dev/null && [[ \$(titan theme current) == nord ]] && pass "theme switch" || fail "theme switch"
 titan doctor >/dev/null 2>&1 && pass "titan doctor (package mode)" || fail "titan doctor"
 [[ -e /usr/share/titan/system/greetd/config.toml && -e /usr/share/titan/packages/login.txt ]] && pass "login installer inputs shipped" || fail "login installer inputs"
+titan theme "\$theme_before" >/dev/null
+titan settings set islandWidth "\$width_before"
 exit \$failed
 EOF
 ((status == 0)) && echo "All VM checks passed." || echo "Some VM checks failed."
+if ((graphical && status == 0)); then
+ # The companion test drives the greeter through QEMU and checks the live session.
+ export TITAN_VM_RUN=$run TITAN_VM_SSH_PORT=$sshport
+ "$root/scripts/vm-graphical" || status=$?
+fi
 exit $status

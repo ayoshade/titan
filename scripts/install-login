@@ -1,8 +1,15 @@
 #!/usr/bin/env bash
 set -euo pipefail
 root=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)
+packages=1
+case ${1:-} in
+ --no-packages) packages=0 ;;
+ -h|--help) echo 'Usage: install-login [--no-packages] (requires root; enables login for next boot)'; exit 0 ;;
+ '') ;;
+ *) echo 'install-login: unknown argument' >&2; exit 2 ;;
+esac
 if (( EUID != 0 )); then
- exec sudo -- "$root/scripts/install-login"
+ exec sudo -- "$root/scripts/install-login" "$@"
 fi
 # Refuse to replace an unrelated login manager.
 if [[ -L /etc/systemd/system/display-manager.service ]]; then
@@ -15,8 +22,10 @@ folder=pathlib.Path(sys.argv[1])
 for name in ['config.toml','regreet.toml']:
  with (folder/name).open('rb') as f: tomllib.load(f)
 CHECK
-mapfile -t packages < "$root/packages/login.txt"
-pacman -Syu --needed "${packages[@]}"
+if ((packages)); then
+ mapfile -t login_packages < "$root/packages/login.txt"
+ pacman -Syu --needed "${login_packages[@]}"
+fi
 getent passwd greeter >/dev/null
 for program in /usr/bin/cage /usr/bin/regreet /usr/bin/start-hyprland; do
  [[ -x "$program" ]] || { printf 'Missing program: %s\n' "$program" >&2; exit 1; }
@@ -41,5 +50,9 @@ systemctl enable greetd.service
 systemctl set-default graphical.target
 systemctl is-enabled greetd.service
 printf '\nGraphical login enabled for next boot. Backup: %s\n' "$backup"
-printf 'At login, choose shade and the Hyprland session (without UWSM).\n'
-printf 'The current desktop has not been restarted. Return to Codex when done.\n'
+if [[ -e /usr/share/wayland-sessions/titan.desktop ]]; then
+ printf 'At login, choose your account and the Titan session.\n'
+else
+ printf 'At login, choose your account and the Hyprland session (without UWSM).\n'
+fi
+printf 'The current desktop has not been restarted.\n'

@@ -1,0 +1,52 @@
+#!/usr/bin/env bash
+# vm-build-iso RUN_DIRECTORY: build the experimental ISO inside a running
+# vm-test --stay guest, then copy it out. No host sudo or package installation.
+set -euo pipefail
+root=$(cd -- "$(dirname -- "$(readlink -f "${BASH_SOURCE[0]}")")/.." && pwd)
+[[ $# == 1 ]] || { echo 'Usage: vm-build-iso RUN_DIRECTORY (from vm-test --stay)' >&2; exit 2; }
+run=$(realpath "$1")
+cache=$(realpath "${XDG_CACHE_HOME:-$HOME/.cache}/titan/vm/runs")
+[[ $run == "$cache/"run.* && -f $run/qemu.pid && -f $run/key ]] || { echo 'vm-build-iso: invalid VM run directory' >&2; exit 2; }
+port=$(python3 - "$run" <<'PORT'
+from pathlib import Path
+import re,sys
+run=Path(sys.argv[1])
+args=Path('/proc', (run/'qemu.pid').read_text().strip(), 'cmdline').read_bytes().decode().split('\0')
+if not any(str(run/'disk.qcow2') in arg for arg in args):
+ raise SystemExit('vm-build-iso: PID does not belong to this VM')
+print(re.search(r'hostfwd=tcp:127\.0\.0\.1:(\d+)-:22', '\n'.join(args)).group(1))
+PORT
+)
+sshargs=(-q -i "$run/key" -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ConnectTimeout=5)
+ssh_vm() { ssh "${sshargs[@]}" -p "$port" tester@127.0.0.1 "$@"; }
+scp_vm() { scp "${sshargs[@]}" -P "$port" "$@"; }
+build=titan-isobuild-$(date +%s)
+tar -C "$root" -czf "$run/iso-source.tar.gz" scripts/build-iso scripts/titan-install lib/titan/install.py lib/titan/hardware.py system/hardware keys/titan-packager.asc installation/packages.txt LICENSE NOTICE version
+scp_vm "$run/iso-source.tar.gz" "$run/key.pub" tester@127.0.0.1:
+cat >"$run/build-iso.sh" <<EOF
+set -euo pipefail
+pacman -Syu --needed --noconfirm archiso
+mkdir /var/tmp/$build-source
+tar -xzf /home/tester/iso-source.tar.gz -C /var/tmp/$build-source
+bash /var/tmp/$build-source/scripts/build-iso --ssh-key /home/tester/key.pub /var/tmp/$build
+touch /var/tmp/$build.ok
+EOF
+scp_vm "$run/build-iso.sh" tester@127.0.0.1:
+ssh_vm "sudo systemd-run --unit=$build --property=Type=oneshot --no-block /bin/bash /home/tester/build-iso.sh"
+echo 'Building ISO inside QEMU…'
+state=activating
+for i in $(seq 1 720); do
+ kill -0 "$(cat "$run/qemu.pid")" 2>/dev/null || { echo 'vm-build-iso: the VM stopped' >&2; exit 1; }
+ state=$(ssh_vm "systemctl is-active $build" 2>/dev/null || true)
+ [[ $state == activating || -z $state ]] || break
+ sleep 5
+done
+ssh_vm "sudo journalctl -u $build --no-pager -o cat" >"$run/build-iso.log"
+if ! ssh_vm "test -e /var/tmp/$build.ok"; then
+ tail -40 "$run/build-iso.log" >&2; exit 1
+fi
+mkdir -p "$run/iso"
+scp_vm "tester@127.0.0.1:/var/tmp/$build/out/*" "$run/iso/"
+scp_vm "tester@127.0.0.1:/var/tmp/$build/build-inputs.txt" "$run/iso/"
+(cd "$run/iso" && sha256sum -c SHA256SUMS)
+echo "TEST ISO (contains this VM's SSH public key; do not distribute): $run/iso"

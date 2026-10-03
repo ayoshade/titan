@@ -148,3 +148,16 @@ Sources: 5cp6DkClAuM 0:48–0:53, J8s7O2IGogE 5:00.
 | Notifications | Adaptation: avatar cards grouped by app with "+N more"; toast drops below the island |
 | Media panel | Implemented after the Ob98KFByTec album-art card, with a blurred art backdrop |
 | Lock screen restyle | Not done: Hyprlock reliability is still unverified (see AGENTS.md), and it cannot be tested without locking the session |
+
+## Phase 2 login and boot — 2026-10-03
+
+The login greeting now names Titan; its existing dark/graphite ReGreet styling
+is retained. A new original Plymouth theme uses a centered letterspaced Titan
+wordmark and restrained progress dots on a dark background, with no refresh
+timer. This is Titan's own boot identity, not a reproduction of a reviewed
+saneAspect boot sequence. No additional videos were reviewed for this work.
+
+The installed QEMU system was visually inspected at 1280×800: splash, greeter,
+wallpaper and first-login Welcome. A brief libseat probe message is visible
+between splash and greeter; smoother handoff remains a deviation to fix.
+Desktop panel geometry and the existing design tokens were not changed.

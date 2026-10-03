@@ -1,0 +1,109 @@
+#!/usr/bin/env python3
+"""Internal companion to vm-test --graphical; never starts a host desktop."""
+import os
+from pathlib import Path
+import subprocess
+import sys
+import time
+import shlex
+import traceback
+
+root = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(root / "lib/titan"))
+from vm_qmp import Monitor
+
+run = Path(os.environ["TITAN_VM_RUN"])
+port = os.environ["TITAN_VM_SSH_PORT"]
+user = f"titanuser{time.time_ns() % 100000}"
+(run / "graphical-user").write_text(user + "\n")
+ssh = ["ssh", "-q", "-i", str(run / "key"), "-p", port,
+       "-o", "StrictHostKeyChecking=no", "-o", "UserKnownHostsFile=/dev/null",
+       "-o", "ConnectTimeout=5", os.environ.get("TITAN_VM_SSH_USER", "tester") + "@127.0.0.1"]
+
+
+def guest(command, check=True):
+    return subprocess.run(ssh + ["cd / && " + command], text=True, capture_output=True, timeout=20, check=check)
+
+
+def wait_for(command, seconds=60):
+    deadline = time.monotonic() + seconds
+    while time.monotonic() < deadline:
+        result = guest(command, check=False)
+        if result.returncode == 0:
+            return result.stdout
+        time.sleep(2)
+    raise RuntimeError(f"Guest check timed out: {command}\n{result.stdout}{result.stderr}")
+
+
+try:
+    monitor = Monitor(run / "qmp.sock")
+    # An ephemeral password only for this throwaway VM; never use a host credential.
+    guest(f"sudo useradd -m -s /bin/bash {user}; "
+          f"printf '{user}:titanvm\\n' | sudo chpasswd; "
+          "sudo pkill -KILL -x Hyprland || true; sudo pkill -KILL -x qs || true; "
+          "sudo rm -f /var/lib/regreet/state.toml; "
+          "sudo systemctl restart --no-block greetd")
+    wait_for("pgrep -x regreet >/dev/null")
+    time.sleep(8)
+    width, height = monitor.screenshot(run / "greeter.png")
+    print(f"Greeter captured: {run / 'greeter.png'}", flush=True)
+    # ReGreet's custom-entry controls avoid depending on account/session
+    # ordering in different package versions. Authentication remains real.
+    monitor.click(width // 2 + 223, height // 2 - 36, width, height)
+    monitor.click(width // 2, height // 2 - 36, width, height)
+    monitor.key("ctrl", "a")
+    monitor.type(user)
+    monitor.key("tab")
+    monitor.click(width // 2 + 223, height // 2 + 25, width, height)
+    monitor.click(width // 2, height // 2 + 25, width, height)
+    monitor.key("ctrl", "a")
+    monitor.type("titan-session")
+    monitor.key("tab")
+    monitor.screenshot(run / "selection.png")
+    monitor.click(width // 2 + 215, height // 2 + 86, width, height)
+    time.sleep(2)
+    monitor.screenshot(run / "login.png")
+    monitor.click(width // 2, height // 2 + 25, width, height)
+    monitor.key("ctrl", "a")
+    monitor.type("titanvm")
+    monitor.key("ret")
+    wait_for(f"pgrep -u {user} -x Hyprland >/dev/null", 90)
+    wait_for(f"pgrep -u {user} -x quickshell >/dev/null || pgrep -u {user} -x qs >/dev/null", 90)
+    time.sleep(8)
+    monitor.screenshot(run / "desktop.png")
+    # SSH does not inherit Wayland's environment; read just its instance id.
+    uid = guest(f"id -u {user}").stdout.strip()
+    display = guest(f"sudo -u {user} find /run/user/{uid} -maxdepth 1 -type s -name 'wayland-*'").stdout.strip().splitlines()[0]
+    user_prefix = f"sudo -H -u {user} env XDG_RUNTIME_DIR=/run/user/{uid} WAYLAND_DISPLAY={shlex.quote(Path(display).name)} "
+    instances = guest(user_prefix + "hyprctl instances -j").stdout
+    import json
+    signature = json.loads(instances)[0]["instance"]
+    prefix = user_prefix + f"HYPRLAND_INSTANCE_SIGNATURE={shlex.quote(signature)} "
+    errors = guest(prefix + "hyprctl configerrors").stdout.strip()
+    if errors:
+        raise RuntimeError(f"Live Hyprland config errors: {errors}")
+    guest(prefix + "hyprctl monitors -j")
+    # IPC confirms QML instantiated, beyond just a process existing.
+    status = json.loads(wait_for(user_prefix + "timeout 10 titan-shell status"))
+    guest(f"sudo -u {user} test -e /home/{user}/.local/state/titan/setup-version && ! sudo -u {user} test -e /home/{user}/.local/state/titan/welcome-done")
+    if status.get("panel") != "welcome":
+        raise RuntimeError(f"Welcome did not open on first login: {status}")
+    (run / "shell-status.json").write_text(json.dumps(status, indent=2) + "\n")
+    print("PASS  Titan session sets up a fresh account on first login", flush=True)
+    print("PASS  ReGreet login starts Hyprland and the live Titan shell", flush=True)
+except Exception as error:
+    (run / "graphical-error.log").write_text(traceback.format_exc())
+    print(f"FAIL  graphical session: {error}", file=sys.stderr)
+    sys.exit(1)
+finally:
+    for name, command in {
+        "greetd.log": "sudo journalctl -b -u greetd --no-pager",
+        "regreet.log": "sudo cat /var/log/regreet/log",
+        "session.log": f"sudo journalctl -b _UID=$(id -u {user}) --no-pager",
+        "shell.log": f"sudo -u {user} env XDG_RUNTIME_DIR=/run/user/$(id -u {user}) WAYLAND_DISPLAY=wayland-1 timeout 5 qs -c umbra log",
+    }.items():
+        try:
+            result = guest(command, check=False)
+            (run / name).write_text(result.stdout + result.stderr)
+        except Exception as error:
+            (run / name).write_text(str(error))

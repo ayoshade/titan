@@ -1,0 +1,14 @@
+{
+  "base": ["linux-firmware", "mesa", "sof-firmware"],
+  "cpu": {
+    "GenuineIntel": ["intel-ucode"],
+    "AuthenticAMD": ["amd-ucode"]
+  },
+  "gpu": {
+    "intel": ["vulkan-intel"],
+    "amd": ["vulkan-radeon"],
+    "virtual": [],
+    "nvidia": null,
+    "unknown": null
+  }
+}
