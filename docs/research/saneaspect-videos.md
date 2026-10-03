@@ -5,18 +5,18 @@ Channel: https://www.youtube.com/@saneAspect/videos. On 2026-10-03, 80 public up
 Review levels: *measured* = native frames analysed numerically; *sampled* = frame
 samples viewed; *captions* = caption text only; blank = not reviewed yet.
 
-Next island-relevant videos to review: Ob98KFByTec, nKomstQedmE, OeT5VgeLSIQ, rLFFjT6kAkA,
-wcm95W876OU. YouTube returned HTTP 429 for caption downloads when they were requested in parallel, so fetch them one at a time.
+Next to review: nKomstQedmE captions, OeT5VgeLSIQ, rLFFjT6kAkA, wcm95W876OU, and full
+frame passes of Ob98KFByTec and ZS6syCYFKPE. YouTube returned HTTP 429 for caption downloads when they were requested in parallel, so fetch them one at a time.
 
 | ID | Title | Length | Date | Topic | Review |
 | --- | --- | --- | --- | --- | --- |
 | [J8s7O2IGogE](https://www.youtube.com/watch?v=J8s7O2IGogE) | Why I added a workspace switcher to my Dynamic Island | 11:32 | 2026-10-02 | Island + workspace switcher | Measured: captions read; native 1080p frames analysed (2026-10-03). Source of [island-notch.md](island-notch.md). |
-| [Mcjr5T2pHxw](https://www.youtube.com/watch?v=Mcjr5T2pHxw) | Why I stopped looking at unixporn for Hyprland inspiration | 13:30 | 2026-10-01 | Design process, notifications, launcher | Captions (earlier session); frames not reviewed. |
+| [Mcjr5T2pHxw](https://www.youtube.com/watch?v=Mcjr5T2pHxw) | Why I stopped looking at unixporn for Hyprland inspiration | 13:30 | 2026-10-01 | Design process, notifications, launcher | Captions (earlier session); video downloaded 2026-10-03, frames not reviewed. |
 | [H4B3gZTi9ao](https://www.youtube.com/watch?v=H4B3gZTi9ao) | Learn 80% of Quickshell in 20 min | 20:18 |  |  |  |
 | [n0UT78KC95I](https://www.youtube.com/watch?v=n0UT78KC95I) | Can you get Face ID on Quickshell + Hyprland? | 16:55 |  |  |  |
 | [h9zYpdNsl-E](https://www.youtube.com/watch?v=h9zYpdNsl-E) | Middle click scrolling on hyprland (you’re welcome) | 9:29 |  |  |  |
 | [5qouuepxSRc](https://www.youtube.com/watch?v=5qouuepxSRc) | 3 Things You Should Never Do When Ricing Hyprland | 14:39 |  |  |  |
-| [5cp6DkClAuM](https://www.youtube.com/watch?v=5cp6DkClAuM) | A full walkthrough of my Dynamic Island Quickshell | 2:18 | 2026-09-19 | Island walkthrough (visual demo) | Sampled: frames every 4 s plus 1080p top-centre crops. Older side-circle layout; captions are lyrics. |
+| [5cp6DkClAuM](https://www.youtube.com/watch?v=5cp6DkClAuM) | A full walkthrough of my Dynamic Island Quickshell | 2:18 | 2026-09-19 | Island walkthrough (visual demo) | Sampled: frames every 4 s plus 1080p crops of the control center (0:22–0:41), the settings window (1:36–1:44) and the theme/wallpaper carousels (1:50–2:12). Older side-circle layout; captions are lyrics. |
 | [vfxf8C5-twM](https://www.youtube.com/watch?v=vfxf8C5-twM) | This analogy makes it super easy to rice Quickshell on Hyprland | 20:04 |  |  |  |
 | [Rj4Axx_WGfk](https://www.youtube.com/watch?v=Rj4Axx_WGfk) | Why Quickshell is actually really simple (it’s not what you think) | 14:02 |  |  |  |
 | [PVzr40mUSGk](https://www.youtube.com/watch?v=PVzr40mUSGk) | True Liquid Glass on Linux? | 15:01 |  |  |  |
@@ -24,7 +24,7 @@ wcm95W876OU. YouTube returned HTTP 429 for caption downloads when they were requ
 | [pLr96tmXZBg](https://www.youtube.com/watch?v=pLr96tmXZBg) | Is Hyprland the best Wayland compositor in 2026? | 22:12 |  |  |  |
 | [SMg7S7EJL_g](https://www.youtube.com/watch?v=SMg7S7EJL_g) | There's autocomplete for Hyprland's Lua files | 14:07 |  |  |  |
 | [jhEkelk44cY](https://www.youtube.com/watch?v=jhEkelk44cY) | Why there’s no point using Waybar on Hyprland anymore | 18:31 |  |  |  |
-| [Ob98KFByTec](https://www.youtube.com/watch?v=Ob98KFByTec) | My Quickshell Dynamic Island just got 10x better. | 24:14 |  |  |  |
+| [Ob98KFByTec](https://www.youtube.com/watch?v=Ob98KFByTec) | My Quickshell Dynamic Island just got 10x better. | 24:14 |  | Island upgrade, control center | Sampled: 25 s contact sheet plus frames at 1:15, 7:30, 7:55 and 21:15 (album-art media popup, control center with a media tile). Captions not retrieved (HTTP 429). |
 | [wkFukXIEjWA](https://www.youtube.com/watch?v=wkFukXIEjWA) | quickshell anchors vs layouts in 2 min | 2:39 |  |  |  |
 | [Lww27cwoGlM](https://www.youtube.com/watch?v=Lww27cwoGlM) | How to get ridiculously good at ricing Hyprland | 28:50 |  |  |  |
 | [zupALX-gRRk](https://www.youtube.com/watch?v=zupALX-gRRk) | Hyprland vs Niri in 2026 | 16:44 |  |  |  |
@@ -32,11 +32,11 @@ wcm95W876OU. YouTube returned HTTP 429 for caption downloads when they were requ
 | [hsPXkFbn39s](https://www.youtube.com/watch?v=hsPXkFbn39s) | We seriously need an alternative to r/unixporn. | 18:46 |  |  |  |
 | [DT01JG-b0pk](https://www.youtube.com/watch?v=DT01JG-b0pk) | How I make legendary Hyprland rices | 19:25 |  |  |  |
 | [fOFB1tYKP0c](https://www.youtube.com/watch?v=fOFB1tYKP0c) | This will save you hours learning Quickshell. | 19:41 |  |  |  |
-| [rLFFjT6kAkA](https://www.youtube.com/watch?v=rLFFjT6kAkA) | It’s done. Everything’s using Quickshell now. | 20:06 |  |  |  |
+| [rLFFjT6kAkA](https://www.youtube.com/watch?v=rLFFjT6kAkA) | It’s done. Everything’s using Quickshell now. | 20:06 |  | Everything in Quickshell | Downloaded 2026-10-03; not reviewed. |
 | [1eULXt-SiZ0](https://www.youtube.com/watch?v=1eULXt-SiZ0) | Hyprland’s blur customization is just insane (latest git version) | 21:45 |  |  |  |
 | [rVA5RmE8zgM](https://www.youtube.com/watch?v=rVA5RmE8zgM) | This Hyprland plugin was made as a joke (now I can't live without it) | 18:06 |  |  |  |
 | [a95_z39c-jc](https://www.youtube.com/watch?v=a95_z39c-jc) | I read hyprglass’ source code so you don’t have to | 16:51 |  |  |  |
-| [ZS6syCYFKPE](https://www.youtube.com/watch?v=ZS6syCYFKPE) | How I choose amazing wallpapers for my Hyprland rices | 18:02 |  |  |  |
+| [ZS6syCYFKPE](https://www.youtube.com/watch?v=ZS6syCYFKPE) | How I choose amazing wallpapers for my Hyprland rices | 18:02 |  | Choosing wallpapers | Sampled: 30 s contact sheet only (Wallhaven Toplist at 1:30). Captions not retrieved (HTTP 429). |
 | [kitMR6T8Ifs](https://www.youtube.com/watch?v=kitMR6T8Ifs) | Hyprland Has Niri’s Scrolling Layout Built-In | 22:59 |  |  |  |
 | [Kdm4dA4rh48](https://www.youtube.com/watch?v=Kdm4dA4rh48) | The Icon Trick I Use in Every Quickshell Module | 14:15 |  |  |  |
 | [WZiruE42hJc](https://www.youtube.com/watch?v=WZiruE42hJc) | Turn Your Trackpad Edges Into Hyprland Controls | 19:16 |  |  |  |
@@ -44,12 +44,12 @@ wcm95W876OU. YouTube returned HTTP 429 for caption downloads when they were requ
 | [uXvwk4dGoPY](https://www.youtube.com/watch?v=uXvwk4dGoPY) | Why Your Rice Isn’t Caelestia | 11:58 |  |  |  |
 | [LhlYRnWedNg](https://www.youtube.com/watch?v=LhlYRnWedNg) | Why Every Hyprland Rice Has Rounded Corners Now | 14:49 |  |  |  |
 | [EG41Kjtqh40](https://www.youtube.com/watch?v=EG41Kjtqh40) | Here’s everything you need to make a Quickshell bar on Hyprland today | 26:28 |  |  |  |
-| [ipEGXS5WcSg](https://www.youtube.com/watch?v=ipEGXS5WcSg) | Best place to find wallpapers for your Hyprland rice | 6:41 |  |  |  |
+| [ipEGXS5WcSg](https://www.youtube.com/watch?v=ipEGXS5WcSg) | Best place to find wallpapers for your Hyprland rice | 6:41 |  | Wallpaper sources | Sampled: 12 s contact sheet; address bars read (wallhaven.cc, theanimegallery.com, r/unixporn). Also shows notch mode at 1:02. Captions not retrieved (HTTP 429). |
 | [EflNk1zNVNE](https://www.youtube.com/watch?v=EflNk1zNVNE) | How to learn Quickshell without getting overwhelmed | 22:46 |  |  |  |
 | [4_fp-aQ0nX0](https://www.youtube.com/watch?v=4_fp-aQ0nX0) | Caelestia Dots in 2026: Should You Use Them? | 21:49 |  |  |  |
 | [nczPmyQx9Ks](https://www.youtube.com/watch?v=nczPmyQx9Ks) | Stop using HyprPanel, its creator already did | 20:37 |  |  |  |
 | [k5-U_xBA3Mg](https://www.youtube.com/watch?v=k5-U_xBA3Mg) | Learn Quickshell in 2026: The Complete Roadmap | 30:42 |  |  |  |
-| [nKomstQedmE](https://www.youtube.com/watch?v=nKomstQedmE) | I Replaced My Whole Hyprland Bar With One Notch | 26:55 |  |  |  |
+| [nKomstQedmE](https://www.youtube.com/watch?v=nKomstQedmE) | I Replaced My Whole Hyprland Bar With One Notch | 26:55 | 2026-08-01 | Notch mode, settings app | Sampled: 25 s contact sheet and 17 s settings crops (Bar & Island, Appearance, Motion). English captions downloaded but not yet read. |
 | [VqXPtJt8okc](https://www.youtube.com/watch?v=VqXPtJt8okc) | How to Get Niri’s Overview on Hyprland | 19:42 |  |  |  |
 | [2ZNGlPW6DM8](https://www.youtube.com/watch?v=2ZNGlPW6DM8) | How to Get Liquid Glass on Hyprland | 22:50 |  |  |  |
 | [7ErM-TF6K2c](https://www.youtube.com/watch?v=7ErM-TF6K2c) | Don't Learn Quickshell (Until This Happens) | 13:09 |  |  |  |
@@ -58,7 +58,7 @@ wcm95W876OU. YouTube returned HTTP 429 for caption downloads when they were requ
 | [7JLfiy-fli4](https://www.youtube.com/watch?v=7JLfiy-fli4) | Beginner’s Roadmap To Ricing Hyprland in 2026 | 15:21 |  |  |  |
 | [aKoG9rFnTOk](https://www.youtube.com/watch?v=aKoG9rFnTOk) | The New Way of Ricing Hyprland in The Age of Quickshell | 13:54 |  |  |  |
 | [TfZ676_41H8](https://www.youtube.com/watch?v=TfZ676_41H8) | How to Make a Game Mode for Hyprland | 9:16 |  |  |  |
-| [OeT5VgeLSIQ](https://www.youtube.com/watch?v=OeT5VgeLSIQ) | So I’ve been working on this new Quickshell feature… | 13:03 |  |  |  |
+| [OeT5VgeLSIQ](https://www.youtube.com/watch?v=OeT5VgeLSIQ) | So I’ve been working on this new Quickshell feature… | 13:03 | 2026-06-25 | Quickshell feature preview | Downloaded with captions 2026-10-03; not reviewed. |
 | [Vlpyz4c4Xdw](https://www.youtube.com/watch?v=Vlpyz4c4Xdw) | How to Rice Quickshell (Part 2) / Battery, Network and Volume | 57:20 |  |  |  |
 | [k0fyXP6YaRk](https://www.youtube.com/watch?v=k0fyXP6YaRk) | How to Rice Quickshell (Part 1) | 22:56 |  |  |  |
 | [-rD5tVnaepc](https://www.youtube.com/watch?v=-rD5tVnaepc) | What Makes The Perfect Hyprland Rice (3 Things) | 13:41 |  |  |  |

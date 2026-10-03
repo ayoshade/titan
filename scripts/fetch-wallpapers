@@ -10,7 +10,7 @@ redistribute them.
 
 Usage: fetch-wallpapers [--count N] [--dry-run] [THEME ...]
 """
-import argparse, json, os, pathlib, sys, tempfile, time, urllib.parse, urllib.request
+import argparse, colorsys, json, os, pathlib, sys, tempfile, time, urllib.parse, urllib.request
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 PALETTES = ROOT/'config/quickshell/umbra/theme/palettes.json'
@@ -24,9 +24,17 @@ MAX_BYTES = 12*1024*1024
 AGENT = 'Titan-fetch-wallpapers/1 (personal desktop setup)'
 
 def rgb(hexcode): return tuple(int(hexcode[i:i+2],16) for i in (0,2,4))
+def hsv(hexcode): return colorsys.rgb_to_hsv(*(v/255 for v in rgb(hexcode)))
 def nearest(hexcode):
-    r,g,b = rgb(hexcode.lstrip('#'))
-    return min(COLOURS, key=lambda c: sum((x-y)**2 for x,y in zip(rgb(c),(r,g,b))))
+    # Pastel accents are closest to greys in RGB; match saturated accents by hue.
+    h,s,v = hsv(hexcode.lstrip('#'))
+    if s < 0.2: return min(COLOURS, key=lambda c: sum((x-y)**2 for x,y in zip(rgb(c),rgb(hexcode.lstrip('#')))))
+    def distance(c):
+        ch,cs,cv = hsv(c)
+        if cs < 0.3: return 9
+        hue = min(abs(ch-h), 1-abs(ch-h))
+        return hue*4 + abs(cv-v)*0.5
+    return min(COLOURS, key=distance)
 
 def get(url, timeout=30):
     request = urllib.request.Request(url, headers={'User-Agent': AGENT})

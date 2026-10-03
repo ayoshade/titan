@@ -35,6 +35,13 @@ glowing active mark, signal bars and solid battery, and no side circles. See
 deviation checklist, and [research/saneaspect-videos.md](research/saneaspect-videos.md)
 for the full channel inventory and review status.
 
+## Panels, settings and wallpapers (2026-10-03)
+
+The control center, Settings window, theme and wallpaper carousels, notch mode
+and wallpaper sourcing were studied from frames of 5cp6DkClAuM, J8s7O2IGogE,
+Ob98KFByTec, nKomstQedmE and ipEGXS5WcSg. See
+[research/shell-panels.md](research/shell-panels.md).
+
 ## Applied to Umbra
 
 The original full-width text bar has been replaced by a centered black island

@@ -19,6 +19,19 @@ interpolation of user text, filenames or calculator expressions.
 - `qs -c umbra ipc call shell island`: toggle the expanded island dashboard on
   the focused monitor. `clock` (and `panelAt 3`) toggles the island's calendar
   view; the overlay clock panel was removed. Escape or moving the pointer away closes it.
+- `qs -c umbra ipc call shell settings SECTION` opens Titan Settings (island,
+  media, clock, appearance, motion, launcher, notifications, control, lock,
+  system); `wallpapers` opens the wallpaper carousel. Quickshell hot-reloads
+  QML edits, but newly added IPC functions need `scripts/shell-restart`.
+- `scripts/workflow settings get [KEY]`, `set KEY VALUE`, `reset KEY` and
+  `schema`: the same validated settings the Settings window edits (schema in
+  `config/quickshell/umbra/theme/settings-schema.json`, values in
+  `$XDG_STATE_HOME/titan/settings.json`). The shell reloads them live. Invalid
+  values exit non-zero without writing.
+- `scripts/workflow wallpaper list|current|next|set PATH`: wallpapers of the
+  current theme (JSON for `list`). `scripts/fetch-wallpapers` fills
+  `~/Pictures/Wallpapers/<theme>/` from Wallhaven; it uses the network, so
+  run it only when asked.
 - `scripts/workflow toggles`: JSON `{"nightlight":BOOL,"gameMode":BOOL}`; safe as
   a diagnostic. `scripts/workflow nightlight` and `game-mode` change the desktop.
   Game mode turns Hyprland animations, blur and shadows off at runtime. It saves

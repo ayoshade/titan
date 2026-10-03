@@ -239,3 +239,31 @@ kernel parameters or bootloader edits were applied.
   until it was sized to the tallest state.
 - Not hands-on tested: pointer clicks on the month buttons, wheel paging,
   Left/Right keys and Super+Ctrl+Alt+D.
+
+## Control center, Settings, wallpapers and dashboard fix — 2026-10-03
+
+- **Dashboard clicks (user report):** workspace rows in the dashboard did not
+  respond. Debug logging showed that exclusive keyboard focus made Hyprland
+  send the island a pointer leave as it opened; the leave timer then collapsed
+  it. On-demand focus keeps hover. Scripted pointer warps only produce
+  enter/leave events, so this was verified through hover and enter logging,
+  not real clicks.
+- **Control center:** opened through IPC; the main page and Wi-Fi drill-in
+  rendered with no warnings. Bluetooth, Sound and Display pages were not
+  opened in this session.
+- **Settings window:** floats at 820×560 through `config/hypr/rules.lua`, and
+  `hyprctl configerrors` is clean. Bar & Island, Appearance, Motion and System
+  were captured. A `scripts/workflow settings set islandWidth 300` change
+  resized the live island, `reset` restored it, and an out-of-range value
+  exited 1. Notch mode was toggled on, inspected and reset.
+- **Wallpapers:** applying nord switched the wallpaper to the nord set, the
+  theme and wallpaper carousels rendered, and `wallpaper next` crossfaded.
+  Industrial was then restored, with Blacksite pinned as its wallpaper. The
+  first fetch mapped pastel accents to greys, so those sets were replaced
+  after the colour match became hue-aware.
+- **A broken hot reload:** a missing `;` briefly broke the hot-reloaded
+  configuration. The previous generation kept running behind an error banner
+  until the fix.
+- **Not hands-on tested:** real clicks on dashboard rows, control-center tiles
+  and Settings controls; Bluetooth connect; per-app volume; the
+  wallpaper-carousel keyboard; font changes across all panels.

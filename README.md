@@ -72,8 +72,13 @@ Launcher: type to filter, arrows to select, Enter to launch. Escape or clicking
 outside closes a panel. Click the island to expand its dashboard (focused
 window, workspaces, clock, week, media, status, Night light and Game mode); click
 the dashboard clock to morph the island into a month calendar (←/→, wheel or
-arrow keys change month). The island's battery and signal icons open
-controls. Screenshots are saved under
+arrow keys change month). The island's battery and signal icons open the
+control center below the island. It has Wi-Fi, Focus, Lock, Bluetooth, Game
+Mode and Night light tiles, plus Sound and Display sliders whose › opens a
+detail page; hold the Wi-Fi or Bluetooth tile to toggle the radio. Titan
+Settings (`qs -c umbra ipc call shell settings appearance`) is a floating
+window with ten sections; every setting there can also be changed with
+`scripts/workflow settings set KEY VALUE`. Screenshots are saved under
 ~/Pictures/Screenshots and copied to the Wayland clipboard.
 
 ## Shell architecture
@@ -145,9 +150,17 @@ retain their dark base. Palette data lives in `theme/palettes.json`; generated
 `kitty/theme.conf` and `hypr/theme.lua` are reproducible with
 `scripts/apply-theme THEME_ID`.
 
-Appearance settings save palette, accent, motion and landscape preferences in
-`theme/preferences.json`. Three restrained accents share the graphite base.
-The wallpaper is a static SVG; the shell does not repaint it on a timer.
+The palette and accent stay in `theme/preferences.json`. All other shell
+settings are declared in `theme/settings-schema.json`, with user values in
+`~/.local/state/titan/settings.json` (outside Git). Wallpapers belong to themes:
+`~/Pictures/Wallpapers/<theme>/` holds each theme's set, and applying a theme
+switches to its wallpaper. The wallpaper picker (Settings → Appearance →
+Wallpaper, or `ipc call shell wallpapers`) chooses within the set, and changes
+crossfade. `scripts/fetch-wallpapers [--count N] [THEME…]` downloads
+colour-matched sets from Wallhaven's Toplist. These images are their authors'
+work, so keep them out of Git. The bundled Blacksite landscape stays
+selectable under every theme. Wallpapers are decoded at screen size and never
+repainted on a timer.
 The island expands briefly for volume/brightness changes; a click opens the
 dashboard, which collapses when the pointer leaves or Escape is pressed. Its fixed reserved space keeps
 windows from jumping during expansion.

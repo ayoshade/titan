@@ -148,13 +148,20 @@ wl-clipboard, grim/slurp and suitable XDG portals.
 | `config/quickshell/umbra/services/` | Reactive state and system integrations |
 | `config/quickshell/umbra/components/` | Shared UI building blocks |
 | `config/quickshell/umbra/modules/` | Feature presentation and panels |
-| `config/quickshell/umbra/theme/` | Tokens, palette catalog and preferences |
+| `config/quickshell/umbra/theme/` | Tokens, palette catalog, preferences and the settings schema |
 | `config/kitty/`, `config/gtk-*/` | Application configuration |
 | `assets/` | Original wallpapers and other shared assets |
 | `packages/` | Explicit package manifests |
 | `scripts/` | Installation, bootstrap, checks, session and user operations |
 | `system/` | Reviewed templates for privileged system configuration |
 | `docs/` | Research, hardware, decisions, validation and recovery |
+
+Shell settings are declared once in `theme/settings-schema.json`. The Settings
+window, `Settings.qml` and `scripts/workflow settings` all use it; user values
+live in `$XDG_STATE_HOME/titan/settings.json`. Add a setting to the schema
+rather than hard-coding a new preference. Theme wallpapers live outside Git in
+`~/Pictures/Wallpapers/<theme>/` (downloaded third-party images; never commit
+them).
 
 `scripts/apply-theme` generates `config/kitty/theme.conf` and
 `config/hypr/theme.lua`, and updates shell preferences. These files can be dirty
@@ -231,6 +238,9 @@ approval. Do not bypass privilege requirements or pass secrets through logs.
 - Run `scripts/doctor` when changing managed configuration/packages/scripts.
   Validate Hyprland configuration and check live `hyprctl configerrors` when
   compositor changes are made. Check Bash syntax for scripts.
+- Check QML syntax with `qmllint` before saving. Quickshell hot-reloads saved
+  files, so a syntax error immediately shows an error banner in the live shell.
+  New IPC functions need `scripts/shell-restart`.
 - Check QML syntax and load the affected UI in the actual Wayland session.
   Inspect runtime logs and affected panels. Static QML type warnings are not
   the same as runtime failures; report the distinction honestly.
