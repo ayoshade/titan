@@ -95,7 +95,7 @@ changes); they suggest it to the user.
 | Version, migrations, `titan` command | Done (0.2.0) |
 | `titan update` | Done; first real run by the user on 2026-10-03 (hyprland and libutf8proc upgraded, no kernel change) |
 | Snapshots before updates (Snapper on Btrfs) | Enabled on this machine 2026-10-03 (`scripts/install-snapshots`; see docs/snapshots.md) |
-| Packaging Titan (`titan` package, defaults in `/usr/share/titan`, own repo) | Done: `scripts/vm-test --full` passed 14/14 on a clean Arch VM; Apache-2.0; hosted as GitHub releases (`scripts/publish-repo`). Signing key pending the owner |
+| Packaging Titan (`titan` package, defaults in `/usr/share/titan`, own repo) | Done: `scripts/vm-test --full` passed 14/14 on a clean Arch VM; Apache-2.0; hosted as GitHub releases (`scripts/publish-repo`). signed with key 8A648F6B462B95C6 |
 | First-run setup | `titan setup` plus the shell's Welcome screen; tested in a throwaway home |
 
 ### Packaging (0.2.0)
@@ -152,8 +152,14 @@ no longer in the database, so files and database always match. Bump
 
 ### 3. Users: add the repository
 
+Titan's packager key: `keys/titan-packager.asc`, key ID `8A648F6B462B95C6`,
+fingerprint `2AD3 24F1 003E A830 989F  5129 8A64 8F6B 462B 95C6`, expiring
+2029-10-02 (extend it with `gpg --quick-set-expire` before then).
+
+
 ```sh
-sudo pacman-key --add titan-packager.asc && sudo pacman-key --lsign-key KEYID
+curl -fsSLO https://raw.githubusercontent.com/ayoshade/titan/main/keys/titan-packager.asc
+sudo pacman-key --add titan-packager.asc && sudo pacman-key --lsign-key 8A648F6B462B95C6
 ```
 
 Then append to `/etc/pacman.conf`, after the official repositories:
@@ -167,8 +173,7 @@ Install with `sudo pacman -Syu titan-desktop`. From then on, `titan update`
 (a full `pacman -Syu`) keeps Titan current. For edge, use `repo-edge` and add
 `SigLevel = Optional TrustAll` only on test machines while edge is unsigned.
 
-Still open: create the signing key (step 1); publish the first release; and
-graphical-login testing in a VM (Phase 2 installer work).
+Still open: graphical-login testing in a VM (Phase 2 installer work).
 
 ### Phase 2 onwards
 
