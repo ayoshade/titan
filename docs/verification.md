@@ -33,8 +33,9 @@
 
 1. Retest visible lock rendering from the desktop without switching TTYs.
    Authentication succeeded in recovery, but black-screen rendering was observed.
-2. Suspend from the session menu: resume requires authentication; display,
-   audio, Bluetooth and network recover.
+2. Suspend/resume verification is deferred: the user now requires always-awake
+   operation and all sleep targets are masked. Only test it after an explicitly
+   requested change to that policy.
 3. Test actual speaker/microphone output, audio-device switching, brightness
    keys and media playback with an MPRIS-capable application.
 4. Join a known Wi-Fi network and pair a Bluetooth device. Ethernet remained
@@ -136,3 +137,22 @@ kernel parameters or bootloader edits were applied.
 - No user windows were closed, moved, grouped or resized during verification.
   Actual keypress behavior is a hands-on check; loaded bindings alone do not
   prove every compositor action under all window/layout states.
+
+## Always-awake policy — live verification
+
+- User ran scripts/install-always-awake with local sudo authentication. Original
+  system destination files/target states are backed up under
+  /var/lib/titan/always-awake/backup.sPyeT4. Initial profile was Performance with
+  BatteryAware enabled; future installer runs also record those property values.
+- Verified all five sleep targets masked and Performance service active/enabled.
+- Live logind D-Bus properties report ignore for lid (all modes), sleep keys,
+  power button and idle action. Reload completed without a session restart.
+- ActiveProfile is performance, BatteryAware is false. System templates match
+  installed files and the service completed successfully in the journal.
+- Hypridle is stopped and absent from session-start. Stored idle config has no
+  listeners. Monitor reports dpmsStatus true. Consoleblank was already 0.
+- Automatic locking was removed with the idle timers; manual locking remains.
+  Suspend tile is replaced by an always-awake indicator. Core checks and changed
+  QML syntax passed; no actual sleep/lid test was forced on the running session.
+- Configuration is persistent, but reboot behavior has not been exercised for
+  this policy. Power loss and firmware/thermal protections remain physical limits.

@@ -12,8 +12,19 @@ done
 systemctl is-active NetworkManager bluetooth power-profiles-daemon ufw
 systemctl --user is-active pipewire.socket pipewire-pulse.socket wireplumber
 if [[ -n ${WAYLAND_DISPLAY:-} ]]; then
- pgrep -x hypridle >/dev/null
+ if pgrep -x hypridle >/dev/null; then
+  printf 'Unexpected hypridle process under always-awake policy\n' >&2; exit 1
+ fi
  qs -c umbra list
  hyprctl configerrors
+fi
+if [[ -f /etc/systemd/logind.conf.d/99-titan-always-awake.conf ]]; then
+ for target in sleep.target suspend.target hibernate.target hybrid-sleep.target suspend-then-hibernate.target; do
+  [[ $(systemctl is-enabled "$target" 2>/dev/null || true) == masked ]]
+ done
+ systemctl is-active titan-performance.service
+ [[ $(busctl --system get-property org.freedesktop.UPower.PowerProfiles /org/freedesktop/UPower/PowerProfiles org.freedesktop.UPower.PowerProfiles ActiveProfile) == 's "performance"' ]]
+ [[ $(busctl --system get-property org.freedesktop.UPower.PowerProfiles /org/freedesktop/UPower/PowerProfiles org.freedesktop.UPower.PowerProfiles BatteryAware) == 'b false' ]]
+ printf 'Always awake; Performance active; battery-aware switching disabled\n'
 fi
 printf '\nStatic configuration, packages, links, and core services checked.\n'

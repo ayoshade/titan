@@ -1,0 +1,13 @@
+[Unit]
+Description=Titan always-awake laptop performance policy
+Wants=power-profiles-daemon.service
+After=power-profiles-daemon.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/busctl --system set-property org.freedesktop.UPower.PowerProfiles /org/freedesktop/UPower/PowerProfiles org.freedesktop.UPower.PowerProfiles BatteryAware b false
+ExecStart=/usr/bin/busctl --system set-property org.freedesktop.UPower.PowerProfiles /org/freedesktop/UPower/PowerProfiles org.freedesktop.UPower.PowerProfiles ActiveProfile s performance
+RemainAfterExit=yes
+
+[Install]
+WantedBy=graphical.target

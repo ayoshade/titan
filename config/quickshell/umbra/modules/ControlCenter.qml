@@ -31,7 +31,7 @@ ScrollView {
    ToggleTile { Layout.fillWidth: true; text: "Wi-Fi"; symbol: "wifi"; subtitle: NetState.label; selected: Networking.wifiEnabled; onClicked: UiState.toggle("connectivity") }
    ToggleTile { Layout.fillWidth: true; text: "Focus"; symbol: "moon"; subtitle: UiState.dnd ? "On" : "Off"; selected: UiState.dnd; onClicked: UiState.dnd=!UiState.dnd }
    ToggleTile { Layout.fillWidth: true; text: "Bluetooth"; symbol: "bluetooth"; subtitle: Bluetooth.defaultAdapter && Bluetooth.defaultAdapter.enabled ? "On" : "Off"; selected: !!Bluetooth.defaultAdapter && Bluetooth.defaultAdapter.enabled; onClicked: UiState.toggle("connectivity") }
-   ToggleTile { Layout.fillWidth: true; text: "Power"; symbol: "bolt"; subtitle: PowerProfiles.profile===PowerProfile.PowerSaver ? "Saver" : PowerProfiles.profile===PowerProfile.Performance ? "Performance" : "Balanced"; selected: PowerProfiles.profile!==PowerProfile.PowerSaver; onClicked: { PowerProfiles.profile=PowerProfiles.profile===PowerProfile.Balanced ? PowerProfile.PowerSaver : PowerProfile.Balanced } }
+   ToggleTile { Layout.fillWidth: true; text: "Power"; symbol: "bolt"; subtitle: PowerProfiles.profile===PowerProfile.PowerSaver ? "Saver" : PowerProfiles.profile===PowerProfile.Performance ? "Performance" : "Balanced"; selected: PowerProfiles.profile!==PowerProfile.PowerSaver; onClicked: PowerProfiles.profile=PowerProfile.Performance }
   }
   Level { Layout.fillWidth: true; label: "Sound"; symbol: Audio.muted ? "mute" : "volume"; value: Audio.volume; onAdjusted: value=>Audio.setVolume(value) }
   RowLayout {

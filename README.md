@@ -155,16 +155,25 @@ only executes installed desktop entries; it is not a shell-command runner.
 
 ## Session behavior
 
-Hyprland launches Quickshell, Hypridle and the small polkit authentication agent.
+Hyprland launches Quickshell and the small polkit authentication agent.
 GTK portals handle file dialogs; the Hyprland portal handles screen sharing and
 screenshots. PipeWire socket activation and WirePlumber provide audio.
 Hyprlock uses immediate rendering with lock-screen animations disabled to avoid
 the black-screen failure observed during TTY switching.
-Hypridle requests a lock after five minutes and turns off displays after six.
-It requests locking before suspend and waits for the lock using its sleep
-inhibitor. There is no automatic suspend timer. Reboot, power off and logout
-require a second click inside the session menu. Lock/unlock and suspend/resume remain hands-on verification steps in
-`docs/verification.md`.
+This laptop uses an always-awake policy: Hypridle is not started, automatic
+locking and display-off timers are absent, and manual locking remains available.
+`scripts/install-always-awake` installs the reviewed system policy with local sudo:
+lid closure, idle and sleep keys are ignored; all sleep/hibernate targets are
+masked. A boot service disables battery-aware profile switching and selects
+Performance. logind reloads without restarting the desktop. Suspend is absent
+from the session menu. Explicit reboot, power off and logout retain confirmation.
+
+This is a policy for the development laptop, not a requirement for every Titan
+machine. Keep it on external power for unattended operation. Hardware loss of
+power, critical thermal protection, and a firmware hard-power-off cannot be
+prevented by desktop settings. See [always-awake.md](docs/always-awake.md) for
+installation, validation and restoration. Manual lock rendering remains a
+hands-on check in `docs/verification.md`.
 
 ## Recovery
 

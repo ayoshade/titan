@@ -25,10 +25,15 @@ instead of maintaining two competing instruction sets.
   graphics and a 1366×768 internal display. Inspect actual hardware before
   assuming that another Titan machine has this configuration.
 - Hyprland, Quickshell, Hyprlock, Hypridle, Kitty, Thunar and Firefox are in use.
-  Graphical login uses greetd/ReGreet/Cage. Read `docs/hardware.md` and
+  Graphical login uses greetd/ReGreet/Cage. The development laptop now uses an
+  always-awake, Performance policy: Hypridle is not started, idle display-off is
+  disabled, logind ignores lid/sleep events, and all sleep targets are masked.
+  See `docs/always-awake.md`; do not re-enable sleep or idle timers without the
+  user requesting a policy change. Read `docs/hardware.md` and
   `docs/verification.md` for details and outstanding reliability checks.
 - Hyprlock has had black-screen rendering failures. Authentication has
-  succeeded, but reliable lock rendering and suspend/resume still need testing.
+  succeeded, but reliable lock rendering still needs testing. Suspend/resume testing is
+  deferred while the user's always-awake policy is active.
   Do not confuse a successful password check with a verified visible lock screen.
 
 ## Start each task

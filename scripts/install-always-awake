@@ -1,0 +1,50 @@
+#!/usr/bin/env bash
+set -euo pipefail
+root=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)
+if (( EUID != 0 )); then
+ exec sudo -- "$root/scripts/install-always-awake"
+fi
+# Require the actual performance profile before touching system sleep policy.
+busctl --system get-property org.freedesktop.UPower.PowerProfiles /org/freedesktop/UPower/PowerProfiles org.freedesktop.UPower.PowerProfiles Profiles | /usr/bin/grep -q '"performance"'
+systemd-analyze verify "$root/system/power/titan-performance.service"
+install -d -m 0755 /var/lib/titan/always-awake /etc/systemd/logind.conf.d /etc/systemd/sleep.conf.d
+backup=$(mktemp -d /var/lib/titan/always-awake/backup.XXXXXX)
+chmod 0700 "$backup"
+busctl --system get-property org.freedesktop.UPower.PowerProfiles /org/freedesktop/UPower/PowerProfiles org.freedesktop.UPower.PowerProfiles ActiveProfile > "$backup/previous-profile.txt"
+busctl --system get-property org.freedesktop.UPower.PowerProfiles /org/freedesktop/UPower/PowerProfiles org.freedesktop.UPower.PowerProfiles BatteryAware > "$backup/previous-battery-aware.txt"
+files=(/etc/systemd/logind.conf.d/99-titan-always-awake.conf /etc/systemd/sleep.conf.d/99-titan-always-awake.conf /etc/systemd/system/titan-performance.service)
+for index in "${!files[@]}"; do
+ path=${files[$index]}
+ if [[ -e "$path" || -L "$path" ]]; then cp -a -- "$path" "$backup/previous-$index"; fi
+ printf '%s\n' "$path" >> "$backup/paths.txt"
+done
+targets=(sleep.target suspend.target hibernate.target hybrid-sleep.target suspend-then-hibernate.target)
+for target in "${targets[@]}"; do
+ printf '%s %s\n' "$target" "$(systemctl is-enabled "$target" 2>/dev/null || true)" >> "$backup/target-states.txt"
+ # A customized local unit requires review instead of silently replacing it.
+ if [[ -e /etc/systemd/system/$target && ! -L /etc/systemd/system/$target ]]; then
+  printf 'Refusing custom local sleep unit: %s\n' "$target" >&2; exit 1
+ fi
+done
+install -o root -g root -m 0644 "$root/system/power/logind.conf" "${files[0]}"
+install -o root -g root -m 0644 "$root/system/power/sleep.conf" "${files[1]}"
+install -o root -g root -m 0644 "$root/system/power/titan-performance.service" "${files[2]}"
+systemctl mask "${targets[@]}"
+systemctl daemon-reload
+# This systemd build supports live logind configuration reload: no session restart.
+systemctl reload systemd-logind.service
+systemctl enable titan-performance.service
+systemctl restart titan-performance.service
+for index in "${!files[@]}"; do
+ source=("$root/system/power/logind.conf" "$root/system/power/sleep.conf" "$root/system/power/titan-performance.service")
+ cmp -- "${source[$index]}" "${files[$index]}"
+done
+for target in "${targets[@]}"; do
+ state=$(systemctl is-enabled "$target" 2>/dev/null || true)
+ [[ $state == masked ]] || { printf 'Sleep target is not masked: %s\n' "$target" >&2; exit 1; }
+ printf '%s: %s\n' "$target" "$state"
+done
+systemctl is-active titan-performance.service
+busctl --system get-property org.freedesktop.UPower.PowerProfiles /org/freedesktop/UPower/PowerProfiles org.freedesktop.UPower.PowerProfiles ActiveProfile
+busctl --system get-property org.freedesktop.UPower.PowerProfiles /org/freedesktop/UPower/PowerProfiles org.freedesktop.UPower.PowerProfiles BatteryAware
+printf '\nAlways-awake policy installed. No reboot needed. Backup: %s\n' "$backup"

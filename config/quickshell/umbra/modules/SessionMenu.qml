@@ -15,7 +15,7 @@ ColumnLayout {
  GridLayout {
   Layout.fillWidth: true; columns: 2; columnSpacing: 8; rowSpacing: 8
   ToggleTile { Layout.fillWidth: true; text: "Lock"; symbol: "lock"; subtitle: "Secure session"; onClicked: { Quickshell.execDetached([Quickshell.env("HOME")+"/dotfiles/scripts/lock"]); UiState.close() } }
-  ToggleTile { Layout.fillWidth: true; text: "Suspend"; symbol: "moon"; subtitle: "Sleep"; onClicked: { Quickshell.execDetached(["systemctl","suspend"]); UiState.close() } }
+  ToggleTile { Layout.fillWidth: true; text: "Always awake"; symbol: "bolt"; subtitle: "Sleep disabled"; enabled: false }
   ToggleTile { Layout.fillWidth: true; text: "Reboot"; symbol: "refresh"; subtitle: "Restart system"; onClicked: root.pending="Reboot" }
   ToggleTile { Layout.fillWidth: true; text: "Power off"; symbol: "power"; subtitle: "Shut down"; onClicked: root.pending="Power off" }
  }

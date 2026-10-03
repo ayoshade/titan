@@ -3,7 +3,8 @@ set -euo pipefail
 export XDG_CURRENT_DESKTOP=Hyprland XDG_SESSION_TYPE=wayland
 systemctl --user import-environment WAYLAND_DISPLAY HYPRLAND_INSTANCE_SIGNATURE XDG_CURRENT_DESKTOP XDG_SESSION_TYPE
 dbus-update-activation-environment --systemd WAYLAND_DISPLAY HYPRLAND_INSTANCE_SIGNATURE XDG_CURRENT_DESKTOP XDG_SESSION_TYPE
-if ! pgrep -x hypridle >/dev/null; then hypridle & fi
+# Always-awake policy: no idle daemon or automatic DPMS/lock timers.
+# Manual locking remains available through scripts/lock.
 if ! pgrep -f '^/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1' >/dev/null; then
  /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1 &
 fi
