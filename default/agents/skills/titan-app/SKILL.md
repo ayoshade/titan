@@ -49,11 +49,11 @@ this machine (Qt 6.11.2, GCC 16) before this skill was written.
    warning that comes from your code. The GCC 16 `-Wsfinae-incomplete` warning
    from `qbitarray.h` comes from Qt's headers; ignore it.
 6. **Prove the live theme:**
-   - Note the current theme in `~/dotfiles/config/quickshell/umbra/theme/preferences.json`.
-   - With the app open, run `~/dotfiles/scripts/apply-theme nord` and
-     `~/dotfiles/scripts/workflow settings set panelRadius 12`, then screenshot.
-   - Restore the original theme and
-     `~/dotfiles/scripts/workflow settings reset panelRadius`.
+   - Note the current theme (`titan theme current`).
+   - With the app open, run `titan theme nord` and
+     `titan settings set panelRadius 12`, then screenshot.
+   - Restore the original theme (`titan theme ORIGINAL`) and
+     `titan settings reset panelRadius`.
    - Colours, accent, font and radius must change without a restart.
 7. **Package:**
    - `cd packaging && makepkg -f` builds the package, with no sudo.
@@ -85,8 +85,8 @@ shell does:
 | Source | Provides |
 | --- | --- |
 | `~/.config/quickshell/umbra/theme/palettes.json` | Palette colours by id: `background`, `shell`, `surface`, `raised`, `border`, `text`, `muted`, `accent`, `danger`, `notch`, `swatches` |
-| `~/.config/quickshell/umbra/theme/preferences.json` | Current `theme`, `accent` (`theme`, `silver`, `ice`, `sage`, `custom`) and `motion` |
-| `~/.local/state/titan/settings.json` | `bodyFont`, `displayFont`, `fontSize`, `cornerRadius`, `panelRadius`, `reduceMotion`, `fadeMs`, `movementMs`, `accentCustom` |
+| `~/.config/titan/preferences.json` over `…/umbra/theme/preferences-default.json` | Current `theme`, `accent` (`theme`, `silver`, `ice`, `sage`, `custom`) and `motion` |
+| `~/.config/titan/settings.json` | `bodyFont`, `displayFont`, `fontSize`, `cornerRadius`, `panelRadius`, `reduceMotion`, `fadeMs`, `movementMs`, `accentCustom` |
 
 - **Live updates:** Titan replaces these files atomically. The singleton
   watches both the files and their directories, re-adds the watches after

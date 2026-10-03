@@ -170,7 +170,7 @@ private:
     QColor color(const char *key, const char *fallback) const;
     QJsonValue setting(const char *key, const QJsonValue &fallback) const;
 
-    QString m_themeDir, m_settingsPath;
+    QString m_themeDir, m_preferencesPath, m_settingsPath;
     QString m_themeId, m_accentName;
     bool m_motion = true;
     QJsonObject m_palette, m_settings;
@@ -208,10 +208,12 @@ static QString envOr(const char *name, const QString &fallback)
 TitanTheme::TitanTheme(QObject *parent) : QObject(parent)
 {
     const QString home = QDir::homePath();
-    // Same locations as the Titan shell: theme files in the umbra config,
-    // user settings in Titan's state directory.
-    m_themeDir = envOr("XDG_CONFIG_HOME", home + "/.config") + "/quickshell/umbra/theme";
-    m_settingsPath = envOr("XDG_STATE_HOME", home + "/.local/state") + "/titan/settings.json";
+    // Same locations as the Titan shell: the palette catalog and defaults ship
+    // with Titan; the user's choices live in ~/.config/titan.
+    const QString config = envOr("XDG_CONFIG_HOME", home + "/.config");
+    m_themeDir = config + "/quickshell/umbra/theme";
+    m_preferencesPath = config + "/titan/preferences.json";
+    m_settingsPath = config + "/titan/settings.json";
 
     // Titan writes these files atomically (rename into place), which drops a
     // plain file watch, so the directories are watched too and the paths are
@@ -227,8 +229,8 @@ TitanTheme::TitanTheme(QObject *parent) : QObject(parent)
 void TitanTheme::rewatch()
 {
     const QStringList wanted = {
-        m_themeDir, m_themeDir + "/palettes.json", m_themeDir + "/preferences.json",
-        QFileInfo(m_settingsPath).absolutePath(), m_settingsPath,
+        m_themeDir, m_themeDir + "/palettes.json",
+        QFileInfo(m_preferencesPath).absolutePath(), m_preferencesPath, m_settingsPath,
     };
     for (const QString &path : wanted)
         if (QFileInfo::exists(path) && !m_watcher.files().contains(path) && !m_watcher.directories().contains(path))
@@ -237,7 +239,11 @@ void TitanTheme::rewatch()
 
 void TitanTheme::reload()
 {
-    const QJsonObject prefs = readJson(m_themeDir + "/preferences.json").object();
+    // Defaults first, then the user's choices on top.
+    QJsonObject prefs = readJson(m_themeDir + "/preferences-default.json").object();
+    const QJsonObject user = readJson(m_preferencesPath).object();
+    for (auto it = user.begin(); it != user.end(); ++it)
+        prefs.insert(it.key(), it.value());
     const QJsonArray palettes = readJson(m_themeDir + "/palettes.json").array();
     m_themeId = prefs.value("theme").toString("graphite");
     m_accentName = prefs.value("accent").toString("theme");

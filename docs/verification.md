@@ -304,3 +304,32 @@ kernel parameters or bootloader edits were applied.
   the SIGABRT and SIGSEGV cores and the occasional hang on `qs kill`; the
   workaround is the escalating `scripts/shell-restart`. The procedure is
   recorded in `default/agents/skills/diagnose-crash/SKILL.md`.
+
+## Phase 1: user layer, version, migrations — 2026-10-03
+
+- **Live migration:** before running, the old state, the tracked preferences,
+  generated files and `mimeapps.list` were backed up to the session scratch
+  directory. `titan migrate` then applied `1791060086-user-layer.sh` on this
+  machine:
+  - the industrial preferences moved to `~/.config/titan/preferences.json`;
+  - settings moved to `~/.config/titan/settings.json`;
+  - `~/.config/mimeapps.list` became a real file and kept the Claude Code
+    handler;
+  - the generated Kitty theme was byte-identical to the old tracked file;
+  - `hyprctl configerrors` was empty.
+- **Repeat runs:** a second `titan migrate` reported nothing pending.
+- **Throwaway homes:** in an old-layout home, settings moved, the user layer
+  was created and the theme was generated, and a re-run was a no-op. On a
+  fresh home, `--mark-all` recorded the migration without running it.
+- **Round-trip:** after a clean `titan-shell restart` (no shell warnings),
+  `titan theme nord` changed the shell, the user preferences, the generated
+  Kitty file and the Hyprland border (88c0d0). `titan theme industrial`
+  restored them. `git status` showed no user changes: switching themes no
+  longer dirties the checkout.
+- **titan-app template:** rebuilt and run; it followed industrial → horizon
+  live through the new paths.
+- **Sound page fix:** its PipeWire tracker referenced `parent` from a
+  non-Item, so per-app volume tracking got `undefined`. It now uses an id.
+- **Not exercised:** `titan update`, because it needs sudo and the network.
+  The user should run it the first time.
+

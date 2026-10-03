@@ -2,6 +2,9 @@
 set -euo pipefail
 root=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)
 config="${XDG_CONFIG_HOME:-$HOME/.config}"
+state="${XDG_STATE_HOME:-$HOME/.local/state}/titan"
+# A machine without Titan state is a fresh install; it starts at the current layout.
+fresh=0; [[ -d $state ]] || fresh=1
 # Preflight every target before creating links. Existing user files are never replaced.
 for source in "$root"/config/*; do
  target="$config/${source##*/}"
@@ -16,12 +19,23 @@ for source in "$root"/config/*; do
 done
 # User-facing commands go on PATH; existing files are never replaced.
 bin="$HOME/.local/bin"; mkdir -p "$bin"
-for name in titan-shell; do
+for name in titan titan-shell; do
  target="$bin/$name"
  if [[ -e "$target" || -L "$target" ]]; then
   [[ "$(readlink -f "$target")" == "$root/scripts/$name" ]] || { printf 'Refusing existing target: %s\n' "$target" >&2; continue; }
  else ln -s "$root/scripts/$name" "$target"; fi
 done
+# User layer: Titan never overwrites these after creating them.
+mkdir -p "$config/titan" "$state"; chmod 700 "$config/titan" "$state"
+[[ -e $config/mimeapps.list || -L $config/mimeapps.list ]] || cp "$root/default/mimeapps.list" "$config/mimeapps.list"
+if ((fresh)); then
+ "$root/scripts/titan" migrate --mark-all
+ [[ -e $config/titan/hypr.lua ]] || printf -- '-- Your Hyprland overrides, loaded after Titan defaults.\n' >"$config/titan/hypr.lua"
+ [[ -e $config/titan/kitty.conf ]] || printf '# Your Kitty overrides, loaded after Titan defaults.\n' >"$config/titan/kitty.conf"
+else
+ "$root/scripts/titan" migrate
+fi
+"$root/scripts/apply-theme"   # generate theme files for the current (or default) theme
 if command -v gsettings >/dev/null && gsettings list-schemas | /usr/bin/grep -qx org.gnome.desktop.interface; then
  gsettings set org.gnome.desktop.interface color-scheme prefer-dark
  gsettings set org.gnome.desktop.interface gtk-theme Adwaita-dark

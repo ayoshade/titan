@@ -26,7 +26,8 @@ instead of maintaining two competing instruction sets.
   changing shortcuts. Super+A/C/V/X are universal editing, Super+L changes
   workspace layout, and Super+Ctrl+L locks. Keep chords exact unless the user
   requests a change. Titan owns the implementation and Quickshell UI.
-- `titan-shell` (`scripts/titan-shell`) controls the Quickshell desktop shell;
+- `titan` (`scripts/titan`: version, migrate, update, theme, settings) is the
+  user-facing command; `titan-shell` (`scripts/titan-shell`) controls the shell;
   `scripts/workflow` is the shared desktop-operation interface; implementations
   live under `lib/titan/`. Workflow packages have their own manifest and installer.
   User state lives outside Git. Clipboard labels contain private content; never
@@ -165,15 +166,20 @@ wl-clipboard, grim/slurp and suitable XDG portals.
 
 Shell settings are declared once in `theme/settings-schema.json`. The Settings
 window, `Settings.qml` and `scripts/workflow settings` all use it; user values
-live in `$XDG_STATE_HOME/titan/settings.json`. Add a setting to the schema
+live in `~/.config/titan/settings.json`. Add a setting to the schema
 rather than hard-coding a new preference. Theme wallpapers live outside Git in
 `~/Pictures/Wallpapers/<theme>/` (downloaded third-party images; never commit
 them).
 
-`scripts/apply-theme` generates `config/kitty/theme.conf` and
-`config/hypr/theme.lua`, and updates shell preferences. These files can be dirty
-because the user changed themes. Preserve those choices and unrelated diffs.
-Do not reset them to a default just to obtain a clean Git status.
+Titan separates three layers (see `docs/distribution.md`): **defaults** in the
+checkout (later the package); the **user layer** `~/.config/titan/`
+(`preferences.json` theme/accent, `settings.json`, `hypr.lua`, `kitty.conf`
+overrides), which updates never overwrite; and **machine state**
+`~/.local/state/titan/` (generated theme files, runtime overrides, applied
+migration markers). `scripts/apply-theme` writes generated Kitty/Hyprland files
+into state and the choice into the user layer, so theme changes no longer
+dirty Git. Layout changes to existing installs ship as numbered, idempotent
+scripts in `migrations/`, run by `titan migrate` (and `titan update`).
 
 As Titan grows, separate distribution defaults, machine profiles, persistent
 user overrides, runtime state and build outputs. Updates must preserve user

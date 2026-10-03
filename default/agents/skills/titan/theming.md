@@ -9,22 +9,23 @@ generated files.
 | Thing | Source of truth | Applied by |
 | --- | --- | --- |
 | Palettes (9: graphite, gruvbox, gruvbox-material, nord, catppuccin, everforest, horizon, rose-pine, industrial) | `~/dotfiles/config/quickshell/umbra/theme/palettes.json` | `scripts/apply-theme ID` |
-| Current theme and accent choice | `theme/preferences.json` (`theme`, `accent`, `motion`, `wallpaper`); the user's choice, so it can be dirty in Git | apply-theme and the Settings window |
-| Kitty colours | **Generated** `config/kitty/theme.conf` | apply-theme (sends SIGUSR1 to Kitty to reload) |
-| Hyprland border colours | **Generated** `config/hypr/theme.lua` | apply-theme, then `hyprctl reload` |
-| Shell tokens (fonts, radii, motion, island size) | `theme/settings-schema.json` defaults plus `~/.local/state/titan/settings.json` | `scripts/workflow settings set`; applied live |
+| Current theme and accent choice | `~/.config/titan/preferences.json` (`theme`, `accent`, `motion`, `wallpaper`) over `theme/preferences-default.json` | `titan theme ID` and the Settings window |
+| Kitty colours | **Generated** `~/.local/state/titan/generated/kitty-theme.conf` (then `~/.config/titan/kitty.conf` overrides) | apply-theme (sends SIGUSR1 to Kitty to reload) |
+| Hyprland border colours | **Generated** `~/.local/state/titan/generated/hypr-theme.lua` | apply-theme, then `hyprctl reload` |
+| Shell tokens (fonts, radii, motion, island size) | `theme/settings-schema.json` defaults plus `~/.config/titan/settings.json` | `scripts/workflow settings set`; applied live |
 | Wallpapers | `~/Pictures/Wallpapers/<theme>/` (outside Git) plus the choice in `settings.json` → `wallpapers` map | wallpaper carousel, `scripts/workflow wallpaper …` |
 | GTK | `config/gtk-3.0`, `config/gtk-4.0` (dark Adwaita) and `gsettings` set by `scripts/bootstrap` | Not themed per palette |
 
 ## Switch or inspect the theme
 
 ```sh
-python3 -c "import json;print(json.load(open('$HOME/dotfiles/config/quickshell/umbra/theme/preferences.json'))['theme'])"   # current — note it first
-~/dotfiles/scripts/apply-theme nord        # or: titan-shell ipc theme nord   (same operation)
+titan theme current                        # note it first
+titan theme nord                           # or: titan-shell ipc theme nord   (same operation)
+titan theme list
 titan-shell open themes                    # the carousel (Super+Ctrl+Shift+Space)
 ```
 
-Applying a theme rewrites the two generated files and `preferences.json`. It
+Applying a theme regenerates the two files in `~/.local/state/titan/generated/` and records the choice in `~/.config/titan/preferences.json`; Git is untouched. It
 signals Kitty, reloads Hyprland (which also clears a runtime game mode), and
 switches the wallpaper to that theme's set. Undo by applying the previous id.
 
@@ -40,7 +41,7 @@ titan-shell ipc accent ice                                     # silver | ice | 
 
 The UI is Settings → Appearance → Accent. Typing a custom hex there also
 selects `custom`. From the CLI, set `accentCustom`; the user then picks the
-custom swatch, or you set `"accent": "custom"` in `preferences.json` while
+custom swatch, or you set `"accent": "custom"` in `~/.config/titan/preferences.json` while
 preserving its other keys.
 
 ## Add or modify a palette

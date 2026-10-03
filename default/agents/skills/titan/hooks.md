@@ -1,6 +1,7 @@
 # Hooks: run something when an event happens
 
-Titan has **no hook directory** yet (no `~/.config/titan/hooks/`, unlike
+Titan has **no hook directory** yet (no `~/.config/titan/hooks/` even though
+`~/.config/titan/` now exists, unlike
 Omarchy). Do not invent one. Use the mechanisms below, which already work.
 Choose by what the event is.
 
@@ -75,16 +76,16 @@ initializes Titan state and clipboard history, and finally `exec`s the shell.
 Titan writes these files atomically (rename into place), which systemd's
 `PathChanged=` sees:
 
-- `~/dotfiles/config/quickshell/umbra/theme/preferences.json`: a theme or
+- `~/.config/titan/preferences.json`: a theme or
   accent was applied.
-- `~/.local/state/titan/settings.json`: any Settings value changed.
+- `~/.config/titan/settings.json`: any Settings value changed.
 - `$XDG_RUNTIME_DIR/titan/toggles.json`: night light or game mode changed.
   Use `%t/titan/toggles.json` in units.
 
 ```ini
 # ~/.config/systemd/user/titan-theme-hook.path
 [Path]
-PathChanged=%h/dotfiles/config/quickshell/umbra/theme/preferences.json
+PathChanged=%h/.config/titan/preferences.json
 [Install]
 WantedBy=default.target
 

@@ -25,11 +25,14 @@ a one-off file.
 ## Rules that apply either way
 
 - **Inspect before editing:** `git -C ~/dotfiles status --short` and
-  `git -C ~/dotfiles diff`. The user's theme choice keeps
-  `config/hypr/theme.lua`, `config/kitty/theme.conf` and
-  `config/quickshell/umbra/theme/preferences.json` (and sometimes
-  `config/mimeapps.list`) dirty. **Never reset, checkout or stash them.**
-  Stage only files you changed.
+  `git -C ~/dotfiles diff`. User choices live in `~/.config/titan`, so a clean
+  checkout is normal; any local change you didn't make belongs to the user or
+  another agent. **Never reset, checkout or stash it.** Stage only files you
+  changed.
+- **Changing the layout of existing installs** (moving a file, renaming a
+  setting): add a numbered, idempotent script to `migrations/` (name
+  `$(date +%s)-what.sh`, using `TITAN_ROOT`, never deleting user data without a
+  copy), run `titan migrate`, and bump `version`. See `docs/distribution.md`.
 - **Another agent:** Codex may be working in the same checkout. Preserve
   unfamiliar changes, and ask before editing a file someone else has modified.
 - **Committing:** commit only when the user asks, or when the task is clearly a

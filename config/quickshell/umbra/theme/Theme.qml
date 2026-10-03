@@ -67,14 +67,20 @@ QtObject {
  readonly property int movement: animate ? Settings.values.movementMs : 0
  readonly property int hover: animate ? Settings.values.hoverMs : 0
  readonly property real bounce: Settings.values.bounce/100
- function save() { preferences.setText(JSON.stringify({theme:paletteName,accent:accentName,motion:motion,wallpaper:wallpaperEnabled},null,2)+"\n") }
- property FileView preferences: FileView {
-  path: Quickshell.env("HOME")+"/dotfiles/config/quickshell/umbra/theme/preferences.json"
-  watchChanges: true
+ // Choices live in ~/.config/titan/preferences.json; preferences-default.json ships the defaults.
+ function save() { userPreferences.setText(JSON.stringify({theme:paletteName,accent:accentName,motion:motion,wallpaper:wallpaperEnabled},null,2)+"\n") }
+ function load(p) {
+  root.paletteName=root.palettes.some(t=>t.id===p.theme) ? p.theme : "graphite"
+  root.accentName=["theme","silver","ice","sage","custom"].includes(p.accent) ? p.accent : "silver"
+  root.motion=p.motion!==false; root.wallpaperEnabled=p.wallpaper!==false
+ }
+ function merged() { let d={}, u={}; try { d=JSON.parse(defaultPreferences.text()||"{}") } catch(e) {} try { u=JSON.parse(userPreferences.text()||"{}") } catch(e) { console.warn("Invalid preferences:",e) } return Object.assign({},d,u) }
+ property FileView defaultPreferences: FileView { path: Qt.resolvedUrl("preferences-default.json"); blockLoading: true }
+ property FileView userPreferences: FileView {
+  path: (Quickshell.env("XDG_CONFIG_HOME")||Quickshell.env("HOME")+"/.config")+"/titan/preferences.json"
+  watchChanges: true; atomicWrites: true; __printErrors: false
   onFileChanged: reload()
-  onLoaded: {
-   try { const p=JSON.parse(text()); root.paletteName=root.palettes.some(t=>t.id===p.theme) ? p.theme : "graphite"; root.accentName=["theme","silver","ice","sage","custom"].includes(p.accent) ? p.accent : "silver"; root.motion=p.motion!==false; root.wallpaperEnabled=p.wallpaper!==false }
-   catch(e) { console.warn("Invalid shell preferences:",e) }
-  }
+  onLoaded: root.load(root.merged())
+  onLoadFailed: root.load(root.merged())
  }
 }

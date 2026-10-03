@@ -30,7 +30,7 @@ interpolation of user text, filenames or calculator expressions.
 - `scripts/workflow settings get [KEY]`, `set KEY VALUE`, `reset KEY` and
   `schema`: the same validated settings the Settings window edits (schema in
   `config/quickshell/umbra/theme/settings-schema.json`, values in
-  `$XDG_STATE_HOME/titan/settings.json`). The shell reloads them live. Invalid
+  `~/.config/titan/settings.json`). The shell reloads them live. Invalid
   values exit non-zero without writing.
 - `scripts/workflow wallpaper list|current|next|set PATH`: wallpapers of the
   current theme (JSON for `list`). `scripts/fetch-wallpapers` fills

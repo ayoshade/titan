@@ -27,18 +27,19 @@ reference file for the area you are changing.
 | `~/.config/hypr/` | Symlink to `~/dotfiles/config/hypr/` (Lua: `hyprland.lua`, `appearance.lua`, `input.lua`, `rules.lua`, `bindings.lua` + `bindings/*.lua`, generated `theme.lua`, `hyprlock.conf`, `hypridle.conf`) |
 | `~/.config/kitty/` | Symlink to `~/dotfiles/config/kitty/`. **Kitty is the terminal**; `theme.conf` is generated |
 | `~/.config/alacritty/`, `~/.config/foot/`, `~/.config/ghostty/` | Not installed. Say so; don't create configs for terminals that aren't there unless the user installs one (`pacman -Qi alacritty`) |
-| `~/.config/titan/` | Does not exist. Titan user state lives in `~/.local/state/titan/` (`settings.json`, `workflow.json`, `hypr-runtime.lua`, `shell-settings.json`) |
+| `~/.config/titan/` | **The user layer** (never overwritten by updates): `preferences.json` (theme, accent, motion, wallpaper on/off), `settings.json` (Settings window values), `hypr.lua` (Hyprland overrides, loaded last), `kitty.conf` (Kitty overrides). Machine state lives in `~/.local/state/titan/` (`generated/` theme files, `hypr-runtime.lua`, `workflow.json`, `migrations/`) |
 | `titan-shell` | The desktop shell: island/bar, control center, launcher, menus, notifications, Settings window. Command: `titan-shell status|restart|ipc|functions|log|open|close` |
 | "bar" | The **island** at the top centre (it has notch mode and a full-width game-mode bar). Hide or show it: `titan-shell ipc bar` |
-| "user-facing titan commands" | `titan-shell`, `~/dotfiles/scripts/workflow OPERATION`, `scripts/apply-theme`, `scripts/fetch-wallpapers`, `scripts/lock`, `scripts/screenshot`, `scripts/doctor`. There is **no** single `titan` CLI yet |
+| "user-facing titan commands" | `titan` (`version`, `migrate`, `update`, `doctor`, `theme list|current|ID`, `settings …`, `wallpaper …`, `shell …`), `titan-shell`, and `~/dotfiles/scripts/workflow OPERATION` for everything else |
 | `titan dev link` (excluded) | No such workflow exists. Changing Titan's own source or defaults is development: follow `~/dotfiles/AGENTS.md` and [contributing.md](contributing.md), not this file |
 
 **Important:** `~/.config/hypr`, `kitty`, `quickshell` and `gtk-*` are symlinks
-into the Git checkout `~/dotfiles`. On this personal checkout, user
-customization therefore edits tracked files. That is expected here. Never
-`git reset`/`checkout` to "clean up". Preserve unrelated diffs (the user's
-theme choice dirties `config/hypr/theme.lua`, `config/kitty/theme.conf` and
-`theme/preferences.json`). Commit only when asked.
+into the Git checkout `~/dotfiles`, which holds Titan's **defaults**. Put a
+user's personal change in the user layer when one exists (settings, theme,
+`~/.config/titan/hypr.lua`, `~/.config/titan/kitty.conf`): it survives
+updates and keeps Git clean. Edit tracked defaults only when the change should
+apply to every Titan user (see [contributing.md](contributing.md)). Never
+`git reset`/`checkout` other people's changes. Commit only when asked.
 
 ## Choose the narrowest interface
 
@@ -49,7 +50,7 @@ UI uses.
    island geometry, notch mode, fonts, radii, motion, clock format, week start,
    launcher, toasts, control-center content and night-light temperature. Values
    are validated against `config/quickshell/umbra/theme/settings-schema.json`
-   and applied live; the shell watches `~/.local/state/titan/settings.json`.
+   and applied live; the shell watches `~/.config/titan/settings.json`.
    The Settings window is `titan-shell open settings SECTION`.
 2. **An existing operation:** `scripts/workflow …` for themes, wallpaper, gaps,
    transparency, layout, scale, night light, game mode, capture, reminders and
@@ -59,8 +60,8 @@ UI uses.
 4. **Shell QML or new workflow code:** only when the user wants new behaviour
    (see [plugins.md](plugins.md)).
 
-Never hand-edit generated files (`config/hypr/theme.lua`,
-`config/kitty/theme.conf`, `~/.local/state/titan/hypr-runtime.lua`). Change
+Never hand-edit generated files (`~/.local/state/titan/generated/*`,
+`~/.local/state/titan/hypr-runtime.lua`). Change
 their source instead (see [theming.md](theming.md) and
 [hyprland.md](hyprland.md)).
 
@@ -105,8 +106,8 @@ their source instead (see [theming.md](theming.md) and
 ## Undo
 
 - **Settings:** `scripts/workflow settings reset KEY`.
-- **Theme:** `scripts/apply-theme PREVIOUS_ID`. Read the current one from
-  `config/quickshell/umbra/theme/preferences.json` *before* changing it.
+- **Theme:** `titan theme PREVIOUS_ID`. Read the current one with
+  `titan theme current` *before* changing it.
 - **Config files:** they are in Git, so `git -C ~/dotfiles diff FILE` shows
   exactly what you changed. Revert only your own hunks, never the user's.
 - **Recovery:** if the shell breaks, Super+Return still opens Kitty, and

@@ -3,7 +3,7 @@ import QtQuick
 import Quickshell
 import Quickshell.Io
 // User settings. Defaults and validation come from theme/settings-schema.json;
-// values live outside Git in $XDG_STATE_HOME/titan/settings.json. The Settings
+// values live outside Git in ~/.config/titan/settings.json. The Settings
 // app and `scripts/workflow settings get|set` edit the same file.
 QtObject {
  id: root
@@ -11,7 +11,7 @@ QtObject {
  readonly property var defaults: { const d={}; for(const k in schema.settings) d[k]=schema.settings[k].default; return d }
  property var stored: ({})
  readonly property var values: Object.assign({},defaults,stored)
- readonly property string path: (Quickshell.env("XDG_STATE_HOME")||Quickshell.env("HOME")+"/.local/state")+"/titan/settings.json"
+ readonly property string path: (Quickshell.env("XDG_CONFIG_HOME")||Quickshell.env("HOME")+"/.config")+"/titan/settings.json"
  function valid(key,value) {
   const s=schema.settings[key]; if(!s) return false
   if(s.type==="bool") return typeof value==="boolean"

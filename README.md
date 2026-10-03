@@ -105,7 +105,10 @@ dotfiles/
 │   ├── kitty/                 Terminal palette and typography
 │   ├── gtk-{3,4}.0/            GTK dark defaults
 │   ├── xdg-desktop-portal/     Hyprland capture + GTK file chooser
-│   └── mimeapps.list          Browser and file manager associations
+│   …
+├── default/mimeapps.list      Default associations, copied once into ~/.config
+├── migrations/                Numbered upgrade steps run by `titan migrate`
+├── version                    Titan version
 ├── assets/wallpapers/          Original Blacksite vector landscape
 ├── system/greetd/              Reviewed system login configuration
 ├── packages/                   Desktop and login package manifests
@@ -153,12 +156,16 @@ saneAspect video. Left/Right selects a card; Enter applies it, Escape closes it.
 Click selects; double-click applies. Nine dark palettes update the shell, Kitty
 and compositor borders together. Theme changes persist across login. GTK apps
 retain their dark base. Palette data lives in `theme/palettes.json`; generated
-`kitty/theme.conf` and `hypr/theme.lua` are reproducible with
-`scripts/apply-theme THEME_ID`.
+Kitty and Hyprland colours are generated into `~/.local/state/titan/generated/`
+with `titan theme THEME_ID` (or `scripts/apply-theme`).
 
-The palette and accent stay in `theme/preferences.json`. All other shell
+Your theme and accent are stored in `~/.config/titan/preferences.json` (defaults
+in `theme/preferences-default.json`). All other shell
 settings are declared in `theme/settings-schema.json`, with user values in
-`~/.local/state/titan/settings.json` (outside Git). Wallpapers belong to themes:
+`~/.config/titan/settings.json` (outside Git). `~/.config/titan/hypr.lua` and
+`kitty.conf` hold your own overrides and load after Titan's defaults; updates
+never overwrite them. `titan version`, `titan migrate` and `titan update`
+manage upgrades (see docs/distribution.md). Wallpapers belong to themes:
 `~/Pictures/Wallpapers/<theme>/` holds each theme's set, and applying a theme
 switches to its wallpaper. The wallpaper picker (Settings → Appearance →
 Wallpaper, or `ipc call shell wallpapers`) chooses within the set, and changes

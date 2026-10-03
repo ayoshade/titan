@@ -1,10 +1,8 @@
 """Titan desktop operations. Inputs stay argv data; no shell interpolation."""
 from __future__ import annotations
 import ast, datetime, fcntl, hashlib, json, math, operator, os, pathlib, re, shutil, signal, subprocess, sys, tempfile, time
-ROOT = pathlib.Path(__file__).resolve().parents[2]
-STATE = pathlib.Path(os.environ.get('XDG_STATE_HOME', str(pathlib.Path.home()/'.local/state')))/'titan'
-RUNTIME = pathlib.Path(os.environ.get('XDG_RUNTIME_DIR', '/run/user/'+str(os.getuid())))/'titan'
-for directory in (STATE, RUNTIME): directory.mkdir(mode=0o700, parents=True, exist_ok=True)
+from paths import ROOT, CONFIG, STATE, RUNTIME, SETTINGS, preferences
+for directory in (CONFIG, STATE, RUNTIME): directory.mkdir(mode=0o700, parents=True, exist_ok=True)
 if not (STATE/'shell-settings.json').exists():
     (STATE/'shell-settings.json').write_text('{"barVisible": true}\n')
     (STATE/'shell-settings.json').chmod(0o600)
@@ -195,7 +193,7 @@ def nightlight(action='toggle'):
     # Temperature comes from Settings → System/Display (nightlightTemp, kelvin).
     require('wlsunset')
     active=subprocess.run(['systemctl','--user','is-active','--quiet','titan-nightlight.service']).returncode==0
-    try: temp=int(json.loads((STATE/'settings.json').read_text()).get('nightlightTemp',4500))
+    try: temp=int(json.loads(SETTINGS.read_text()).get('nightlightTemp',4500))
     except (FileNotFoundError,json.JSONDecodeError,ValueError,TypeError): temp=4500
     temp=max(2500,min(6000,temp))
     if action=='apply' and not active: return
@@ -244,7 +242,7 @@ def settings_valid(spec,value):
     return False
 def settings(action,args):
     # Same file and schema as the Settings app; the shell reloads it on change.
-    schema=json.loads(SCHEMA.read_text())['settings']; path=STATE/'settings.json'
+    schema=json.loads(SCHEMA.read_text())['settings']; path=SETTINGS
     try: stored=json.loads(path.read_text())
     except (FileNotFoundError,json.JSONDecodeError): stored={}
     current={k:stored.get(k,v['default']) for k,v in schema.items()}
@@ -267,10 +265,10 @@ def settings(action,args):
 WALLPAPERS=pathlib.Path(os.environ.get('TITAN_WALLPAPERS',str(pathlib.Path.home()/'Pictures/Wallpapers')))
 def wallpaper(action,args):
     # Same per-theme map the shell's wallpaper picker writes in settings.json.
-    theme=json.loads((ROOT/'config/quickshell/umbra/theme/preferences.json').read_text()).get('theme','graphite')
+    theme=preferences().get('theme','graphite')
     files=sorted(str(p) for p in (WALLPAPERS/theme).glob('*') if p.suffix.lower() in ('.jpg','.jpeg','.png','.webp'))
     files.append(str(ROOT/'assets/wallpapers/blacksite.svg'))
-    path=STATE/'settings.json'
+    path=SETTINGS
     try: stored=json.loads(path.read_text())
     except (FileNotFoundError,json.JSONDecodeError): stored={}
     chosen=stored.get('wallpapers',{}).get(theme) or (files[0] if files else '')
