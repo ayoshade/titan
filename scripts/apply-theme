@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+set -euo pipefail
+root=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)
+python - "$root" "${1:-graphite}" <<'PY'
+from pathlib import Path
+import json,os,sys,tempfile,signal
+r=Path(sys.argv[1]);q=r/'config/quickshell/umbra/theme'
+palettes=json.loads((q/'palettes.json').read_text())
+p=next((p for p in palettes if p['id']==sys.argv[2]),None)
+if p is None:raise SystemExit('Unknown palette')
+def atomic(path,text):
+ fd,name=tempfile.mkstemp(dir=path.parent,prefix='.'+path.name)
+ try:
+  with os.fdopen(fd,'w') as f:f.write(text)
+  os.replace(name,path)
+ finally:
+  if os.path.exists(name):os.unlink(name)
+colors=[p['surface'],*p['swatches'],p['text'],p['muted'],*p['swatches'],p['text']]
+kitty=f"background {p['background']}\nforeground {p['text']}\ncursor {p['accent']}\nselection_background {p['raised']}\nselection_foreground {p['text']}\n"+''.join(f'color{i} {c}\n' for i,c in enumerate(colors))
+atomic(r/'config/kitty/theme.conf',kitty)
+atomic(r/'config/hypr/theme.lua', 'hl.config({general={col={active_border="rgba('+p['accent'][1:]+'ff)",inactive_border="rgba('+p['raised'][1:]+'ff)"}}})\n')
+prefs=json.loads((q/'preferences.json').read_text());prefs.update(theme=p['id'],accent='theme')
+atomic(q/'preferences.json',json.dumps(prefs,indent=2)+'\n')
+# Kitty supports SIGUSR1 configuration reload. Only signal this user's processes.
+for proc in Path('/proc').iterdir():
+ if not proc.name.isdigit():continue
+ try:
+  if proc.stat().st_uid==os.getuid() and (proc/'comm').read_text().strip()=='kitty':os.kill(int(proc.name),signal.SIGUSR1)
+ except (OSError,ProcessLookupError):pass
+PY
+if [[ -n ${HYPRLAND_INSTANCE_SIGNATURE:-} ]]; then
+ hyprctl reload >/dev/null
+fi

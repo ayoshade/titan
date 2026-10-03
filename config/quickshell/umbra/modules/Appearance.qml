@@ -2,15 +2,16 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import QtQuick.Layouts
 import "../components"
+import "../services"
 import "../theme"
 ColumnLayout {
  spacing: 16
  ShellText { text: "Appearance"; font.pixelSize: Theme.titleSize }
- ShellText { text: "Graphite / Blacksite"; color: Theme.muted }
+ ToggleTile { Layout.fillWidth: true; text: "Theme"; subtitle: Theme.palette.label || "Graphite"; symbol: "settings"; onClicked: UiState.toggle("themes") }
  ShellText { text: "Accent"; font.pixelSize: Theme.captionSize; color: Theme.muted }
  RowLayout {
   Repeater {
-   model: ["silver","ice","sage"]
+   model: ["theme","silver","ice","sage"]
    Action { required property string modelData; text: modelData.charAt(0).toUpperCase()+modelData.slice(1); selected: Theme.accentName===modelData; onClicked: { Theme.accentName=modelData; Theme.save() } }
   }
  }

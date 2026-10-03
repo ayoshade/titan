@@ -1,0 +1,191 @@
+[
+  {
+    "id": "graphite",
+    "label": "Graphite",
+    "background": "#080a0d",
+    "shell": "#080a0d",
+    "surface": "#121417",
+    "raised": "#202328",
+    "border": "#202328",
+    "text": "#e1e5e9",
+    "muted": "#9299a3",
+    "accent": "#aeb8c4",
+    "danger": "#bd8585",
+    "swatches": [
+      "#bd8585",
+      "#a4b5a1",
+      "#bbb29a",
+      "#96a6bb",
+      "#aea0b8",
+      "#9bb5b5"
+    ]
+  },
+  {
+    "id": "gruvbox",
+    "label": "Gruvbox",
+    "background": "#1d2021",
+    "shell": "#1d2021",
+    "surface": "#282828",
+    "raised": "#3c3836",
+    "border": "#3c3836",
+    "text": "#ebdbb2",
+    "muted": "#a89984",
+    "accent": "#d79921",
+    "danger": "#cc241d",
+    "swatches": [
+      "#cc241d",
+      "#98971a",
+      "#d79921",
+      "#458588",
+      "#b16286",
+      "#689d6a"
+    ]
+  },
+  {
+    "id": "gruvbox-material",
+    "label": "Gruvbox Material",
+    "background": "#1d2021",
+    "shell": "#1d2021",
+    "surface": "#292828",
+    "raised": "#383432",
+    "border": "#383432",
+    "text": "#d4be98",
+    "muted": "#a89984",
+    "accent": "#a9b665",
+    "danger": "#ea6962",
+    "swatches": [
+      "#ea6962",
+      "#a9b665",
+      "#d8a657",
+      "#7daea3",
+      "#d3869b",
+      "#89b482"
+    ]
+  },
+  {
+    "id": "nord",
+    "label": "Nord",
+    "background": "#242933",
+    "shell": "#242933",
+    "surface": "#2e3440",
+    "raised": "#3b4252",
+    "border": "#3b4252",
+    "text": "#eceff4",
+    "muted": "#a3acbd",
+    "accent": "#88c0d0",
+    "danger": "#bf616a",
+    "swatches": [
+      "#bf616a",
+      "#a3be8c",
+      "#ebcb8b",
+      "#81a1c1",
+      "#b48ead",
+      "#8fbcbb"
+    ]
+  },
+  {
+    "id": "catppuccin",
+    "label": "Catppuccin",
+    "background": "#181825",
+    "shell": "#181825",
+    "surface": "#1e1e2e",
+    "raised": "#313244",
+    "border": "#313244",
+    "text": "#cdd6f4",
+    "muted": "#9399b2",
+    "accent": "#cba6f7",
+    "danger": "#f38ba8",
+    "swatches": [
+      "#f38ba8",
+      "#a6e3a1",
+      "#f9e2af",
+      "#89b4fa",
+      "#cba6f7",
+      "#94e2d5"
+    ]
+  },
+  {
+    "id": "everforest",
+    "label": "Everforest",
+    "background": "#232a2e",
+    "shell": "#232a2e",
+    "surface": "#2d353b",
+    "raised": "#3d484d",
+    "border": "#3d484d",
+    "text": "#d3c6aa",
+    "muted": "#9da9a0",
+    "accent": "#a7c080",
+    "danger": "#e67e80",
+    "swatches": [
+      "#e67e80",
+      "#a7c080",
+      "#dbbc7f",
+      "#7fbbb3",
+      "#d699b6",
+      "#83c092"
+    ]
+  },
+  {
+    "id": "horizon",
+    "label": "Horizon",
+    "background": "#16161c",
+    "shell": "#16161c",
+    "surface": "#1c1e26",
+    "raised": "#2e303e",
+    "border": "#2e303e",
+    "text": "#e0e0e0",
+    "muted": "#9b9cac",
+    "accent": "#e95678",
+    "danger": "#e95678",
+    "swatches": [
+      "#e95678",
+      "#29d398",
+      "#fab795",
+      "#26bbd9",
+      "#ee64ac",
+      "#59e1e3"
+    ]
+  },
+  {
+    "id": "rose-pine",
+    "label": "Rosé Pine",
+    "background": "#15121f",
+    "shell": "#15121f",
+    "surface": "#191724",
+    "raised": "#26233a",
+    "border": "#26233a",
+    "text": "#e0def4",
+    "muted": "#908caa",
+    "accent": "#c4a7e7",
+    "danger": "#eb6f92",
+    "swatches": [
+      "#eb6f92",
+      "#9ccfd8",
+      "#f6c177",
+      "#31748f",
+      "#c4a7e7",
+      "#ebbcba"
+    ]
+  },
+  {
+    "id": "industrial",
+    "label": "Industrial",
+    "background": "#090909",
+    "shell": "#090909",
+    "surface": "#141414",
+    "raised": "#262626",
+    "border": "#262626",
+    "text": "#d5d5d5",
+    "muted": "#888888",
+    "accent": "#bbbbbb",
+    "danger": "#676767",
+    "swatches": [
+      "#676767",
+      "#797979",
+      "#8b8b8b",
+      "#9d9d9d",
+      "#afafaf",
+      "#c1c1c1"
+    ]
+  }
+]

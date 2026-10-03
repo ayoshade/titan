@@ -21,17 +21,19 @@ PanelWindow {
  MouseArea { anchors.fill: parent; onClicked: UiState.close() }
  Rectangle {
   id: card
-  width: Math.min(UiState.panel==="launcher" ? Theme.launcherWidth : Theme.panelWidth,root.width-32)
-  height: Math.min(UiState.panel==="clock" ? 400 : UiState.panel==="session" ? 430 : UiState.panel==="appearance" ? 400 : 640,root.height-40)
+  width: Math.min(UiState.panel==="themes" ? 580 : UiState.panel==="launcher" ? Theme.launcherWidth : Theme.panelWidth,root.width-32)
+  height: Math.min(UiState.panel==="themes" ? 164 : UiState.panel==="clock" ? 400 : UiState.panel==="session" ? 430 : UiState.panel==="appearance" ? 400 : 640,root.height-40)
   anchors { top: parent.top; topMargin: 8; horizontalCenter: parent.horizontalCenter }
-  color: Theme.shell; radius: Theme.panelRadius; border.width: 1; border.color: "#262a30"
+  color: Theme.shell; radius: Theme.panelRadius; border.width: 1; border.color: Theme.border
   MouseArea { anchors.fill: parent; onClicked: {} }
   scale: root.visible ? 1 : 0.9
   opacity: root.visible ? 1 : 0
   transformOrigin: Item.Top
   Behavior on scale { NumberAnimation { duration: Theme.duration; easing.type: Easing.OutCubic } }
   Behavior on opacity { NumberAnimation { duration: Theme.duration } }
+  Loader { anchors { fill: parent; margins: 14 } active: root.visible && UiState.panel==="themes"; source: "ThemeSwitcher.qml" }
   ColumnLayout {
+   visible: UiState.panel!=="themes"
    anchors { fill: parent; margins: 10 } spacing: 8
    RowLayout {
     Layout.fillWidth: true; spacing: 0
@@ -48,7 +50,7 @@ PanelWindow {
     Loader {
      id: loader
      anchors { fill: parent; margins: 14 }
-     active: root.visible
+     active: root.visible && UiState.panel!=="themes"
      source: UiState.panel==="launcher" ? "Launcher.qml" : UiState.panel==="controls" ? "ControlCenter.qml" : UiState.panel==="notifications" ? "NotificationCenter.qml" : UiState.panel==="clock" ? "ClockPanel.qml" : UiState.panel==="appearance" ? "Appearance.qml" : UiState.panel==="media" ? "MediaPanel.qml" : UiState.panel==="connectivity" ? "Connectivity.qml" : "SessionMenu.qml"
      focus: true
      Keys.onEscapePressed: UiState.close()

@@ -44,6 +44,7 @@ the next boot and preserves the currently running desktop.
 | Super+Return | Kitty terminal |
 | Super+Space | Quickshell application launcher |
 | Super+A | Control center |
+| Super+T | Theme switcher |
 | Super+N | Notification center |
 | Super+Shift+E | Session menu |
 | Super+E / Super+B | Thunar / Firefox |
@@ -127,7 +128,15 @@ restart the shell:
 ```
 
 Tune colors, spacing, radii, font defaults and durations in `theme/Theme.qml`.
-Appearance settings save accent, motion and landscape preferences in
+Super+T opens a searchable horizontal theme carousel inspired by the referenced
+saneAspect video. Left/Right selects a card; Enter applies it, Escape closes it.
+Click selects; double-click applies. Nine dark palettes update the shell, Kitty
+and compositor borders together. Theme changes persist across login. GTK apps
+retain their dark base. Palette data lives in `theme/palettes.json`; generated
+`kitty/theme.conf` and `hypr/theme.lua` are reproducible with
+`scripts/apply-theme THEME_ID`.
+
+Appearance settings save palette, accent, motion and landscape preferences in
 `theme/preferences.json`. Three restrained accents share the graphite base.
 The wallpaper is a static SVG; the shell does not repaint it on a timer.
 The island expands briefly for volume/brightness changes and shows media

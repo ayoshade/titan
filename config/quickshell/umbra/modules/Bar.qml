@@ -28,7 +28,7 @@ PanelWindow {
   height: bar.expanded ? Theme.expandedIslandHeight : Theme.islandHeight
   radius: bar.expanded ? 22 : 16
   color: Theme.shell
-  border.width: 1; border.color: "#202328"
+  border.width: 1; border.color: Theme.raised
   Behavior on width { NumberAnimation { duration: Theme.duration; easing.type: Easing.OutCubic } }
   Behavior on height { NumberAnimation { duration: Theme.duration; easing.type: Easing.OutCubic } }
   HoverHandler { id: hover }
@@ -47,7 +47,7 @@ PanelWindow {
       width: 10; height: 26
       Rectangle {
        anchors.centerIn: parent; width: mark.active ? 7 : 5; height: mark.active ? 16 : 10; radius: 4
-       color: mark.active ? Theme.accent : mark.workspace && mark.workspace.toplevels.values.length>0 ? "#69737e" : "#30363d"
+       color: mark.active ? Theme.accent : mark.workspace && mark.workspace.toplevels.values.length>0 ? Theme.muted : Theme.border
        Behavior on height { NumberAnimation { duration: Theme.duration; easing.type: Easing.OutCubic } }
        Behavior on color { ColorAnimation { duration: Theme.duration } }
       }
@@ -91,13 +91,13 @@ PanelWindow {
  IconButton {
   id: launcher; anchors { right: island.left; rightMargin: 8; top: parent.top; topMargin: 8 }
   symbol: "apps"; label: "Applications · Super+Space"; size: 32
-  background: Rectangle { radius: 16; color: launcher.hovered ? Theme.raised : Theme.shell; border.width: 1; border.color: "#202328" }
+  background: Rectangle { radius: 16; color: launcher.hovered ? Theme.raised : Theme.shell; border.width: 1; border.color: Theme.raised }
   onClicked: UiState.toggle("launcher")
  }
  IconButton {
   id: notifications; anchors { left: island.right; leftMargin: 8; top: parent.top; topMargin: 8 }
   symbol: "controls"; label: "Control center · Super+A"; size: 32
-  background: Rectangle { radius: 16; color: notifications.hovered ? Theme.raised : Theme.shell; border.width: 1; border.color: "#202328"; Rectangle { visible: Notices.items.values.length>0; width: 4; height: 4; radius: 2; x: parent.width-8; y: 6; color: Theme.accent } }
+  background: Rectangle { radius: 16; color: notifications.hovered ? Theme.raised : Theme.shell; border.width: 1; border.color: Theme.raised; Rectangle { visible: Notices.items.values.length>0; width: 4; height: 4; radius: 2; x: parent.width-8; y: 6; color: Theme.accent } }
   onClicked: UiState.toggle("controls")
  }
 }

@@ -1,5 +1,6 @@
 {
-  "accent": "silver",
+  "accent": "theme",
   "motion": true,
-  "wallpaper": true
+  "wallpaper": true,
+  "theme": "graphite"
 }

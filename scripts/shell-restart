@@ -6,6 +6,11 @@ if [[ -z ${WAYLAND_DISPLAY:-} ]]; then
 fi
 export QT_QPA_PLATFORM=wayland
 qs -c umbra kill || true
+# Wait for the old process to release the single-instance lock.
+for attempt in {1..30}; do
+ if ! qs -c umbra list | grep -q "^Instance "; then break; fi
+ sleep 0.1
+done
 # Launch through the compositor so logind/polkit see the desktop's session,
 # even when this recovery script was invoked from a different TTY.
 exec hyprctl dispatch 'hl.dsp.exec_cmd("qs -n -d -c umbra")'

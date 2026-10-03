@@ -8,8 +8,10 @@ import "modules"
 ShellRoot {
  IpcHandler {
   target: "shell"
-  function status(): string { return JSON.stringify({panel:UiState.panel,screen:UiState.panelScreen,screens:Quickshell.screens.map(s=>s.name),accent:Theme.accentName,motion:Theme.motion,wallpaper:Theme.wallpaperEnabled}) }
+  function status(): string { return JSON.stringify({panel:UiState.panel,screen:UiState.panelScreen,screens:Quickshell.screens.map(s=>s.name),theme:Theme.paletteName,accent:Theme.accentName,motion:Theme.motion,wallpaper:Theme.wallpaperEnabled}) }
   function accent(name: string): bool { if(!["silver","ice","sage"].includes(name)) return false; Theme.accentName=name; Theme.save(); return true }
+  function themes(): void { UiState.toggle("themes") }
+  function theme(name: string): bool { return Theme.apply(name) }
   function launcher(): void { UiState.toggle("launcher") }
   function controls(): void { UiState.toggle("controls") }
   function notifications(): void { UiState.toggle("notifications") }

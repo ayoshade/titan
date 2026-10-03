@@ -13,3 +13,6 @@ hl.curve("restrained", {type="bezier", points={{0.2,0.8},{0.2,1}}})
 for _,leaf in ipairs({"windows", "fade", "workspaces", "layers"}) do
  hl.animation({leaf=leaf, enabled=true, speed=2.5, bezier="restrained"})
 end
+
+-- Generated from the same palette catalog used by Quickshell and Kitty.
+dofile(os.getenv("HOME").."/dotfiles/config/hypr/theme.lua")

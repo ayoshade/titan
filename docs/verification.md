@@ -104,3 +104,20 @@ kernel parameters or bootloader edits were applied.
 - Final shell RSS observed at 203728 KiB (about 199 MiB), with 0.6% CPU over
   one five-second idle sample after panels closed. This is a brief observation,
   not a sustained performance benchmark.
+
+## Theme switcher
+
+- Inspected the reference video’s theme-picker frame at 05:50 and rebuilt the
+  horizontal search/palette-card layout in Quickshell.
+- Nine palette catalogs validated for unique IDs, valid RGB tokens and six
+  swatches each. Unknown IDs reject without changing generated files.
+- Live picker loaded without runtime warnings and fits the 1366×768 screen.
+- Applied Nord through the native IPC/Process path; shell state and generated
+  Kitty palette matched. Live compositor configuration errors remained empty.
+- Saved palette survived shell restart; Graphite was restored after testing.
+- Super+T binding verified in the live compositor. Doctor and QML syntax
+  parsing passed. Pointer/keyboard navigation still benefits from user feedback.
+- Theme application affects Quickshell, Kitty and Hyprland borders. It does not
+  swap GTK themes, browser styling or wallpapers.
+- Shell restart now waits for the old instance to release its single-instance
+  lock, preventing the replacement from exiting during a restart race.

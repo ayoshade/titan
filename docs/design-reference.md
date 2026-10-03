@@ -56,3 +56,14 @@ visible-only refresh remains the one deliberate timer for system state.
 
 Preview images show the original artwork and shell without user applications:
 [desktop](previews/desktop.png), [controls](previews/controls.png).
+
+## Theme carousel
+
+The follow-up theme switcher reproduces the October 2 video’s compact top-center
+search/card/footer arrangement, palette swatches, selection outline and applied
+marker. It has nine dark palette adaptations, filtering, keyboard and pointer
+navigation, Enter/double-click application, and saved choice. A single JSON
+catalog supplies Quickshell tokens and generated Kitty/Hyprland colors.
+Application is explicit; browsing does not rewrite configuration. A native
+Process serializes theme application and FileView reacts to saved preferences.
+GTK colors and wallpaper remain the established dark base/landscape.
