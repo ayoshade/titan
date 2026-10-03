@@ -96,7 +96,7 @@ their source instead (see [theming.md](theming.md) and
   hang the shell). New IPC functions need `titan-shell restart`. Then check
   `titan-shell status` and
   `titan-shell log | grep -iE "warn|error"`.
-- **Scripts:** run `bash -n` (or Python `ast`), then `~/dotfiles/scripts/doctor`.
+- **Scripts:** run `bash -n` (or Python `ast`), then `titan doctor`.
 - **Visual checks:** `grim -g "X,Y WxH" /tmp/…png` and look at the image.
   Screenshots of the user's screen can contain private content; keep them in a
   scratch directory and never commit them.

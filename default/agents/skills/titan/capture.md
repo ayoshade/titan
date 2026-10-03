@@ -54,7 +54,7 @@ their own handles. Do not count them as permanent binds.
 ## Verify
 
 - **After editing workflow.py:** `python3 -m py_compile
-  ~/dotfiles/lib/titan/workflow.py`, then `~/dotfiles/scripts/doctor`.
+  ~/dotfiles/lib/titan/workflow.py`, then `titan doctor`.
 - **`full` takes a real screenshot** of the focused monitor. Run it only after
   telling the user, because it captures whatever is on screen (possibly
   private). Check the file exists, then delete test captures you created.

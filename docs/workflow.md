@@ -9,7 +9,11 @@ interpolation of user text, filenames or calculator expressions.
 ## Agent interfaces
 
 - `titan version|setup|migrate|update|doctor|theme|settings|wallpaper|shell`
-  (`scripts/titan`) is the top-level command. `titan setup` is safe to repeat;
+  (`scripts/titan`) is the top-level command. `titan doctor` (`scripts/doctor`)
+  always fails on static errors: scripts, Python, Hyprland config, and live
+  `configerrors`. In a checkout it also requires the package set and
+  `~/.config` links. On packaged installs missing packages, `titan setup` and
+  optional services are warnings. `titan setup` is safe to repeat;
   `titan update` needs the user (sudo).
 - `titan-shell ipc welcome` opens the first-login Welcome screen.
 - `titan-shell status|restart|ipc METHOD [ARG…]|functions|log [-f]|open PANEL|close`
@@ -84,8 +88,15 @@ media/output switching use native Quickshell service state.
 
 ## State and reproducibility
 
-`$XDG_STATE_HOME/titan` (default ~/.local/state/titan) holds workflow.json,
-hypr-runtime.lua, shell-settings.json and a writer lock. Directory mode is 0700;
+User choices live in `~/.config/titan` (`preferences.json`, `settings.json`,
+`hypr.lua`, `kitty.conf`; see docs/distribution.md). `$XDG_STATE_HOME/titan`
+(default ~/.local/state/titan) holds machine state:
+- `workflow.json`, `hypr-runtime.lua` and `shell-settings.json`;
+- `generated/` theme files and `migrations/` markers;
+- `setup-version` and `welcome-done`;
+- writer and update locks.
+
+Directory mode is 0700;
 atomic replacement files are 0600. Runtime Lua is generated only from validated
 workspace numbers, known layouts, monitor connector names and bounded scales.
 Ordinary configuration reloads preserve managed runtime overrides. Deleting a
@@ -95,8 +106,9 @@ $XDG_RUNTIME_DIR/titan, never in Git. Nightlight, recording and clipboard use
 named user units, independent of QML panel lifetime. Recording gets SIGINT to
 finish its container; pressing Alt+Print again stops the owned recording unit.
 
-Reproduce with install-packages then bootstrap; install-workflow adds dependencies
-to an existing install. Both use full pacman upgrades, not partial upgrades.
+Reproduce with install-packages then bootstrap (checkout), or install the
+`titan-desktop` package; install-workflow adds dependencies to an existing
+install. Both use full pacman upgrades, not partial upgrades.
 Desktop tools come from official Arch repositories. Optional Omarchy app bundles
 and Omarchy's external shell/helpers are not installed.
 

@@ -59,7 +59,7 @@ not hidden.
 
 | Area | Check |
 | --- | --- |
-| Repo | `~/dotfiles/scripts/doctor` (exit 0) and `git diff --check` |
+| Repo | `titan doctor` (exit 0) and `git diff --check` |
 | Hyprland | `hyprctl reload` then `hyprctl configerrors` (empty) |
 | Shell | `qmllint`, `titan-shell status`, and `titan-shell log` free of new warnings; a screenshot of the affected surface |
 | Python | `python3 -m py_compile lib/titan/workflow.py` |

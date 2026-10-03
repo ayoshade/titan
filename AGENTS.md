@@ -14,8 +14,12 @@ instead of maintaining two competing instruction sets.
 
 ## Current state and continuity
 
-- The project lives at `~/dotfiles`, a Git repository. This checkout is the
-  working prototype, not yet a released distribution or bootable installer.
+- Titan is owned by **Cristian Adrian Paredez** (GitHub `ayoshade`) and licensed
+  Apache-2.0 (`LICENSE`, `NOTICE`). The public repository is
+  `github.com/ayoshade/titan`. Titan 0.2.0 ships as signed Arch packages
+  (`titan`, `titan-desktop`) through GitHub releases; there is no installer or
+  ISO yet. The owner's development checkout is `~/dotfiles` on the laptop
+  `umbra`, local user `shade`.
 - **Titan** is the product name. **Umbra** is the existing shell/configuration
   name; `umbra` is also the laptop hostname, and `shade` is the local user.
   Plan a compatible branding migration rather than blindly renaming paths,

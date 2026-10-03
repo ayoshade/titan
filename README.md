@@ -1,260 +1,294 @@
-# Umbra
+# Titan
 
-An original Quickshell-first desktop for shade's Intel laptop. Graphite surfaces,
-quiet typography, a centered dynamic island, and restrained motion. No prebuilt
-rice, no Waybar, no separate launcher or notification daemon.
+Titan is an Arch-based, agent-friendly Linux desktop by **Cristian Adrian
+Paredez** (`ayoshade`): Hyprland plus its own Quickshell shell. The shell is a
+centered dynamic island, a control center, a launcher and a Settings app, in a
+dark black-and-graphite style modelled on saneAspect's designs. Everything is
+original code: no Waybar, no prebuilt rice, no separate launcher or
+notification daemon. The shell's internal name is **umbra**.
 
-Reference research and visual decisions are documented in
-[design-reference.md](docs/design-reference.md).
+Status: **Titan 0.2.0**, published as signed Arch packages. An installer and ISO
+are planned (see [docs/distribution.md](docs/distribution.md)). Licensed under
+[Apache-2.0](LICENSE); attributions are in [NOTICE](NOTICE).
 
-## Reproduce
+## Features
 
-On an Arch installation with NetworkManager, Bluetooth, PipeWire/WirePlumber,
-power-profiles-daemon and UFW already configured:
+- **Island:** workspaces, clock, signal and battery at the top center.
+  - Click it for a dashboard: focused window, workspace list, week, media,
+    status, Night light and Game mode.
+  - Click the dashboard clock and it becomes a month calendar.
+  - Volume and brightness changes expand it briefly.
+  - Optional notch mode attaches it to the top edge; Game mode turns it into a
+    full-width bar.
+- **Control center** (click the battery or signal icons):
+  - tiles for Wi-Fi, Focus, Lock/power, Bluetooth, Game Mode and Night light;
+  - Sound and Display sliders with detail pages (networks, devices,
+    outputs/inputs/apps, monitors, night-light temperature);
+  - media, running tray apps and notifications.
+- **Settings window:** ten sections (Bar & Island, Media, Clock & Date,
+  Appearance, Motion, Launcher, Notifications, Control Center, Lock Screen,
+  System) with search. Every setting can also be set from the command line.
+- **Launcher and menus:**
+  - Super+Alt+Space opens apps; Super+Space opens Titan's menus (capture,
+    toggles, hardware, themes, wallpapers, agents, settings, system).
+  - Super+K searches all keybindings; Super+Escape opens the session menu.
+- **Themes and wallpapers:** nine dark palettes recolour the shell, Kitty and
+  window borders together. Each theme has its own wallpapers, chosen in a
+  carousel with a crossfade.
+- **Capture:** region, window and monitor screenshots, OCR, colour picker and
+  screen recording.
+- **Notifications** (grouped by app), clipboard history, emoji picker,
+  calculator, reminders and world clock.
+- **Updates:** `titan update` takes a Snapper snapshot, runs a full Arch
+  upgrade and applies migrations; your own settings are never overwritten.
+- **Agent support:** documented commands and skills for Claude Code and Codex
+  (see [AGENTS.md](AGENTS.md) and `default/agents/skills/`).
+
+Keyboard chords follow Omarchy's complete set (231 bindings), implemented
+independently. See [docs/keybindings.md](docs/keybindings.md).
+
+## Install
+
+### From the Titan package repository
+
+On an existing Arch installation with NetworkManager, PipeWire and a user
+account:
 
 ```sh
-~/dotfiles/scripts/install-packages
-~/dotfiles/scripts/bootstrap
-~/dotfiles/scripts/doctor
-~/dotfiles/scripts/install-login
+curl -fsSLO https://raw.githubusercontent.com/ayoshade/titan/main/keys/titan-packager.asc
+sudo pacman-key --add titan-packager.asc
+sudo pacman-key --lsign-key 8A648F6B462B95C6
+printf '\n[titan]\nServer = https://github.com/ayoshade/titan/releases/download/repo-stable\n' | sudo tee -a /etc/pacman.conf
+sudo pacman -Syu titan-desktop
 ```
 
-Keep the checkout at `~/dotfiles`. Package installation uses a full
-`pacman -Syu --needed` transaction.
-Review that transaction locally. Bootstrap links configuration and refuses to
-replace existing files. It also sets the GTK dark preference and Inter font.
-Nothing in these scripts partitions disks, changes mount layout, edits the
-bootloader, disables networking, or changes firewall rules.
+Packages are signed with key `8A648F6B462B95C6` (fingerprint
+`2AD3 24F1 003E A830 989F 5129 8A64 8F6B 462B 95C6`). Choose the **Titan**
+session at your login screen. On first login Titan sets up your account
+(`titan setup`) and shows a short Welcome screen. Optionally install the
+reviewed greetd login screen with `/usr/share/titan/scripts/install-login`.
 
-After `scripts/install-login`, reboot to the dark ReGreet login screen. Choose
-`shade` and the **Hyprland** session (without UWSM), then enter your password.
-The desktop and Quickshell start automatically after authentication. ReGreet
-remembers your user and session after the first successful login. There is no
-automatic login.
+### From a Git checkout (development)
 
-If the login manager has not been installed, log into a TTY and run
-`start-hyprland`. Ctrl+Alt+F3 provides a recovery console; desktop VT numbers
-depend on how the session was started. The login installer enables greetd for
-the next boot and preserves the currently running desktop.
+```sh
+git clone https://github.com/ayoshade/titan.git ~/dotfiles
+~/dotfiles/scripts/install-packages     # full pacman -Syu of packages/*.txt; review the transaction
+~/dotfiles/scripts/bootstrap            # links ~/.config/{hypr,kitty,quickshell,gtk-*} and runs `titan setup`
+~/dotfiles/scripts/doctor               # health check
+~/dotfiles/scripts/install-login        # optional: greetd + ReGreet (sudo)
+```
 
-## Keys
+`bootstrap` refuses to replace existing files. None of these scripts
+partitions disks, changes mount layout, edits the bootloader, disables
+networking or changes firewall rules.
 
-Titan uses Omarchy's complete shortcut combinations, with native Titan helpers
-and Quickshell menus. Super is the Windows key. Press **Super+K** to search them.
+## Everyday use
 
 | Key | Action |
 | --- | --- |
-| Super+Return | Terminal |
+| Super+Return | Terminal (Kitty) |
 | Super+Space / Super+Alt+Space | Titan menu / application launcher |
+| Super+K | Search every shortcut |
 | Super+Shift+F / Super+Shift+B / Super+Shift+N | Files / browser / editor |
 | Super+A / C / V / X | Select all / copy / paste / cut |
 | Super+Ctrl+V | Clipboard history |
 | Super+Ctrl+A | Control center |
-| Super+Ctrl+Shift+Space | Theme switcher |
+| Super+Ctrl+Shift+Space | Theme carousel |
 | Super+Shift+Alt+comma | Notification history |
 | Super+Escape | Session menu |
 | Super+Ctrl+L | Lock |
-| Super+L | Workspace layout |
-| Super+W / Super+Q | Close focused window |
-| Alt+Tab / Alt+Shift+Tab | Next / previous window |
+| Super+L | Toggle workspace layout (dwindle/scrolling) |
+| Super+W / Super+Q | Close window |
 | Super+1…0 / Super+Shift+1…0 | Switch workspace / move window |
 | Super+F / Super+T | Fullscreen / floating |
-| Print / Super+Print / Alt+Print | Screenshot / color picker / recording |
+| Print / Super+Print / Alt+Print | Screenshot / colour picker / recording |
+| Super+Ctrl+N | Night light |
 
-Full mappings, optional apps and policy exceptions:
-[docs/keybindings.md](docs/keybindings.md). Desktop helpers and agent interfaces:
-[docs/workflow.md](docs/workflow.md). Always-awake settings remain authoritative;
-close-all requires confirmation. Optional Omarchy applications need separate
-installation. Clipboard history is event driven, bounded to 100 items and stored
-in runtime storage that clears at reboot; marked-sensitive entries are skipped.
+Search menus filter as you type; ↑/↓ or Tab select and Enter runs. Escape or
+clicking outside closes a panel. Hold the Wi-Fi or Bluetooth tile to switch the
+radio. Screenshots go to `~/Pictures/Screenshots` and the clipboard;
+recordings go to `~/Videos/Recordings`.
 
-Launcher (Super+Alt+Space), Titan menus (Super+Space) and keybindings (Super+K)
-share the reference launcher style: type to filter, ↑/↓ or Tab to select, Enter
-to run; the panel grows with its results. Escape or clicking outside closes a
-panel. The session menu (Super+Escape) uses control-center tiles with inline
-confirmation (keys L, E, R, P), and the control center's lock button opens the
-same power actions inline. Game Mode turns the island into a full-width bar. Click the island to expand its dashboard (focused
-window, workspaces, clock, week, media, status, Night light and Game mode); click
-the dashboard clock to morph the island into a month calendar (←/→, wheel or
-arrow keys change month). The island's battery and signal icons open the
-control center below the island. It has Wi-Fi, Focus, Lock, Bluetooth, Game
-Mode and Night light tiles, plus Sound and Display sliders whose › opens a
-detail page; hold the Wi-Fi or Bluetooth tile to toggle the radio. Titan
-Settings (`qs -c umbra ipc call shell settings appearance`) is a floating
-window with ten sections; every setting there can also be changed with
-`scripts/workflow settings set KEY VALUE`. Screenshots are saved under
-~/Pictures/Screenshots and copied to the Wayland clipboard.
+## Make it yours
 
-## Shell architecture
+Titan keeps three layers apart, so updates never overwrite your choices:
+
+| Layer | Where | Contents |
+| --- | --- | --- |
+| Defaults | `/usr/share/titan` (package) or the checkout | Shipped configuration, shell, scripts, migrations |
+| Your configuration | `~/.config/titan/` | `preferences.json` (theme, accent), `settings.json` (Settings window), `hypr.lua` and `kitty.conf` (your overrides, loaded last) |
+| Machine state | `~/.local/state/titan/` | Generated theme files, runtime toggles, migration markers |
+
+`~/.config/mimeapps.list`, the GTK settings and (packaged installs)
+`~/.config/kitty/kitty.conf` are copied once and then belong to you.
+
+```sh
+titan version                       # version and install location
+titan theme list | current | nord   # themes
+titan settings get | set KEY VALUE | reset KEY | schema
+titan wallpaper list | next | set PATH
+titan shell status | restart | ipc METHOD | open PANEL
+titan doctor                        # health check
+titan update                        # snapshot, full upgrade, migrations (asks for sudo)
+```
+
+- **Settings window:** `titan shell open settings appearance` (or another
+  section name).
+- **Wallpapers:** they live in `~/Pictures/Wallpapers/<theme>/`.
+  `scripts/fetch-wallpapers [--count N] [THEME…]` downloads colour-matched sets
+  from Wallhaven. They are their authors' work, so never commit them. The
+  bundled Blacksite landscape is selectable under every theme.
+- **Agents:** the `titan` skill covers customization, `titan-app` building
+  themed Qt Quick apps, and `diagnose-crash` reading core dumps.
+
+## Updating and recovery
+
+- **Updating:** `titan update` refuses to start if pacman is busy, disk space
+  is low or the checkout has local changes. It then takes a snapshot, updates
+  Titan (Git or package), runs `pacman -Syu`, applies migrations, runs the
+  health check, restarts the shell when needed and tells you when a reboot is
+  due.
+- **Snapshots:** `scripts/install-snapshots` enables Snapper and snap-pac on a
+  Btrfs root, so every pacman transaction is snapshotted. Inspecting, undoing,
+  rolling back and removing are covered in
+  [docs/snapshots.md](docs/snapshots.md).
+- **If the shell misbehaves:** Super+Return still opens Kitty. Run
+  `titan-shell restart` (or `scripts/shell-restart` from a TTY). It escalates
+  to TERM/KILL if Quickshell hangs while exiting.
+- **Logs:**
+
+  ```sh
+  qs -c umbra log
+  hyprctl configerrors
+  journalctl --user -b -u xdg-desktop-portal -u xdg-desktop-portal-hyprland
+  ```
+
+- **Reverting your own changes:** use `titan settings reset KEY`, or apply your
+  previous theme with `titan theme ID`. Titan does not manage passwords,
+  browser profiles, Wi-Fi credentials or machine-wide networking.
+
+## Building and releasing
+
+`packaging/titan` and `packaging/titan-desktop` hold the PKGBUILDs.
+
+```sh
+scripts/build-repo --channel edge                         # local pacman repository
+scripts/vm-test --full                                    # install local builds on a throwaway Arch VM (needs qemu-base)
+scripts/vm-test --full --from-repo                        # install from the published repository, as a user would
+scripts/publish-repo --channel stable --sign KEYID --yes  # GitHub release repo-stable
+```
+
+Release, signing and user setup are documented in
+[docs/distribution.md](docs/distribution.md).
+
+## Layout
 
 ```text
-dotfiles/
 ├── config/
-│   ├── hypr/                  Lua compositor modules, Hypridle, Hyprlock
-│   ├── quickshell/umbra/
-│   │   ├── shell.qml          Root, screen lifecycle, typed IPC
-│   │   ├── theme/             Tokens, palettes, preferences, settings schema
-│   │   ├── components/        Text, icons, tiles, switches, sliders, SearchMenu
-│   │   ├── services/          State, audio, network, media, notices, backlight,
-│   │   │                      toggles, wallpapers
-│   │   ├── assets/icons/      Original vector UI icons
-│   │   └── modules/           Background, island (Bar, dashboard, calendar),
-│   │                          overlays, launcher, command menus, control center,
-│   │                          Settings window, theme/wallpaper carousels,
-│   │                          media, notifications, toast, session menu
-│   ├── kitty/                 Terminal palette and typography
-│   ├── gtk-{3,4}.0/            GTK dark defaults
-│   ├── xdg-desktop-portal/     Hyprland capture + GTK file chooser
-│   …
-├── default/mimeapps.list      Default associations, copied once into ~/.config
-├── migrations/                Numbered upgrade steps run by `titan migrate`
-├── version                    Titan version
-├── assets/wallpapers/          Original Blacksite vector landscape
-├── system/greetd/              Reviewed system login configuration
-├── packages/                   Desktop and login package manifests
-├── scripts/                    Install, link, verify, session, lock, capture
-└── docs/                       Hardware, validation, operating notes
+│   ├── hypr/                Hyprland Lua: appearance, input, rules, bindings/, Hyprlock, Hypridle
+│   ├── quickshell/umbra/    The shell
+│   │   ├── shell.qml        Root, per-screen windows, typed IPC
+│   │   ├── theme/           Theme, Settings and Paths singletons; palettes; settings schema; defaults
+│   │   ├── services/        Audio, network, media, notices, backlight, toggles, wallpapers, UI state
+│   │   ├── components/      Shared controls (Tile, Switch, PillSlider, SearchMenu, …)
+│   │   ├── modules/         Island, dashboard, calendar, control center, Settings, menus, panels
+│   │   └── assets/          Icons, menu definitions, emoji data
+│   ├── kitty/  gtk-3.0/  gtk-4.0/  xdg-desktop-portal/
+├── default/                 Defaults copied once (mimeapps.list) and agent skills
+├── lib/titan/               Python behind scripts/workflow (desktop operations, paths)
+├── scripts/                 titan, titan-shell, titan-session, workflow, bootstrap, install-*,
+│                            apply-theme, fetch-wallpapers, build-repo, publish-repo, vm-test, doctor
+├── migrations/              Numbered upgrade steps run by `titan migrate`
+├── packaging/               PKGBUILDs for titan and titan-desktop
+├── packages/                Package manifests (desktop, workflow, login)
+├── system/                  Reviewed templates for privileged config (greetd, power)
+├── keys/                    Public packager key
+├── assets/wallpapers/       Original Blacksite landscape
+├── docs/                    Design research, distribution, verification, hardware, recovery
+├── version  LICENSE  NOTICE
 ```
 
-Logic lives in service singletons, presentation in modules. QML bindings consume
-native Quickshell Hyprland IPC, NetworkManager, BlueZ, PipeWire, UPower, MPRIS,
-notification-server and status-notifier APIs. PipeWire nodes use
-`PwObjectTracker`. No shell command interpolates an SSID or Wi-Fi password.
-Wi-Fi PSKs go through the native D-Bus API and are cleared from the field after
-submission. Bluetooth power and paired-device connection are native controls.
-New Bluetooth pairing opens `bluetoothctl` in Kitty for interactive PIN/agent
-confirmation. Run `agent on`, `default-agent`, `scan on`, then `pair ADDRESS`,
-`trust ADDRESS`, and `connect ADDRESS` as appropriate. Advanced and enterprise
-network configuration opens `nmtui`.
+The shell keeps logic in service singletons and presentation in modules. It
+uses native Quickshell APIs for Hyprland, NetworkManager, BlueZ, PipeWire,
+UPower, MPRIS, notifications and the system tray. Theme tokens come from one
+palette catalog and the settings schema.
 
-Network scanning runs only with controls or connections open. Bluetooth scanning
-stops when the connections panel closes. The clock updates once per minute. Backlight
-sysfs does not deliver reliable inotify events: it refreshes after hardware-key
-IPC and slider writes, plus every two seconds only while controls are open.
-No hidden panel polls. Media position is not continuously sampled.
+## Privacy and resource notes
 
-The island exists per monitor; overlays open on the focused monitor. Notifications
-appear on the first monitor. Workspace marks start with 1–5 and expand through
-10 as those workspaces exist. Notifications are capped at 50 live tracked items;
-DND suppresses popups while retaining history. History survives QML reloads but
-is not stored on disk. Closing an application's notification removes it from
-live history. Media controls follow the playing player, falling back to the
-first registered player. Cover images use the MPRIS artwork URL supplied by
-the player; this may load an image from its remote URL. No media position timer
-runs in the background. The tray is available inside the control center.
+- **Credentials:** Wi-Fi passwords go through NetworkManager's D-Bus API. No
+  command line contains an SSID or password. New Bluetooth pairing opens
+  `bluetoothctl` for PIN confirmation; advanced networking opens `nmtui`.
+- **Clipboard:** history is event driven, capped at 100 items and kept in
+  runtime storage that clears at reboot. Entries marked sensitive are skipped.
+- **No background polling:**
+  - Network and Bluetooth scans run only while their panels are open.
+  - Backlight is re-read after key presses and slider changes, and every two
+    seconds only while the control center is open.
+  - Media position updates once a second only while a media view is open and
+    playing.
+- **Cover art** uses the player's artwork URL, which may load a remote image.
+- **Notifications:** at most 50 are tracked; Do Not Disturb hides pop-ups but
+  keeps history; history is not written to disk.
 
-QML file changes reload automatically. After changing a `qmldir` or imports,
-restart the shell:
+## This development laptop
 
-```sh
-~/dotfiles/scripts/shell-restart
-```
+The reference machine is an Intel laptop (1366×768, Arch, systemd-boot, Btrfs,
+UFW) running from the checkout. Two of its policies are laptop-specific, not
+Titan defaults:
 
-Tune colors, spacing, radii, font defaults and durations in `theme/Theme.qml`.
-Super+Ctrl+Shift+Space opens a searchable horizontal theme carousel inspired by the referenced
-saneAspect video. Left/Right selects a card; Enter applies it, Escape closes it.
-Click selects; double-click applies. Nine dark palettes update the shell, Kitty
-and compositor borders together. Theme changes persist across login. GTK apps
-retain their dark base. Palette data lives in `theme/palettes.json`; generated
-Kitty and Hyprland colours are generated into `~/.local/state/titan/generated/`
-with `titan theme THEME_ID` (or `scripts/apply-theme`).
+- **Always awake** (`scripts/install-always-awake`, sudo): Hypridle is not
+  started. Lid, idle and sleep keys are ignored, and sleep and hibernate are
+  masked. Performance profile at boot. Suspend is absent from the session and
+  power menus; reboot, power off and log out still confirm. Keep it on external
+  power. Details and restoration: [docs/always-awake.md](docs/always-awake.md).
+- **Hyprlock** uses immediate rendering without animations, to avoid a
+  black-screen failure seen during TTY switching. Manual lock rendering is
+  still a hands-on check ([docs/verification.md](docs/verification.md)).
 
-Your theme and accent are stored in `~/.config/titan/preferences.json` (defaults
-in `theme/preferences-default.json`). All other shell
-settings are declared in `theme/settings-schema.json`, with user values in
-`~/.config/titan/settings.json` (outside Git). `~/.config/titan/hypr.lua` and
-`kitty.conf` hold your own overrides and load after Titan's defaults; updates
-never overwrite them. `titan version`, `titan migrate` and `titan update`
-manage upgrades (see docs/distribution.md). Titan also builds as Arch packages
-(`packaging/`, `scripts/build-repo`), and the packaged session is "Titan"
-(`titan-session`). Titan is licensed under Apache-2.0; see `LICENSE` and
-`NOTICE`. Release and install steps are in docs/distribution.md. Wallpapers belong to themes:
-`~/Pictures/Wallpapers/<theme>/` holds each theme's set, and applying a theme
-switches to its wallpaper. The wallpaper picker (Settings → Appearance →
-Wallpaper, or `ipc call shell wallpapers`) chooses within the set, and changes
-crossfade. `scripts/fetch-wallpapers [--count N] [THEME…]` downloads
-colour-matched sets from Wallhaven's Toplist. These images are their authors'
-work, so keep them out of Git. The bundled Blacksite landscape stays
-selectable under every theme. Wallpapers are decoded at screen size and never
-repainted on a timer.
-The island expands briefly for volume/brightness changes; a click opens the
-dashboard, which collapses when the pointer leaves or Escape is pressed. Its fixed reserved space keeps
-windows from jumping during expansion.
-Hyprland appearance lives independently in `hypr/appearance.lua`. Monitor scale
-is 1 for this machine's 1366×768 display. Keyboard layout is US. The launcher
-only executes installed desktop entries; it is not a shell-command runner.
+Hardware notes: [docs/hardware.md](docs/hardware.md).
 
-## Session behavior
-
-Hyprland launches Quickshell and the small polkit authentication agent.
-GTK portals handle file dialogs; the Hyprland portal handles screen sharing and
-screenshots. PipeWire socket activation and WirePlumber provide audio.
-Hyprlock uses immediate rendering with lock-screen animations disabled to avoid
-the black-screen failure observed during TTY switching.
-This laptop uses an always-awake policy: Hypridle is not started, automatic
-locking and display-off timers are absent, and manual locking remains available.
-`scripts/install-always-awake` installs the reviewed system policy with local sudo:
-lid closure, idle and sleep keys are ignored; all sleep/hibernate targets are
-masked. A boot service disables battery-aware profile switching and selects
-Performance. logind reloads without restarting the desktop. Suspend is absent
-from the session menu and the control-center power menu. Explicit reboot, power off and logout retain confirmation.
-
-This is a policy for the development laptop, not a requirement for every Titan
-machine. Keep it on external power for unattended operation. Hardware loss of
-power, critical thermal protection, and a firmware hard-power-off cannot be
-prevented by desktop settings. See [always-awake.md](docs/always-awake.md) for
-installation, validation and restoration. Manual lock rendering remains a
-hands-on check in `docs/verification.md`.
-
-## Recovery
-
-If the shell fails, Super+Return still opens Kitty. Run `titan-shell restart`
-(or `scripts/shell-restart` from a TTY);
-it escalates to TERM/KILL if Quickshell hangs while exiting.
-From a TTY it discovers the running Hyprland display. Inspect logs with:
-
-```sh
-qs -c umbra log
-hyprctl configerrors
-journalctl --user -b -u xdg-desktop-portal -u xdg-desktop-portal-hyprland
-```
-
-From a TTY use `qs -c umbra log --help` for instance selection if needed. User
-configuration is tracked in Git; restore a known commit and restart the shell.
-Bootstrap never overwrites a foreign config: move it aside manually only after
-reviewing and backing it up. This repository does not manage passwords, browser
-profiles, Wi-Fi credentials or machine-wide networking configuration.
-
-API references: [Quickshell 0.3.1](https://quickshell.org/docs/v0.3.1/types/),
-[Hyprland Lua configuration](https://wiki.hypr.land/configuring/core/).
-
-## Graphical login administration
+## Graphical login (greetd)
 
 The optional login stack is greetd, ReGreet and Cage. Cage runs only the
-greeter, supports VT switching, and exits when the authenticated desktop starts.
-ReGreet uses the system Hyprland session entry, which executes `start-hyprland`.
-Quickshell remains the desktop shell.
+greeter and exits when the desktop starts. Sessions come from
+`/usr/share/wayland-sessions`: **Titan** (`titan-session`) for packaged
+installs, or **Hyprland** (`start-hyprland`) for the checkout.
 
-`scripts/install-login` requires sudo, validates the TOML and installed CLI,
-backs up existing `/etc/greetd` configuration into `umbra-backup.*`, installs
-root-owned copies, verifies the systemd unit, and enables greetd for the next
-boot. It does not start or restart greetd in the current session. Config changes
-under `system/greetd/` must be reinstalled with that script to take effect.
+`scripts/install-login` needs sudo and:
+- validates the TOML and the installed CLI;
+- backs up `/etc/greetd` into `umbra-backup.*` and installs root-owned copies;
+- verifies the unit and enables greetd for the next boot, without restarting
+  the running one.
 
-If graphical login fails, use Ctrl+Alt+F3, log in, then inspect:
+Changes under `system/greetd/` take effect only after reinstalling. If login
+fails, press Ctrl+Alt+F3, log in and run:
 
 ```sh
 systemctl status greetd --no-pager
 journalctl -b -u greetd --no-pager
+sudo systemctl disable greetd.service   # return to text login next boot
 ```
 
-To return to text login on the next boot:
+## Documentation
 
-```sh
-sudo systemctl disable greetd.service
-```
+| Document | Contents |
+| --- | --- |
+| [AGENTS.md](AGENTS.md) | Rules and context for AI agents (Claude Code, Codex) |
+| [docs/distribution.md](docs/distribution.md) | Layers, migrations, updates, packaging, releasing, roadmap |
+| [docs/workflow.md](docs/workflow.md) | Command and IPC interfaces |
+| [docs/keybindings.md](docs/keybindings.md) | Complete shortcut reference |
+| [docs/snapshots.md](docs/snapshots.md) | Snapshots and recovery |
+| [docs/design-reference.md](docs/design-reference.md) and [docs/research/](docs/research/) | saneAspect research, measurements, checklists |
+| [docs/verification.md](docs/verification.md) | Dated record of what was tested, and what was not |
+| [docs/always-awake.md](docs/always-awake.md), [docs/hardware.md](docs/hardware.md) | Development-laptop policy and hardware |
 
-The original enabled getty on tty1 is preserved. Do not stop greetd while you
-have an active desktop launched by it; disabling alone changes future boots.
-Login references: [ReGreet](https://github.com/rharish101/ReGreet),
-[greetd configuration](https://man.archlinux.org/man/greetd.5.en).
+API references: [Quickshell 0.3.1](https://quickshell.org/docs/v0.3.1/types/),
+[Hyprland Lua configuration](https://wiki.hypr.land/configuring/core/),
+[ReGreet](https://github.com/rharish101/ReGreet),
+[greetd](https://man.archlinux.org/man/greetd.5.en).
+
+## License
+
+Copyright 2026 Cristian Adrian Paredez and Titan contributors. Licensed under
+the Apache License, Version 2.0 ([LICENSE](LICENSE)); see [NOTICE](NOTICE) for
+third-party attributions.

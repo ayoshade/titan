@@ -43,44 +43,51 @@ Ob98KFByTec, nKomstQedmE and ipEGXS5WcSg. Launcher and menu styling, the power m
 game-mode bar and the night-light temperature slider followed later the same
 day. See [research/shell-panels.md](research/shell-panels.md).
 
-## Applied to Umbra
+## Current implementation
 
-The original full-width text bar has been replaced by a centered black island
-(the side circles were removed on 2026-10-03 to match the October 2 video).
-Workspaces use glowing vertical marks with occupied/empty shades. Clicking the
-island opens the three-column dashboard; compact status icons open controls,
-and hardware-key OSDs expand the pill. Panels share a central origin, black outer frame and graphite inner
-surface. Controls group radio/focus/power tiles, filled sound/display sliders,
-media and recent notifications. Launcher rows include icons and rank name
-matches ahead of description matches. Session actions retain confirmation.
+This summarizes the shell as it is now. The research notes linked above give
+the measurements and per-feature checklists.
 
-The user’s original black/graphite direction is retained instead of reproducing
-the reference’s turquoise or blue accents. The Blacksite SVG landscape and UI
-icons are original, authored for this laptop. Appearance controls persist a
-restrained silver/ice/sage accent, reduced motion and landscape visibility.
-They change shell appearance; GTK and terminal retain the coordinated graphite
-base. This is a close adaptation of the public visual approach, not an exact
-copy of every feature in the paid Dynamite shell.
+- **Island** (`modules/Bar.qml`):
+  - A 230×33 pure-black pill, 11 px from the top, with glowing workspace marks,
+    clock, signal bars and solid battery.
+  - Hover widens it slightly; volume and brightness expand it into an OSD.
+  - A click opens the dashboard (`IslandDashboard.qml`). The dashboard clock
+    morphs it into a month calendar (`IslandCalendar.qml`).
+  - Notch mode attaches it to the top edge with flares. Game mode makes it a
+    full-width bar. The side circles of the older reference layout were
+    removed to match the October 2 video.
+- **Control center** (`ControlCenter.qml`):
+  - A drop-down below the status icons, built from tiles, slider cards with
+    drill-in pages, media, tray, notifications and an inline power menu.
+  - Panels use a black frame and graphite inner surface; search menus use the
+    reference's flat black launcher style (`components/SearchMenu.qml`).
+- **Settings** (`SettingsApp.qml`): a floating window whose rows come from
+  `theme/settings-schema.json`.
+- **Theme and wallpaper carousels:** top center, centred selection. Each
+  theme owns a wallpaper set, and wallpaper changes crossfade.
+- **Colour:** the user's black/graphite direction is kept rather than the
+  reference's turquoise or blue accents. Accent choices are the palette's
+  own, silver, ice, sage or a custom hex. The Blacksite landscape and all UI
+  icons are original.
 
 ## Architecture and cost
 
-Existing native reactive services remain separate from presentation. New shared
-components are ShellIcon, IconButton and ToggleTile. Theme owns shape, spacing,
-font, motion and island/panel constants. Preferences use native FileView events
-and atomic writes. The static wallpaper is rendered once as an image texture.
-Workspace state comes from Hyprland, with no polling. Backlight’s existing
-visible-only refresh remains the one deliberate timer for system state.
+- **Services and modules:** native reactive services
+  (`services/`, `theme/Settings.qml`, `theme/Theme.qml`) stay separate from
+  presentation. Shared components are ShellIcon, IconButton, Tile, Switch,
+  PillSlider, SearchMenu, WorkspaceMark, SignalBars and BatteryGlyph.
+- **Tokens:** Theme derives fonts, radii, motion and island geometry from
+  Settings. Preferences and settings use FileView events with atomic writes.
+- **Events, not polling:** workspace and window state come from Hyprland
+  events.
+- **The only timers:**
+  - backlight refresh while the control center is open;
+  - media position while a media view is open and playing;
+  - the debounced night-light re-apply after a temperature change.
+- **Wallpapers** are decoded at screen size and blurred only during a
+  transition.
 
 Preview images show the original artwork and shell without user applications:
-[desktop](previews/desktop.png), [controls](previews/controls.png).
-
-## Theme carousel
-
-The follow-up theme switcher reproduces the October 2 video’s compact top-center
-search/card/footer arrangement, palette swatches, selection outline and applied
-marker. It has nine dark palette adaptations, filtering, keyboard and pointer
-navigation, Enter/double-click application, and saved choice. A single JSON
-catalog supplies Quickshell tokens and generated Kitty/Hyprland colors.
-Application is explicit; browsing does not rewrite configuration. A native
-Process serializes theme application and FileView reacts to saved preferences.
-GTK colors and wallpaper remain the established dark base/landscape.
+[desktop](previews/desktop.png), [controls](previews/controls.png). They
+predate the October redesign.

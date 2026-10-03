@@ -23,7 +23,7 @@ changes, reboot or desktop restart are needed.
 
 ## Check
 
-Run `~/dotfiles/scripts/doctor`. For detailed effective settings:
+Run `titan doctor`. For detailed effective settings:
 
 ```sh
 systemd-analyze cat-config systemd/logind.conf
