@@ -25,7 +25,10 @@ PanelWindow {
  exclusiveZone: Theme.barHeight
  color: "transparent"
  WlrLayershell.namespace: "umbra-bar"
- WlrLayershell.keyboardFocus: islandOpen ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
+ // Exclusive focus makes Hyprland send the island a pointer leave as it opens,
+ // which collapsed it before rows could be clicked. OnDemand keeps the pointer
+ // and gives Escape/arrow keys after the first click inside.
+ WlrLayershell.keyboardFocus: islandOpen ? WlrKeyboardFocus.OnDemand : WlrKeyboardFocus.None
  mask: Region { item: island }
  RectangularShadow {
   anchors.fill: island; radius: island.radius
