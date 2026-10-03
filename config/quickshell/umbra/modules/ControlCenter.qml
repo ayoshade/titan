@@ -351,11 +351,13 @@ Item {
  Component {
   id: soundPage
   Column {
+   id: sound
    spacing: 8
    readonly property var outputs: Pipewire.nodes.values.filter(n=>n.isSink && !n.isStream && n.audio)
    readonly property var inputs: Pipewire.nodes.values.filter(n=>!n.isSink && !n.isStream && n.audio)
    readonly property var apps: Pipewire.nodes.values.filter(n=>n.isStream && !n.isSink && n.audio)
-   PwObjectTracker { objects: parent.apps }
+   // Trackers are not Items, so they have no visual parent: reference by id.
+   PwObjectTracker { objects: sound.apps }
    PageHead { title: "Sound" }
    Caption { text: "Output" }
    Repeater {
