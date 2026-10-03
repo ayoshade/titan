@@ -69,8 +69,10 @@ installation. Clipboard history is event driven, bounded to 100 items and stored
 in runtime storage that clears at reboot; marked-sensitive entries are skipped.
 
 Launcher: type to filter, arrows to select, Enter to launch. Escape or clicking
-outside closes a panel. The left circle opens applications; the right opens
-controls. Click the island clock for the calendar. Screenshots are saved under
+outside closes a panel. Click the island to expand its dashboard (focused
+window, workspaces, clock, week, media, status, Night light and Game mode); click
+the dashboard clock for the calendar. The island's battery and signal icons open
+controls. Screenshots are saved under
 ~/Pictures/Screenshots and copied to the Wayland clipboard.
 
 ## Shell architecture
@@ -145,8 +147,8 @@ retain their dark base. Palette data lives in `theme/palettes.json`; generated
 Appearance settings save palette, accent, motion and landscape preferences in
 `theme/preferences.json`. Three restrained accents share the graphite base.
 The wallpaper is a static SVG; the shell does not repaint it on a timer.
-The island expands briefly for volume/brightness changes and shows media
-controls on hover while a player exists. Its fixed reserved space keeps
+The island expands briefly for volume/brightness changes; a click opens the
+dashboard, which collapses when the pointer leaves or Escape is pressed. Its fixed reserved space keeps
 windows from jumping during expansion.
 Hyprland appearance lives independently in `hypr/appearance.lua`. Monitor scale
 is 1 for this machine's 1366×768 display. Keyboard layout is US. The launcher

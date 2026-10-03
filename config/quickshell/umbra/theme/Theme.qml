@@ -44,6 +44,10 @@ QtObject {
  readonly property int islandTop: 11
  readonly property int islandPadding: 20
  readonly property int clockSize: 16
+ // Click-expanded dashboard island (same reference, 10:36–10:49).
+ readonly property int dashboardWidth: 648
+ readonly property int dashboardHeight: 167
+ readonly property int dashboardRadius: 30
  readonly property int expandedIslandWidth: 370
  readonly property int expandedIslandHeight: 78
  readonly property int panelWidth: 420

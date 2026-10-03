@@ -16,6 +16,13 @@ interpolation of user text, filenames or calculator expressions.
   media, clock, appearance, session, close, osd volume/brightness.
 - New IPC: bar, setBar BOOL, dnd, dismissOne, dismissAll, invokeLast,
   cycleAudio, cycleMedia and panelAt INDEX.
+- `qs -c umbra ipc call shell island`: toggle the expanded island dashboard on
+  the focused monitor. Escape or moving the pointer away closes it.
+- `scripts/workflow toggles`: JSON `{"nightlight":BOOL,"gameMode":BOOL}`; safe as
+  a diagnostic. `scripts/workflow nightlight` and `game-mode` change the desktop.
+  Game mode turns Hyprland animations, blur and shadows off at runtime. It saves
+  the previous values in `$XDG_RUNTIME_DIR/titan/game-mode.json` and restores them
+  on the next toggle; a Hyprland reload also restores the configured values.
 - `scripts/workflow keybindings`, `clipboard-list`, `reminder-list` and
   `worldclock` return JSON arrays for Quickshell. Never dump clipboard-list
   into agent logs: its labels contain user clipboard content.

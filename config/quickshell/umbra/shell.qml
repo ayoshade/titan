@@ -18,6 +18,7 @@ ShellRoot {
   function appearance(): void { UiState.toggle("appearance") }
   function media(): void { UiState.toggle("media") }
   function clock(): void { UiState.toggle("clock") }
+  function island(): void { UiState.toggleIsland("") }
   function connectivity(): void { UiState.toggle("connectivity") }
   function session(): void { UiState.toggle("session") }
   function menu(kind: string): void { UiState.menu(kind) }

@@ -38,10 +38,10 @@ for the full channel inventory and review status.
 ## Applied to Umbra
 
 The original full-width text bar has been replaced by a centered black island
-and two small side circles. Workspaces use animated vertical marks, a subtle
-halo and occupied/empty shades. The clock opens a calendar. Compact status
-icons open controls; media appears on hover, and hardware-key OSDs expand the
-pill. Panels share a central origin, black outer frame and graphite inner
+(the side circles were removed on 2026-10-03 to match the October 2 video).
+Workspaces use glowing vertical marks with occupied/empty shades. Clicking the
+island opens the three-column dashboard; compact status icons open controls,
+and hardware-key OSDs expand the pill. Panels share a central origin, black outer frame and graphite inner
 surface. Controls group radio/focus/power tiles, filled sound/display sliders,
 media and recent notifications. Launcher rows include icons and rank name
 matches ahead of description matches. Session actions retain confirmation.

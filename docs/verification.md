@@ -207,3 +207,22 @@ kernel parameters or bootloader edits were applied.
   IPC and displayed correctly. `scripts/doctor` passed.
 - Not hands-on tested: pointer clicks on workspace marks, the clock and status,
   the low-battery colour, and a Wi-Fi signal (this machine was on Ethernet).
+
+## Island dashboard — 2026-10-03
+
+- Built the click-expanded dashboard from frames of J8s7O2IGogE (10:36–10:55,
+  including 30 fps transition scans). Reference and Titan were compared side by
+  side at 1:1 scale.
+- Live checks: the shell reloaded with no runtime warnings after fixes. The
+  dashboard opened and closed through `ipc call shell island`. Rapid grim captures
+  confirmed the open overshoot (peak ~650×167, settling at 648×167) and the
+  height-then-width close. `scripts/workflow game-mode` was toggled on and off: all
+  three Hyprland options went false, then were restored to true, and the runtime
+  state file was removed. `scripts/workflow toggles` reported both states.
+  `scripts/doctor` passed.
+- An invalid fractional `font.pixelSize` briefly stopped the shell from loading
+  during development. Run a live reload after QML edits, because qmllint did not
+  catch it.
+- Not hands-on tested: the media row with a live MPRIS player (none was playing),
+  pointer hover/leave collapse, Escape, the Night light chip (it would start
+  wlsunset), clicking workspace rows, and a dashboard on a second monitor.

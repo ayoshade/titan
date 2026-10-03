@@ -52,8 +52,14 @@ direction, not a spec.
 | Mark sizes, pitch, occupied/empty tones, active glow | Matched; glow strength is tuned by eye |
 | Clock size and weight | Matched. Titan renders subpixel colour fringes, while his text is greyscale antialiased |
 | Signal bars and solid battery | Matched; Ethernet or no Wi-Fi shows full bars |
-| Side buttons removed | Matched. Launcher and controls stay on shortcuts; status and clock clicks open panels |
+| Side buttons removed | Matched. The launcher stays on its shortcut. Clicking the island opens the dashboard; the status icons open controls |
 | Accent colour | Adaptation: follows Titan's palette and accent preference instead of his turquoise/ice |
-| Expanded 3-column dashboard | Gap: Titan still expands to the 370×78 media/OSD strip |
-| Expand/collapse motion | Not measured yet; the 1 s frame scan missed the transition |
+| Expanded 3-column dashboard | Implemented (`modules/IslandDashboard.qml`) at 648×167, radius 30, same column positions; compared with 10:41 at matched scale |
+| Dashboard week strip, today box, faded edge days | Matched. Weekend red uses the palette's `danger` colour, which is muted in some palettes |
+| Workspace list | Shows five rows plus “+” (first empty workspace). With more than five workspaces, the list follows the active workspace instead of scrolling |
+| Hover row highlight, calendar hover box | Implemented. The calendar opens Titan's existing clock panel instead of morphing the island into a month view |
+| Status rows | Battery, network (SSID/strength or “Wired”), Bluetooth (device name when connected), volume and mic, notification count. Rows open the matching panel |
+| Night light / Game mode | Implemented through `scripts/workflow nightlight` / `game-mode`. Game mode is Titan's own runtime toggle; his implementation has not been reviewed |
+| Hover media expansion | Removed. Media now lives in the dashboard, as in the reference |
+| Expand/collapse motion | Measured at 30 fps (open 636.1–636.43 s, close 652.67–653.2 s). Implemented as OutBack 330 ms (Titan peaks at ~650 against his 653); close animates height (140 ms), then width (380 ms). A 10 px hover bump is included. Dashboard collapses 350 ms after the pointer leaves |
 | Scale on 1366×768 | Adaptation: the same logical pixels are used, so the island takes a larger share of a small screen |

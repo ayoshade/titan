@@ -12,6 +12,11 @@ QtObject {
  property bool dnd: false
  property bool barVisible: true
  property string menuKind: "root"
+ // Expanded island dashboard, shown on one screen at a time.
+ property string islandScreen: ""
+ function focusedScreen() { return Hyprland.focusedMonitor ? Hyprland.focusedMonitor.name : (Quickshell.screens.length ? Quickshell.screens[0].name : "") }
+ function toggleIsland(screen) { const target=screen || focusedScreen(); islandScreen=islandScreen===target ? "" : target; if(islandScreen) panel="" }
+ function closeIsland() { islandScreen="" }
  function menu(kind) {
   if(kind==="apps") { toggle("launcher"); return }
   if(kind==="system") { toggle("session"); return }
@@ -34,6 +39,7 @@ QtObject {
  function toggle(name) {
   panelScreen = Hyprland.focusedMonitor ? Hyprland.focusedMonitor.name : (Quickshell.screens.length ? Quickshell.screens[0].name : "")
   panel = panel === name ? "" : name
+  if (panel) islandScreen = ""
  }
  function close() { panel = "" }
  function osd(kind) { context = kind; if (kind === "brightness") Brightness.refresh(); root.timeout.restart() }

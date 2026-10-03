@@ -200,6 +200,26 @@ def nightlight():
             'wlsunset','-T','4501','-t','4500','-S','00:00','-s','23:59',stdout=subprocess.DEVNULL); notify('Nightlight enabled')
 
 OPS={ast.Add:operator.add,ast.Sub:operator.sub,ast.Mult:operator.mul,ast.Div:operator.truediv,ast.Mod:operator.mod,ast.Pow:operator.pow,ast.FloorDiv:operator.floordiv}
+GAME_OPTIONS=('animations:enabled','decoration:blur:enabled','decoration:shadow:enabled')
+def option(name): return bool(json.loads(output('hyprctl','getoption',name,'-j')).get('bool',True))
+def game_mode_active():
+    # A Hyprland reload restores configured effects, which leaves a stale saved state.
+    return (RUNTIME/'game-mode.json').exists() and not option('animations:enabled')
+def game_mode():
+    path=RUNTIME/'game-mode.json'
+    if game_mode_active():
+        saved=json.loads(path.read_text())
+        values=[lua(bool(saved.get(name,True))) for name in GAME_OPTIONS]
+        evaluate('hl.config({animations={enabled=%s},decoration={blur={enabled=%s},shadow={enabled=%s}}})' % tuple(values))
+        path.unlink(); notify('Game mode disabled')
+    else:
+        atomic(path,json.dumps({name:option(name) for name in GAME_OPTIONS})+'\n')
+        evaluate('hl.config({animations={enabled=false},decoration={blur={enabled=false},shadow={enabled=false}}})')
+        notify('Game mode enabled','Animations, blur and shadows are off until toggled again or Hyprland reloads.')
+def toggles():
+    nightlight=subprocess.run(['systemctl','--user','is-active','--quiet','titan-nightlight.service']).returncode==0
+    print(json.dumps({'nightlight':nightlight,'gameMode':game_mode_active()}))
+
 def calculate(expression):
     if len(expression)>200: raise ValueError('Expression too long')
     def visit(node,depth=0):
@@ -378,6 +398,8 @@ def main(argv):
     elif name=='scale': scale(args[0])
     elif name=='mirror': mirror()
     elif name=='nightlight': nightlight()
+    elif name=='game-mode': game_mode()
+    elif name=='toggles': toggles()
     elif name=='calculator': print(calculate(args[0]))
     elif name=='copy-text': run('wl-copy',input=args[0].encode()); notify('Copied')
     elif name=='capture': capture(args[0])
@@ -415,7 +437,7 @@ if __name__=='__main__':
     try:
         # Serial state writers avoid lost changes from simultaneous key presses.
         lock=open(STATE/'workflow.lock','a')
-        if len(sys.argv)>1 and sys.argv[1] in ('layout','gaps','square','desktop','width','touchpad','scale','mirror','reminder-set','reminder-clear'):
+        if len(sys.argv)>1 and sys.argv[1] in ('game-mode','layout','gaps','square','desktop','width','touchpad','scale','mirror','reminder-set','reminder-clear'):
             fcntl.flock(lock,fcntl.LOCK_EX)
         main(sys.argv[1:])
     except (ValueError,KeyError,SyntaxError,ZeroDivisionError,OverflowError,OSError,subprocess.CalledProcessError) as error:
