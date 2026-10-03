@@ -16,8 +16,8 @@ power-profiles-daemon and UFW already configured:
 start-hyprland
 ```
 
-Keep the checkout at `~/dotfiles`. `~/dotfilez` is a symlink to the same Git
-repository. Package installation uses a full `pacman -Syu --needed` transaction.
+Keep the checkout at `~/dotfiles`. Package installation uses a full
+`pacman -Syu --needed` transaction.
 Review that transaction locally. Bootstrap links configuration and refuses to
 replace existing files. It also sets the GTK dark preference and Inter font.
 Nothing in these scripts partitions disks, changes mount layout, edits the
