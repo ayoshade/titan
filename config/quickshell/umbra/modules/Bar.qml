@@ -1,5 +1,6 @@
 pragma ComponentBehavior: Bound
 import QtQuick
+import QtQuick.Effects
 import QtQuick.Layouts
 import Quickshell
 import Quickshell.Wayland
@@ -16,28 +17,36 @@ PanelWindow {
  anchors { top: true; left: true; right: true }
  readonly property int workspaceCount: Math.max(5,...Hyprland.workspaces.values.filter(w=>w.id>0 && w.id<=10).map(w=>w.id))
  readonly property bool expanded: UiState.context!=="" || (hover.hovered && !!Media.player)
- implicitHeight: expanded ? 96 : Theme.barHeight
+ // Leave room below the island for its drop shadow; input is limited by the mask.
+ implicitHeight: Theme.islandTop+island.height+28
  exclusiveZone: Theme.barHeight
  color: "transparent"
  WlrLayershell.namespace: "umbra-bar"
- mask: Region { item: island; Region { item: launcher } Region { item: notifications } }
+ mask: Region { item: island }
  SystemClock { id: clock; precision: SystemClock.Minutes }
+ RectangularShadow {
+  anchors.fill: island; radius: island.radius
+  offset.y: 4; blur: 22; spread: 0
+  color: Qt.rgba(0,0,0,0.55)
+ }
  Rectangle {
   id: island
-  anchors { top: parent.top; topMargin: 8; horizontalCenter: parent.horizontalCenter }
-  width: bar.expanded ? Theme.expandedIslandWidth : Theme.islandWidth+(bar.workspaceCount-5)*12
+  anchors { top: parent.top; topMargin: Theme.islandTop; horizontalCenter: parent.horizontalCenter }
+  width: bar.expanded ? Theme.expandedIslandWidth : Theme.islandWidth+(bar.workspaceCount-5)*11
   height: bar.expanded ? Theme.expandedIslandHeight : Theme.islandHeight
-  radius: bar.expanded ? 22 : 16
-  color: Theme.shell
-  border.width: 1; border.color: Theme.raised
+  radius: bar.expanded ? 22 : height/2
+  color: Theme.notch
   Behavior on width { NumberAnimation { duration: Theme.duration; easing.type: Easing.OutCubic } }
   Behavior on height { NumberAnimation { duration: Theme.duration; easing.type: Easing.OutCubic } }
+  Behavior on radius { NumberAnimation { duration: Theme.duration; easing.type: Easing.OutCubic } }
   HoverHandler { id: hover }
-  RowLayout {
-   anchors { top: parent.top; topMargin: 2; left: parent.left; right: parent.right; leftMargin: 10; rightMargin: 10 }
-   height: 28; spacing: 12
+  Item {
+   id: compact
+   anchors { top: parent.top; left: parent.left; right: parent.right; leftMargin: Theme.islandPadding; rightMargin: Theme.islandPadding }
+   height: Theme.islandHeight
    Row {
-    spacing: 2
+    anchors.verticalCenter: parent.verticalCenter
+    spacing: 4
     Repeater {
      model: bar.workspaceCount
      Item {
@@ -45,36 +54,75 @@ PanelWindow {
       required property int index
       readonly property var workspace: Hyprland.workspaces.values.find(w=>w.id===index+1) || null
       readonly property bool active: !!workspace && workspace.active && !!workspace.monitor && workspace.monitor.name===bar.modelData.name
-      width: 10; height: 26
+      readonly property bool occupied: !!workspace && workspace.toplevels.values.length>0
+      width: pill.width; height: Theme.islandHeight
+      RectangularShadow {
+       anchors.fill: pill; radius: pill.radius; blur: 7; spread: 0
+       color: Theme.accent; opacity: mark.active ? 0.65 : 0
+       Behavior on opacity { NumberAnimation { duration: Theme.duration } }
+      }
       Rectangle {
-       anchors.centerIn: parent; width: mark.active ? 7 : 5; height: mark.active ? 16 : 10; radius: 4
-       color: mark.active ? Theme.accent : mark.workspace && mark.workspace.toplevels.values.length>0 ? Theme.muted : Theme.border
+       id: pill
+       anchors.centerIn: parent
+       width: mark.active ? 9 : 7; height: mark.active ? 15 : 11; radius: width/2
+       color: mark.active ? Theme.accent : mark.occupied ? Qt.alpha(Theme.accent,0.42) : Qt.alpha(Theme.text,0.11)
+       Behavior on width { NumberAnimation { duration: Theme.duration; easing.type: Easing.OutCubic } }
        Behavior on height { NumberAnimation { duration: Theme.duration; easing.type: Easing.OutCubic } }
        Behavior on color { ColorAnimation { duration: Theme.duration } }
       }
-      Rectangle { anchors.centerIn: parent; width: 11; height: 21; radius: 5; color: Theme.accent; opacity: mark.active ? 0.13 : 0; z: -1 }
-      MouseArea { anchors.fill: parent; cursorShape: Qt.PointingHandCursor; onClicked: Hyprland.dispatch("hl.dsp.focus({workspace="+(mark.index+1)+"})") }
+      MouseArea { anchors { fill: parent; leftMargin: -2; rightMargin: -2 } cursorShape: Qt.PointingHandCursor; onClicked: Hyprland.dispatch("hl.dsp.focus({workspace="+(mark.index+1)+"})") }
       Accessible.role: Accessible.Button; Accessible.name: "Workspace "+(index+1); Accessible.onPressAction: Hyprland.dispatch("hl.dsp.focus({workspace="+(mark.index+1)+"})")
      }
     }
    }
-   Item { Layout.fillWidth: true }
-   Action { text: Qt.formatDateTime(clock.date,"HH:mm"); implicitWidth: 52; implicitHeight: 26; onClicked: UiState.toggle("clock") }
-   Item { Layout.fillWidth: true }
-   Item {
-    implicitWidth: 22; implicitHeight: 26
-    ShellIcon { anchors.centerIn: parent; name: NetState.active ? "wifi" : "ethernet"; size: 14; opacity: NetState.label==="Offline" ? 0.3 : 0.85 }
-    MouseArea { anchors.fill: parent; cursorShape: Qt.PointingHandCursor; onClicked: UiState.toggle("controls") }
+   ShellText {
+    id: time
+    anchors.centerIn: parent
+    text: Qt.formatDateTime(clock.date,"HH:mm")
+    font.pixelSize: Theme.clockSize; font.weight: Font.Medium
+    font.features: { "tnum": 1 }
+    MouseArea { anchors { fill: parent; margins: -6 } cursorShape: Qt.PointingHandCursor; onClicked: UiState.toggle("clock") }
+    Accessible.role: Accessible.Button; Accessible.name: "Clock and calendar"; Accessible.onPressAction: UiState.toggle("clock")
    }
-   Item {
-    implicitWidth: 26; implicitHeight: 26
-    Rectangle {
-     anchors.centerIn: parent; width: 22; height: 11; radius: 4; color: "transparent"; border.width: 1; border.color: Theme.muted
-     Rectangle { x: 2; y: 2; height: 7; width: 18*(UPower.displayDevice.ready ? UPower.displayDevice.percentage : 1); radius: 2; color: UPower.onBattery && UPower.displayDevice.percentage<0.15 ? Theme.danger : Theme.accent }
-     Rectangle { x: 22; y: 4; width: 2; height: 3; radius: 1; color: Theme.muted }
+   Row {
+    id: status
+    anchors { right: parent.right; verticalCenter: parent.verticalCenter }
+    spacing: 7
+    readonly property real strength: NetState.active ? NetState.active.signalStrength : NetState.label==="Offline" ? 0 : 1
+    Row {
+     spacing: 1.5; height: 12
+     opacity: NetState.label==="Offline" ? 0.4 : 1
+     Repeater {
+      model: [4,7,9,12]
+      Rectangle {
+       required property int index
+       required property int modelData
+       anchors.bottom: parent.bottom
+       width: 3; height: modelData; radius: 1
+       color: status.strength>index/4+0.05 || (index===0 && status.strength>0) ? Theme.accent : Qt.alpha(Theme.text,0.16)
+      }
+     }
     }
-    MouseArea { anchors.fill: parent; cursorShape: Qt.PointingHandCursor; onClicked: UiState.toggle("controls") }
+    Row {
+     id: battery
+     spacing: 1.5
+     readonly property real level: UPower.displayDevice.ready ? UPower.displayDevice.percentage : 1
+     readonly property bool low: UPower.onBattery && level<0.15
+     Rectangle {
+      width: 25; height: 12; radius: 4
+      color: Qt.alpha(Theme.text,0.14)
+      Rectangle {
+       width: Math.max(height,parent.width*battery.level); height: parent.height; radius: parent.radius
+       color: battery.low ? Theme.danger : Theme.accent
+      }
+     }
+     Rectangle { anchors.verticalCenter: parent.verticalCenter; width: 2; height: 4; radius: 1; color: Qt.alpha(Theme.text,0.22) }
+    }
+    Accessible.role: Accessible.Button
+    Accessible.name: "Controls · "+NetState.label+" · battery "+Math.round((UPower.displayDevice.ready ? UPower.displayDevice.percentage : 1)*100)+"%"
+    Accessible.onPressAction: UiState.toggle("controls")
    }
+   MouseArea { anchors { fill: status; margins: -6 } cursorShape: Qt.PointingHandCursor; onClicked: UiState.toggle("controls") }
   }
   RowLayout {
    anchors { left: parent.left; right: parent.right; bottom: parent.bottom; leftMargin: 18; rightMargin: 18; bottomMargin: 13 }
@@ -88,17 +136,5 @@ PanelWindow {
    }
    IconButton { visible: UiState.context==="" && !!Media.player; symbol: Media.player && Media.player.isPlaying ? "pause" : "play"; label: "Play or pause"; onClicked: Media.player.togglePlaying() }
   }
- }
- IconButton {
-  id: launcher; anchors { right: island.left; rightMargin: 8; top: parent.top; topMargin: 8 }
-  symbol: "apps"; label: "Applications · Super+Alt+Space"; size: 32
-  background: Rectangle { radius: 16; color: launcher.hovered ? Theme.raised : Theme.shell; border.width: 1; border.color: Theme.raised }
-  onClicked: UiState.toggle("launcher")
- }
- IconButton {
-  id: notifications; anchors { left: island.right; leftMargin: 8; top: parent.top; topMargin: 8 }
-  symbol: "controls"; label: "Control center · Super+Ctrl+A"; size: 32
-  background: Rectangle { radius: 16; color: notifications.hovered ? Theme.raised : Theme.shell; border.width: 1; border.color: Theme.raised; Rectangle { visible: Notices.items.values.length>0; width: 4; height: 4; radius: 2; x: parent.width-8; y: 6; color: Theme.accent } }
-  onClicked: UiState.toggle("controls")
  }
 }

@@ -26,6 +26,15 @@ Public downloads and captions were kept under /tmp; full transcripts are not
 redistributed in this repository. No paid course or proprietary dotfiles were
 accessed. No external desktop configuration or source code was copied.
 
+## Notch measurements (2026-10-03)
+
+The compact island was re-measured from native 1080p frames of J8s7O2IGogE and
+rebuilt to those dimensions: 230×33 pure-black pill, no border, drop shadow,
+glowing active mark, signal bars and solid battery, and no side circles. See
+[research/island-notch.md](research/island-notch.md) for measurements and the
+deviation checklist, and [research/saneaspect-videos.md](research/saneaspect-videos.md)
+for the full channel inventory and review status.
+
 ## Applied to Umbra
 
 The original full-width text bar has been replaced by a centered black island

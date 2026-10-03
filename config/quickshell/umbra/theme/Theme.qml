@@ -23,6 +23,8 @@ QtObject {
  readonly property color text: palette.text || "#e1e5e9"
  readonly property color muted: palette.muted || "#9299a3"
  readonly property color accent: accentName==="theme" ? palette.accent || "#aeb8c4" : accentName==="ice" ? "#8faebc" : accentName==="sage" ? "#9fae9d" : "#aeb8c4"
+ // Notch surface: saneAspect keeps the island pure black under every palette.
+ readonly property color notch: palette.notch || "#000000"
  readonly property color danger: palette.danger || "#c48787"
  readonly property string sans: "Inter"
  readonly property string mono: "JetBrains Mono"
@@ -36,8 +38,12 @@ QtObject {
  readonly property int subtitleSize: 14
  readonly property int captionSize: 10
  readonly property int heroSize: 28
- readonly property int islandWidth: 248
- readonly property int islandHeight: 32
+ // Compact notch geometry measured from saneAspect's 2026-10-02 island at 1920×1080.
+ readonly property int islandWidth: 230
+ readonly property int islandHeight: 33
+ readonly property int islandTop: 11
+ readonly property int islandPadding: 20
+ readonly property int clockSize: 16
  readonly property int expandedIslandWidth: 370
  readonly property int expandedIslandHeight: 78
  readonly property int panelWidth: 420

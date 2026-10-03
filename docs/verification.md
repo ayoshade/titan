@@ -196,3 +196,14 @@ kernel parameters or bootloader edits were applied.
   live rather than frozen selection, and transient reminders are documented.
   Physical keyboard, external monitors, webcam, actual recording/OCR, media
   output switching and reliable Hyprlock rendering remain hands-on checks.
+
+## Notch geometry match — 2026-10-03
+
+- Measured saneAspect's compact island from native 1080p frames (J8s7O2IGogE,
+  10:30–10:55) and rebuilt `modules/Bar.qml` to match it.
+- The live shell was restarted with `scripts/shell-restart`, and no QML runtime
+  warnings were logged. A grim capture measured the pill at 230×33, top y=11,
+  centred on eDP-1. The volume OSD expansion and clock panel were opened through
+  IPC and displayed correctly. `scripts/doctor` passed.
+- Not hands-on tested: pointer clicks on workspace marks, the clock and status,
+  the low-battery colour, and a Wi-Fi signal (this machine was on Ethernet).
