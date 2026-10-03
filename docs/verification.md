@@ -18,8 +18,11 @@
 - Hyprland explicit DPMS-on Lua dispatcher returned ok and remained on across
   repeated calls. Idle commands use table arguments with an explicit action.
 - Initial Hyprlock rendering stalled during TTY switching. Immediate rendering
-  and disabled locker animations were applied; visible local authentication
-  remains under verification. No password was collected by the agent.
+  and disabled locker animations were applied. The replacement subsequently
+  logged successful PAM authentication, unlocked and exited. The user regained
+  the desktop. Reliable visible lock rendering during TTY switching remains
+  unresolved; successful authentication does not establish that it is fixed.
+  No password was collected by the agent.
 - GTK, Hyprland and core XDG portals active.
 - NetworkManager, Bluetooth, power profiles and UFW remain active.
 - Quickshell resident memory observed around 202 MiB after opening all panels;
@@ -28,7 +31,8 @@
 
 ## Hands-on checks still required
 
-1. Super+L: lock screen renders; type the local password and unlock.
+1. Retest visible lock rendering from the desktop without switching TTYs.
+   Authentication succeeded in recovery, but black-screen rendering was observed.
 2. Suspend from the session menu: resume requires authentication; display,
    audio, Bluetooth and network recover.
 3. Test actual speaker/microphone output, audio-device switching, brightness
@@ -44,3 +48,12 @@
 Run `~/dotfiles/scripts/doctor` for repeatable static/package/service checks.
 The script does not claim to validate real authentication, suspend, hardware
 output, screen-share negotiation or device pairing.
+
+## Kernel observation
+
+At 03:36:59 on 2026-10-03 the kernel logged a missing SystemCMOS address-space
+handler for region CMS0 and aborted ACPI method `_SB.PC00.LPCB.EC0._Q33` with
+AE_NOT_EXIST. This was after the initial black-screen report. The observation
+does not establish a causal connection to Hyprlock. The rtc_cmos driver exists
+and RTC devices rtc0/rtc1 are present. No ACPI overrides, firmware changes,
+kernel parameters or bootloader edits were applied.
