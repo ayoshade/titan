@@ -1,0 +1,45 @@
+#!/usr/bin/env bash
+# Link Titan's bundled skills without replacing user-owned files or skills.
+set -euo pipefail
+root=$(cd -- "$(dirname -- "$(readlink -f "${BASH_SOURCE[0]}")")/.." && pwd)
+dry_run=0
+case ${1:-} in
+ --dry-run) dry_run=1 ;;
+ -h|--help) echo 'Usage: install-agent-skills [--dry-run]'; exit 0 ;;
+ '') ;;
+ *) echo 'install-agent-skills: unknown argument' >&2; exit 2 ;;
+esac
+(( $# <= 1 )) || { echo 'install-agent-skills: too many arguments' >&2; exit 2; }
+shopt -s nullglob
+sources=("$root"/default/agents/skills/*/SKILL.md)
+(( ${#sources[@]} )) || { echo 'install-agent-skills: no bundled skills found' >&2; exit 1; }
+destinations=("${CODEX_HOME:-$HOME/.codex}/skills" "$HOME/.claude/skills")
+# Complete preflight before creating anything. Refuse even broken foreign links.
+conflicts=0
+for folder in "${destinations[@]}"; do
+ ancestor=$folder
+ while [[ ! -e $ancestor && ! -L $ancestor ]]; do ancestor=$(dirname -- "$ancestor"); done
+ if [[ ! -d $ancestor ]]; then
+  printf 'Refusing non-directory skill path: %s\n' "$ancestor" >&2
+  conflicts=1
+ fi
+ for skill in "${sources[@]}"; do
+  source=${skill%/SKILL.md}; target=$folder/${source##*/}
+  if [[ -e $target || -L $target ]]; then
+   if [[ ! -L $target || $(readlink -f -- "$target" || true) != "$source" ]]; then
+    printf 'Refusing existing skill: %s\n' "$target" >&2
+    conflicts=1
+   fi
+  fi
+ done
+done
+(( !conflicts )) || exit 1
+for folder in "${destinations[@]}"; do
+ ((dry_run)) || mkdir -p -- "$folder"
+ for skill in "${sources[@]}"; do
+  source=${skill%/SKILL.md}; target=$folder/${source##*/}
+  [[ ! -L $target ]] || continue
+  printf 'Link %s -> %s\n' "$target" "$source"
+  ((dry_run)) || ln -s -- "$source" "$target"
+ done
+done

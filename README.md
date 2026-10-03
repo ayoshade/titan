@@ -132,6 +132,7 @@ titan wallpaper list | next | set PATH
 titan shell status | restart | ipc METHOD | open PANEL
 titan doctor                        # health check
 titan hardware --json                # read-only hardware inventory and installer packages
+titan skills [--dry-run]             # link bundled skills for Codex and Claude
 titan update                        # snapshot, full upgrade, migrations (asks for sudo)
 ```
 
@@ -142,7 +143,10 @@ titan update                        # snapshot, full upgrade, migrations (asks f
   from Wallhaven. They are their authors' work, so never commit them. The
   bundled Blacksite landscape is selectable under every theme.
 - **Agents:** the `titan` skill covers customization, `titan-app` building
-  themed Qt Quick apps, and `diagnose-crash` reading core dumps.
+  themed Qt Quick apps, and `diagnose-crash` reading core dumps. Seven development
+  skills adapt Omarchy's agent guides for Titan. Setup/update link bundled skills
+  for Codex and Claude; `titan skills --dry-run` previews missing links without
+  replacing personal skills. See [docs/agent-skills.md](docs/agent-skills.md).
 
 ## Updating and recovery
 
@@ -282,6 +286,7 @@ sudo systemctl disable greetd.service   # return to text login next boot
 | [AGENTS.md](AGENTS.md) | Rules and context for AI agents (Claude Code, Codex) |
 | [docs/distribution.md](docs/distribution.md) | Layers, migrations, updates, packaging, releasing, roadmap |
 | [docs/installation.md](docs/installation.md) | Experimental UEFI ISO, installer, hardware profiles and QEMU testing |
+| [docs/agent-skills.md](docs/agent-skills.md) | Bundled agent skills, Omarchy port mappings, installation and removal |
 | [docs/workflow.md](docs/workflow.md) | Command and IPC interfaces |
 | [docs/keybindings.md](docs/keybindings.md) | Complete shortcut reference |
 | [docs/snapshots.md](docs/snapshots.md) | Snapshots and recovery |

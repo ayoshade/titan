@@ -7,6 +7,11 @@ this machine the personal checkout `~/dotfiles` *is* the live config (through
 symlinks), so both kinds of change touch the same files. The difference is
 intent and how much care the change needs.
 
+The development task table in `AGENTS.md` routes to seven Titan skills for
+commands, installation, shell development, icons, acceptance tests, visual
+verification and migrations. Read the relevant one when working on Titan
+source; ordinary personal customization stays in this skill.
+
 ## Which one is it?
 
 | Personal customization (stay in this skill) | Titan development (read AGENTS.md first) |
@@ -44,7 +49,8 @@ a one-off file.
   - **Push only when asked**; it publishes to `github.com/ayoshade/titan`.
 - **Defaults vs user state:** distribution defaults go in the repo (schema
   defaults, palettes, config files). User values belong in
-  `~/.local/state/titan/` or `~/Pictures/Wallpapers/`, outside Git.
+  `~/.config/titan/`; generated machine state belongs in
+  `~/.local/state/titan/`, and wallpapers in `~/Pictures/Wallpapers/`, outside Git.
   - Don't bake a user's personal value into a default unless they say it
     should be Titan's default.
   - Machine-specific values (monitor names like `eDP-1`, the `intel_backlight`
@@ -85,8 +91,10 @@ you could not test.
 ## Skills in this repo
 
 Skills live in `~/dotfiles/default/agents/skills/<name>/` and are symlinked into
-`~/.claude/skills/` and `~/.codex/skills/`. Edit them in the repo; the links
-pick the changes up. A new skill needs its own link in both places.
+`~/.claude/skills/` and `${CODEX_HOME:-$HOME/.codex}/skills`. Edit them in the
+repo; the links pick the changes up. Run `titan skills --dry-run`, then
+`titan skills`, to register new bundled skills. Existing personal entries are
+never overwritten. See `docs/agent-skills.md` for the upstream port mapping.
 
 Quote a skill's `description:` in single quotes (doubling any `'`), because
 trigger lists contain `: `, which is invalid in a plain YAML scalar; GitHub

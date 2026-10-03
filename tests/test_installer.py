@@ -117,7 +117,7 @@ class FirstLogin(unittest.TestCase):
             root = Path(folder) / "source"
             home = Path(folder) / "home"
             (root / "scripts").mkdir(parents=True)
-            for path in ["scripts/titan", "version"]:
+            for path in ["scripts/titan", "scripts/install-agent-skills", "version"]:
                 shutil.copy(source / path, root / path)
             for path in ["migrations", "default", "config/gtk-3.0", "config/gtk-4.0"]:
                 shutil.copytree(source / path, root / path)
@@ -136,7 +136,8 @@ class FirstLogin(unittest.TestCase):
             state.mkdir(parents=True)
             (state / "setup.log").write_text("")
             env = dict(os.environ, HOME=str(home), XDG_CONFIG_HOME=str(home / ".config"),
-                       XDG_STATE_HOME=str(home / ".local/state"), PATH=str(binaries) + ":" + os.environ["PATH"])
+                       XDG_STATE_HOME=str(home / ".local/state"), CODEX_HOME=str(home / ".codex"),
+                       PATH=str(binaries) + ":" + os.environ["PATH"])
             subprocess.run([str(root / "scripts/titan"), "setup"], env=env, check=True, capture_output=True)
             self.assertTrue((state / "setup-version").is_file())
             self.assertFalse((state / "welcome-done").exists())

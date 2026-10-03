@@ -519,3 +519,53 @@ kernel parameters or bootloader edits were applied.
   splash-to-greeter handoff, signed 0.3.0 channel testing, ISO source/license
   review and a public image without test access. Suspend/lock rendering on the
   development laptop remains untested under its always-awake policy.
+
+## Omarchy developer skills port — 2026-10-03
+
+- Reviewed all seven guides in Omarchy's `agents/skills/` at quattro revision
+  `8e02fc84f5bdc511ed102e2a14f8935bba4f92bd`, plus its existing end-user skill
+  inventory. Added `titan-commands`, `titan-installation`, `titan-shell-dev`,
+  `titan-icons`, `titan-acceptance-tests`, `titan-visual-verification` and
+  `titan-migrations`. The three existing Titan end-user skills are preserved.
+  Commands, paths, SVG assets, shell lifecycle, setup, migration semantics and
+  QEMU test interfaces follow Titan's implementation rather than nonexistent
+  Omarchy compatibility APIs. Source mappings are in `docs/agent-skills.md`.
+- Retained the full upstream MIT license in `default/agents/LICENSE.omarchy`,
+  declared the adaptation in `NOTICE`, and installed its license text under
+  `/usr/share/licenses/titan/`. No Omarchy executable, font, plugin registry or
+  dotfiles were installed.
+- Added `titan skills [--dry-run]` with complete destination preflight,
+  CODEX_HOME support, idempotent links and refusal of custom entries/broken
+  foreign links. Setup/update register new bundled skills, warning on conflicts
+  without replacing personal skills or preventing desktop setup.
+- **Local registration passed:** ten bundled directories resolve correctly in
+  both Codex and Claude; the seven new skills are linked to the checkout. A
+  subsequent preview is silent. All ten skill frontmatters pass the
+  skill-creator validator; local Markdown references resolve. Validator PyYAML
+  lives only in a disposable cache venv, not Titan's runtime dependencies.
+- **Automated checks passed:** 17 unittest checks (six new registration tests
+  plus the existing eleven), including preview without writes, path relocation
+  with spaces, custom CODEX_HOME, repeat without replacing links, preservation
+  of personal skills/broken links, atomic conflict refusal, blocked parent
+  directories and invalid arguments. The first-login fixture also exercises
+  setup's registration in an isolated HOME/CODEX_HOME.
+- **Package VM checks passed: 18/18.** The rebuilt 0.3.0-1 development package
+  installed after a successful full upgrade in the reused disposable QEMU
+  guest, and setup linked every bundled skill for both agents. Both license
+  locations were verified. Artifacts/log:
+  `~/.cache/titan/vm/runs/run.mkTYG7/install.log`.
+- Two earlier package checks failed on missing new links: the guest had a
+  stale pacman database lock, so the package transaction never ran. The harness
+  incorrectly accepted a previous install success marker. It now clears that
+  marker before each job, requires systemd's successful Result as well as the
+  new marker, and preserves the installation log. The unused lock was removed
+  only inside the disposable guest after checking for active pacman/lock users;
+  the complete package run then passed. No host package transaction ran.
+- Host `scripts/doctor`, Bash syntax and `git diff --check` pass. The live shell
+  still responds with the user's industrial theme on eDP-1. No QML/compositor,
+  boot, power or shortcut settings changed; no visual or lock/suspend test was
+  needed for the guide/registration work. The test VM was stopped on exit.
+- New sessions can discover the linked skills. There is no persistent bundled
+  skill opt-out yet: removing a discovery link is reversible, but setup/update
+  registers it again. Static guide validation and package integration checks
+  do not claim forward-testing every development recipe or a new public release.

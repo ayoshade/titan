@@ -131,6 +131,7 @@ GRAPHICAL
 fi
 scp -q -i "$run/key" -P "$sshport" -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "$run/install.sh" tester@127.0.0.1:
 echo "Installing inside the VM (detached job; full update first)…"
+ssh_vm 'sudo rm -f /var/tmp/titan-install.ok'
 ssh_vm "sudo systemd-run --unit=titan-vmtest-install --property=Type=oneshot --no-block /bin/bash /home/tester/install.sh"
 state=activating
 vm_alive() { kill -0 "$(cat "$run/qemu.pid")" 2>/dev/null; }
@@ -140,9 +141,10 @@ for i in $(seq 1 360); do
  [[ $state == activating || -z $state ]] || break
  sleep 5
 done
-if ! ssh_vm test -e /var/tmp/titan-install.ok; then
+ssh_vm sudo journalctl -u titan-vmtest-install --no-pager -o cat >"$run/install.log"
+if [[ $(ssh_vm systemctl show titan-vmtest-install -p Result --value) != success ]] || ! ssh_vm test -e /var/tmp/titan-install.ok; then
  echo "vm-test: the install job did not succeed (state: ${state:-unknown}). Its log:" >&2
- ssh_vm sudo journalctl -u titan-vmtest-install --no-pager | tail -40 >&2 || true
+ tail -40 "$run/install.log" >&2
  keep=1; exit 1
 fi
 # Show how pacman validated the installed packages (signature, checksum…).
@@ -164,6 +166,15 @@ theme_before=\$(titan theme current)
 width_before=\$(titan settings get islandWidth)
 titan setup >/dev/null && pass "titan setup (first run)" || fail "titan setup"
 titan setup >/dev/null && pass "titan setup is repeatable" || fail "titan setup repeat"
+skills_ok=1
+[[ -f /usr/share/licenses/titan/LICENSE.omarchy && -f /usr/share/titan/default/agents/LICENSE.omarchy ]] || skills_ok=0
+for entry in /usr/share/titan/default/agents/skills/*/SKILL.md; do
+ source=\${entry%/SKILL.md}; name=\${source##*/}
+ for folder in "\${CODEX_HOME:-\$HOME/.codex}/skills" "\$HOME/.claude/skills"; do
+  [[ \$(readlink -f "\$folder/\$name") == "\$source" ]] || skills_ok=0
+ done
+done
+((skills_ok)) && pass "bundled skills registered for Codex and Claude; upstream license shipped" || fail "bundled skill links or license"
 [[ \$(titan theme current) == \$theme_before ]] && pass "setup preserves theme (graphite on fresh installs)" || fail "theme preservation"
 titan migrate --status | grep -q pending && fail "migrations pending on a fresh install" || pass "fresh install has no pending migrations"
 [[ -e ~/.config/titan/preferences.json && -e ~/.local/state/titan/generated/kitty-theme.conf ]] && pass "user layer and generated theme" || fail "user layer"

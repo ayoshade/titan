@@ -4,12 +4,18 @@ Copyright 2026 Cristian Adrian Paredez and Titan contributors
 Licensed under the Apache License, Version 2.0 (see LICENSE).
 
 This product includes:
+- Agent skill guidance adapted from Omarchy, Copyright (c) David Heinemeier
+  Hansson, under the MIT License (default/agents/LICENSE.omarchy). The seven
+  developer guides originate from agents/skills/ at revision
+  8e02fc84f5bdc511ed102e2a14f8935bba4f92bd of
+  https://github.com/omacom/omarchy. Titan adapts commands, paths, architecture,
+  installation, validation and safety guidance; see docs/agent-skills.md.
 - Emoji names in config/quickshell/umbra/assets/emojis.json, which are the
   character names from the Unicode Character Database. Copyright © Unicode,
   Inc. Used under the Unicode License v3 (https://www.unicode.org/license.txt).
 
 Acknowledgements (no code or assets copied):
-- Keyboard chords follow Omarchy (https://github.com/basecamp/omarchy, MIT);
+- Keyboard chords follow Omarchy (https://github.com/omacom/omarchy, MIT);
   Titan's implementation is independent.
 - The desktop design is inspired by saneAspect's public videos; Titan's QML,
   icons and artwork are original.

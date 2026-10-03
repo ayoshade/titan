@@ -19,6 +19,7 @@ Usage: titan COMMAND [ARGS]
   update [--no-system]    Snapshot, update Titan and Arch packages, migrate, check
   doctor                  Health check
   hardware [--json|--packages]  Read-only hardware inventory and installer profile
+  skills [--dry-run]       Link bundled skills for Codex and Claude; preserve custom skills
   theme [list|current|ID] Show or apply a theme
   settings …              Same as: scripts/workflow settings …
   wallpaper …             Same as: scripts/workflow wallpaper …
@@ -76,6 +77,7 @@ setup() {
   gsettings set org.gnome.desktop.interface font-name 'Inter 10' || true
  fi
  systemctl --user enable --now pipewire.socket pipewire-pulse.socket wireplumber.service >/dev/null 2>&1 || true
+ "$root/scripts/install-agent-skills" || echo 'titan: custom skill conflict; resolve it and run titan skills' >&2
  cat "$root/version" >"$state/setup-version"
  echo "Titan $(cat "$root/version") is set up for $(id -un)."
 }
@@ -108,6 +110,7 @@ update() {
   sudo pacman -Syu   # full upgrade only: Arch does not support partial upgrades
  fi
  migrate
+ "$root/scripts/install-agent-skills" || echo 'titan: custom skill conflict; resolve it and run titan skills' >&2
  "$root/scripts/doctor" >/dev/null && echo "Doctor: OK" || echo "Doctor reported problems: run titan doctor" >&2
  local after; after=$( ((checkout)) && git -C "$root" rev-parse HEAD || cat "$root/version")
  if [[ $after != "$before" ]] && { ((!checkout)) || ! git -C "$root" diff --quiet "$before" HEAD -- config/quickshell; }; then
@@ -125,6 +128,7 @@ case "${1:-help}" in
  update) shift; update "$@" ;;
  doctor) exec "$root/scripts/doctor" ;;
  hardware) shift; exec "$root/scripts/titan-hardware" "$@" ;;
+ skills) shift; exec "$root/scripts/install-agent-skills" "$@" ;;
  theme)
   case "${2:-current}" in
    list) python3 -c "import json,sys;[print(p['id']) for p in json.load(open(sys.argv[1]))]" "$root/config/quickshell/umbra/theme/palettes.json" ;;

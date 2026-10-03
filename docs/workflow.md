@@ -8,13 +8,19 @@ interpolation of user text, filenames or calculator expressions.
 
 ## Agent interfaces
 
-- `titan version|setup|migrate|update|doctor|hardware|theme|settings|wallpaper|shell`
+- `titan version|setup|migrate|update|doctor|hardware|skills|theme|settings|wallpaper|shell`
   (`scripts/titan`) is the top-level command. `titan doctor` (`scripts/doctor`)
   always fails on static errors: scripts, Python, Hyprland config, and live
   `configerrors`. In a checkout it also requires the package set and
   `~/.config` links. On packaged installs missing packages, `titan setup` and
   optional services are warnings. `titan setup` is safe to repeat;
   `titan update` needs the user (sudo).
+- `titan skills [--dry-run]`: link all bundled skill directories into
+  `${CODEX_HOME:-$HOME/.codex}/skills` and `~/.claude/skills`. Preflight all
+  destinations before writing; unrelated files/directories and broken foreign
+  links cause exit 1 and no new links. Matching links are left alone. Invalid
+  arguments exit 2. Setup/update warn on conflicts and continue. See
+  [agent-skills.md](agent-skills.md).
 - `titan hardware --json`: versioned read-only CPU/GPU/laptop inventory and
   conservative installer package selection. `--packages` prints package names
   and exits nonzero for unsupported GPU profiles. It never installs packages

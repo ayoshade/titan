@@ -32,7 +32,7 @@ instead of maintaining two competing instruction sets.
   changing shortcuts. Super+A/C/V/X are universal editing, Super+L changes
   workspace layout, and Super+Ctrl+L locks. Keep chords exact unless the user
   requests a change. Titan owns the implementation and Quickshell UI.
-- `titan` (`scripts/titan`: version, migrate, update, theme, settings) is the
+- `titan` (`scripts/titan`: version, migrate, update, theme, settings, skills) is the
   user-facing command; `titan-shell` (`scripts/titan-shell`) controls the shell;
   `scripts/workflow` is the shared desktop-operation interface; implementations
   live under `lib/titan/`. Workflow packages have their own manifest and installer.
@@ -79,6 +79,27 @@ When Codex and Claude work on the same checkout, preserve each other's work.
 Coordinate file ownership if both are active; use separate branches/worktrees
 for overlapping changes. Keep durable decisions and unfinished work in repository
 documents rather than relying on either agent's conversation history.
+
+### Development task skills
+
+Titan ports Omarchy's seven `agents/skills` guides into discoverable skills in
+`default/agents/skills/`. Read the matching guide for the work being done;
+these supplement this guide rather than replace it.
+
+| Task | Skill |
+| --- | --- |
+| CLI routes, help, structured output, IPC | [titan-commands](default/agents/skills/titan-commands/SKILL.md) |
+| Bootstrap, setup, hardware, packaging, installer | [titan-installation](default/agents/skills/titan-installation/SKILL.md) |
+| Quickshell components, services and panels | [titan-shell-dev](default/agents/skills/titan-shell-dev/SKILL.md) |
+| SVG icons and branded marks | [titan-icons](default/agents/skills/titan-icons/SKILL.md) |
+| Graphical QEMU acceptance tests | [titan-acceptance-tests](default/agents/skills/titan-acceptance-tests/SKILL.md) |
+| Live visual inspection and capture | [titan-visual-verification](default/agents/skills/titan-visual-verification/SKILL.md) |
+| Existing-install migrations | [titan-migrations](default/agents/skills/titan-migrations/SKILL.md) |
+
+`titan skills` installs all bundled skill links for Codex and Claude without
+replacing custom entries (`--dry-run` previews). Setup and update also attempt
+this; conflicts warn without preventing the desktop setup/update. See
+`docs/agent-skills.md` for provenance, mappings and removal.
 
 ## Study saneAspect and reproduce the style
 
@@ -169,7 +190,7 @@ wl-clipboard, grim/slurp and suitable XDG portals.
 | `system/` | Reviewed templates for privileged system configuration |
 | `installation/`, `lib/titan/install.py` | Experimental QEMU-only dedicated-disk installer and its base packages |
 | `system/hardware/profiles.json`, `lib/titan/hardware.py` | Read-only detection and conservative hardware package selection (`titan hardware`) |
-| `default/agents/skills/` | Agent skills shipped as Titan defaults (one `SKILL.md` per skill), symlinked into `~/.claude/skills/` and `~/.codex/skills/`; `titan` covers end-user customization, `titan-app` new Qt Quick desktop apps, `diagnose-crash` core dumps |
+| `default/agents/skills/` | Bundled discoverable skills: three end-user skills plus seven development task skills; `titan skills` links them into Claude and Codex (respecting `CODEX_HOME`) |
 | `docs/` | Research, hardware, decisions, validation and recovery |
 
 Shell settings are declared once in `theme/settings-schema.json`. The Settings
