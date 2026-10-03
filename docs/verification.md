@@ -354,3 +354,30 @@ kernel parameters or bootloader edits were applied.
     but creates nothing while the timeline is off.
   - snap-pac's pre/post pair appears at the next pacman transaction.
 
+## Phase 1: packaging and first run — 2026-10-03
+
+- **Hyprland:** with `base` taken from `TITAN_ROOT`, `Hyprland --verify-config`
+  printed `config ok` and live reloads had no errors.
+- **Existing install:** `titan migrate` applied `1791060868-first-run-markers`
+  here (setup-version and welcome-done recorded).
+- **Welcome screen:** it did not open after a restart, because the marker
+  exists. It rendered when opened through IPC. With the marker moved aside it
+  opened by itself at startup (panel `welcome`); the marker was restored
+  afterwards.
+- **Packages:** `makepkg` built `titan` (208 entries: no `__pycache__`, `.git`
+  or user files) and `titan-desktop` (40 dependencies).
+- **Packaged tree:** extracted into a throwaway root, with a fresh home:
+  - `titan setup` created the user layer, the thin Kitty config, the GTK and
+    mimeapps defaults and the graphite theme;
+  - both migrations were recorded as done;
+  - `Hyprland --verify-config` on the packaged config printed `config ok`;
+  - the packaged shell QML linted cleanly.
+  The test's `gsettings` and `systemctl --user` calls hit this real session
+  but set values it already had.
+- **Repository:** `build-repo --channel edge` produced a valid repository
+  database. A stable build correctly refused uncommitted changes.
+- **`vm-test`:** it parses, and it stops with install guidance because QEMU
+  is missing. **The VM run itself is pending** (`sudo pacman -S qemu-base`,
+  then `scripts/vm-test`). A graphical login of the Titan session has not been
+  tested.
+

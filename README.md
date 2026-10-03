@@ -165,7 +165,9 @@ settings are declared in `theme/settings-schema.json`, with user values in
 `~/.config/titan/settings.json` (outside Git). `~/.config/titan/hypr.lua` and
 `kitty.conf` hold your own overrides and load after Titan's defaults; updates
 never overwrite them. `titan version`, `titan migrate` and `titan update`
-manage upgrades (see docs/distribution.md). Wallpapers belong to themes:
+manage upgrades (see docs/distribution.md). Titan also builds as Arch packages
+(`packaging/`, `scripts/build-repo`), and the packaged session is "Titan"
+(`titan-session`). Wallpapers belong to themes:
 `~/Pictures/Wallpapers/<theme>/` holds each theme's set, and applying a theme
 switches to its wallpaper. The wallpaper picker (Settings → Appearance →
 Wallpaper, or `ipc call shell wallpapers`) chooses within the set, and changes

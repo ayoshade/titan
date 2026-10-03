@@ -95,34 +95,36 @@ changes); they suggest it to the user.
 | Version, migrations, `titan` command | Done (0.2.0) |
 | `titan update` | Done; first real run by the user on 2026-10-03 (hyprland and libutf8proc upgraded, no kernel change) |
 | Snapshots before updates (Snapper on Btrfs) | Enabled on this machine 2026-10-03 (`scripts/install-snapshots`; see docs/snapshots.md) |
-| Packaging Titan (`titan` package, defaults in `/usr/share/titan`, own repo) | Planned, below |
-| First-run setup (user, owner, theme, network) | Planned |
+| Packaging Titan (`titan` package, defaults in `/usr/share/titan`, own repo) | Built and tested in a throwaway root; VM run pending QEMU (below) |
+| First-run setup | `titan setup` plus the shell's Welcome screen; tested in a throwaway home |
 
-### Packaging plan
+### Packaging (0.2.0)
 
-Today the shell, Hyprland and Kitty load their configs through
-`~/.config/{quickshell,hypr,kitty} → ~/dotfiles/config/...` symlinks, and
-scripts assume `~/dotfiles`.
+| Piece | What it does |
+| --- | --- |
+| `TITAN_ROOT` | Resolved once by `hyprland.lua` (environment variable, then `/usr/share/titan`, then `~/dotfiles`) and exported to every child. The shell uses `Paths`, scripts use their own location, and `hyprland.lua` loads siblings from `TITAN_ROOT`, not `~/.config/hypr` |
+| `packaging/titan/PKGBUILD` | `arch=any`. Installs `/usr/share/titan/{config,scripts,lib,assets,migrations,default,version}`; `/usr/bin/{titan,titan-shell,titan-session}` (symlinks); `/etc/xdg/quickshell/umbra` (Quickshell searches XDG config dirs); `/etc/xdg/xdg-desktop-portal/hyprland-portals.conf`; `/usr/share/wayland-sessions/titan.desktop`; docs in `/usr/share/doc/titan`. User state never ships |
+| `packaging/titan-desktop/PKGBUILD` | Meta-package: `titan` plus every package in `packages/*.txt`, all in official repositories |
+| `scripts/titan-session` | The "Titan" login session. On a user's first login it runs `titan setup`, then `start-hyprland -- --config $TITAN_ROOT/config/hypr/hyprland.lua`. No `~/.config/hypr` is needed |
+| `titan setup` | Per user, idempotent, never overwrites. Creates the user layer; copies `mimeapps.list` and GTK settings once; writes a thin `~/.config/kitty/kitty.conf` in package mode; marks migrations on fresh installs (applies them otherwise); generates the theme; sets GTK dark preferences; enables PipeWire user units; records `setup-version` |
+| Welcome screen | The shell opens it on startup while `~/.local/state/titan/welcome-done` is missing. It lists theme, wallpapers, Wi-Fi, keys and Settings; "Get started" writes the marker. Reopen with `titan-shell ipc welcome`. Migration `1791060868-first-run-markers` marks existing installs |
+| `scripts/build-repo [--channel stable\|edge] [--sign KEY] [OUT]` | Builds both packages and runs `repo-add` into `~/.cache/titan/repo/CHANNEL`. Stable requires a clean checkout. Unsigned repositories are for testing only |
+| `scripts/vm-test [--full] [--keep]` | Boots Arch's official cloud image under QEMU/KVM on a throwaway overlay, injects a key through cloud-init, installs the built packages and runs about 14 checks. Needs `qemu-base` |
+| `titan update` in package mode | No Git: pacman's full upgrade updates `titan` from the configured repo. The shell restarts when the version changes |
 
-1. **Done (0.2.0):** one `TITAN_ROOT` instead of hard-coded `~/dotfiles`.
-   - `hyprland.lua` resolves it in this order: the environment variable,
-     `/usr/share/titan` (when it contains `version`), `~/dotfiles`. It exports
-     it with `hl.env`, so the shell and every launched script inherit it.
-   - Scripts resolve it from their own location.
-   - The shell uses the `Paths` singleton (`Paths.root`, `Paths.workflow`,
-     `Paths.script(name)`).
-2. Ship Titan as an Arch package:
-   - `titan` contains defaults, scripts, shell, assets, migrations and
-     `version`.
-   - `titan-desktop` is a meta-package depending on `packages/*.txt`.
-   - `/usr/bin/titan` and `/usr/bin/titan-shell` are installed.
-3. Keep `~/.config/{hypr,kitty,quickshell}` as thin user files that load the
-   packaged defaults first, then `~/.config/titan` overrides. Installing over
-   an existing setup goes through a migration.
-4. Run a pacman repository for `titan` with stable and edge channels, and
-   point `titan update` at it. The developer checkout keeps working through a
-   developer mode.
-5. Build and test in a VM; never on the daily laptop.
+Developer mode (this laptop) keeps the `~/.config → ~/dotfiles` symlinks
+through `scripts/bootstrap`, which then runs `titan setup`. Both modes share
+the same setup code.
+
+Still open before others can install Titan:
+
+- Choose a license. The PKGBUILDs say `LicenseRef-unlicensed` until a LICENSE
+  file exists.
+- Create a packager GPG key for signing (`build-repo --sign`).
+- Decide where the repository is hosted (for example GitHub Pages or a VPS),
+  and document the `pacman.conf` entry plus key import.
+- Run `scripts/vm-test --full` and a graphical VM login (Phase 2 installer
+  work).
 
 ### Phase 2 onwards
 

@@ -1,0 +1,91 @@
+#!/usr/bin/env bash
+# vm-test [--full] [--keep]: install the built Titan packages on a throwaway Arch
+# VM and check them. Never touches this machine's system.
+#   - boots Arch's official cloud image (cached in ~/.cache/titan/vm) under
+#     QEMU/KVM, headless, on a disposable overlay disk
+#   - injects a throwaway SSH key with cloud-init (NoCloud over QEMU's network)
+#   - builds an edge repository from this checkout, installs `titan`
+#     (`titan-desktop` too with --full), runs `titan setup` as the VM user,
+#     verifies the Hyprland config, lints the shell and runs `titan doctor`-style checks
+# Requires: qemu-base (sudo pacman -S qemu-base) and /dev/kvm.
+set -euo pipefail
+root=$(cd -- "$(dirname -- "$(readlink -f "${BASH_SOURCE[0]}")")/.." && pwd)
+full=0 keep=0
+for a in "$@"; do case $a in --full) full=1 ;; --keep) keep=1 ;; *) sed -n 2,12p "$0"; exit 2 ;; esac; done
+command -v qemu-system-x86_64 >/dev/null || { echo "vm-test: install QEMU first: sudo pacman -S qemu-base" >&2; exit 1; }
+[[ -w /dev/kvm ]] || { echo "vm-test: /dev/kvm is not available" >&2; exit 1; }
+cache=${XDG_CACHE_HOME:-$HOME/.cache}/titan/vm
+run=$(mktemp -d "${TMPDIR:-/tmp}/titan-vm.XXXXXX")
+mkdir -p "$cache"
+image=$cache/Arch-Linux-x86_64-cloudimg.qcow2
+base=https://geo.mirror.pkgbuild.com/images/latest
+if [[ ! -e $image ]]; then
+ echo "Downloading the Arch cloud image (≈550 MB, cached)…"
+ curl -fL --progress-bar -o "$image.part" "$base/Arch-Linux-x86_64-cloudimg.qcow2"
+ curl -fsL -o "$cache/image.SHA256" "$base/Arch-Linux-x86_64-cloudimg.qcow2.SHA256"
+ (cd "$cache" && sed 's/  .*/  Arch-Linux-x86_64-cloudimg.qcow2.part/' image.SHA256 | sha256sum -c --quiet)
+ mv "$image.part" "$image"
+fi
+qemu-img create -q -f qcow2 -b "$image" -F qcow2 "$run/disk.qcow2" 24G
+ssh-keygen -q -t ed25519 -N '' -f "$run/key"
+mkdir -p "$run/seed"
+printf 'instance-id: titan-vm-test\nlocal-hostname: titan-test\n' >"$run/seed/meta-data"
+cat >"$run/seed/user-data" <<EOF
+#cloud-config
+users:
+  - name: tester
+    sudo: ALL=(ALL) NOPASSWD:ALL
+    shell: /bin/bash
+    ssh_authorized_keys: [$(cat "$run/key.pub")]
+growpart: {mode: auto, devices: ['/']}
+EOF
+# Packages to test, built from this checkout.
+"$root/scripts/build-repo" --channel edge "$run/repo" >/dev/null
+port=$((20000 + RANDOM % 20000)) sshport=$((40000 + RANDOM % 20000))
+python3 -m http.server "$port" --bind 127.0.0.1 --directory "$run/seed" >/dev/null 2>&1 &
+http=$!
+cleanup() {
+ kill "$http" 2>/dev/null || true
+ [[ -e $run/qemu.pid ]] && kill "$(cat "$run/qemu.pid")" 2>/dev/null || true
+ ((keep)) || rm -rf "$run"
+}
+trap cleanup EXIT
+qemu-system-x86_64 -enable-kvm -cpu host -m 4096 -smp 4 -display none -daemonize -pidfile "$run/qemu.pid" \
+ -drive file="$run/disk.qcow2",if=virtio \
+ -nic user,model=virtio-net-pci,hostfwd=tcp:127.0.0.1:$sshport-:22 \
+ -smbios type=1,serial="ds=nocloud;s=http://10.0.2.2:$port/" \
+ -serial file:"$run/console.log"
+ssh_vm() { ssh -q -i "$run/key" -p "$sshport" -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ConnectTimeout=5 tester@127.0.0.1 "$@"; }
+echo "Booting the VM…"
+for i in $(seq 1 90); do ssh_vm true 2>/dev/null && break; sleep 3; done
+ssh_vm true || { echo "vm-test: the VM did not come up; console log: $run/console.log" >&2; keep=1; exit 1; }
+scp -q -i "$run/key" -P "$sshport" -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "$run"/repo/*.pkg.tar.zst tester@127.0.0.1:
+pkgs="titan-*-any.pkg.tar.zst"; ((full)) && pkgs="titan-[0-9]*-any.pkg.tar.zst titan-desktop-*-any.pkg.tar.zst"
+echo "Installing and checking inside the VM…"
+ssh_vm bash -s <<EOF
+set -euo pipefail
+pass() { printf 'PASS  %s\n' "\$1"; }
+fail() { printf 'FAIL  %s\n' "\$1"; failed=1; }
+failed=0
+sudo pacman-key --init >/dev/null 2>&1; sudo pacman-key --populate archlinux >/dev/null 2>&1
+sudo pacman -Syu --noconfirm >/dev/null
+sudo pacman -U --noconfirm $pkgs >/dev/null && pass "pacman installs $pkgs" || fail "pacman install"
+command -v titan >/dev/null && pass "titan on PATH" || fail "titan on PATH"
+titan version
+titan setup >/dev/null && pass "titan setup (first run)" || fail "titan setup"
+titan setup >/dev/null && pass "titan setup is repeatable" || fail "titan setup repeat"
+[[ \$(titan theme current) == graphite ]] && pass "default theme graphite" || fail "default theme"
+titan migrate --status | grep -q pending && fail "migrations pending on a fresh install" || pass "fresh install has no pending migrations"
+[[ -e ~/.config/titan/preferences.json && -e ~/.local/state/titan/generated/kitty-theme.conf ]] && pass "user layer and generated theme" || fail "user layer"
+grep -q /usr/share/titan/config/kitty/kitty.conf ~/.config/kitty/kitty.conf && pass "thin Kitty config" || fail "thin Kitty config"
+[[ -e /etc/xdg/quickshell/umbra/shell.qml ]] && pass "shell registered in /etc/xdg" || fail "shell path"
+[[ -e /usr/share/wayland-sessions/titan.desktop ]] && pass "Titan login session" || fail "session file"
+TITAN_ROOT=/usr/share/titan Hyprland --verify-config -c /usr/share/titan/config/hypr/hyprland.lua 2>&1 | grep -q "config ok" && pass "Hyprland accepts the packaged config" || fail "Hyprland config"
+if /usr/lib/qt6/bin/qmllint -I /usr/lib/qt6/qml /usr/share/titan/config/quickshell/umbra/shell.qml 2>&1 | grep -qE "^Error"; then fail "shell QML"; else pass "shell QML parses"; fi
+titan settings set islandWidth 260 && [[ \$(titan settings get islandWidth) == 260 ]] && pass "settings round-trip" || fail "settings"
+titan theme nord >/dev/null && [[ \$(titan theme current) == nord ]] && pass "theme switch" || fail "theme switch"
+exit \$failed
+EOF
+status=$?
+((status == 0)) && echo "All VM checks passed." || echo "Some VM checks failed."
+exit $status

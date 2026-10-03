@@ -8,6 +8,10 @@ interpolation of user text, filenames or calculator expressions.
 
 ## Agent interfaces
 
+- `titan version|setup|migrate|update|doctor|theme|settings|wallpaper|shell`
+  (`scripts/titan`) is the top-level command. `titan setup` is safe to repeat;
+  `titan update` needs the user (sudo).
+- `titan-shell ipc welcome` opens the first-login Welcome screen.
 - `titan-shell status|restart|ipc METHOD [ARG…]|functions|log [-f]|open PANEL|close`
   (`scripts/titan-shell`, linked into `~/.local/bin` by `scripts/bootstrap`) is
   the user-facing shell command. Its IPC calls time out after 5 s, and `status`

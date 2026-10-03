@@ -180,6 +180,9 @@ migration markers). `scripts/apply-theme` writes generated Kitty/Hyprland files
 into state and the choice into the user layer, so theme changes no longer
 dirty Git. Layout changes to existing installs ship as numbered, idempotent
 scripts in `migrations/`, run by `titan migrate` (and `titan update`).
+Packaging lives in `packaging/` (`titan`, `titan-desktop`); `titan setup` is
+shared first-run setup; `titan-session` is the login session; build a repository
+with `scripts/build-repo` and test packages only in a VM (`scripts/vm-test`).
 Never hard-code `~/dotfiles`: Lua uses the `TITAN_ROOT` global, shell QML uses
 `Paths.root`/`Paths.script()`, and scripts resolve their own location.
 Snapshots: `scripts/install-snapshots` (user runs it with sudo; `--dry-run` is

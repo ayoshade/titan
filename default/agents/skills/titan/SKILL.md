@@ -30,7 +30,7 @@ reference file for the area you are changing.
 | `~/.config/titan/` | **The user layer** (never overwritten by updates): `preferences.json` (theme, accent, motion, wallpaper on/off), `settings.json` (Settings window values), `hypr.lua` (Hyprland overrides, loaded last), `kitty.conf` (Kitty overrides). Machine state lives in `~/.local/state/titan/` (`generated/` theme files, `hypr-runtime.lua`, `workflow.json`, `migrations/`) |
 | `titan-shell` | The desktop shell: island/bar, control center, launcher, menus, notifications, Settings window. Command: `titan-shell status|restart|ipc|functions|log|open|close` |
 | "bar" | The **island** at the top centre (it has notch mode and a full-width game-mode bar). Hide or show it: `titan-shell ipc bar` |
-| "user-facing titan commands" | `titan` (`version`, `migrate`, `update`, `doctor`, `theme list|current|ID`, `settings …`, `wallpaper …`, `shell …`), `titan-shell`, and `~/dotfiles/scripts/workflow OPERATION` for everything else |
+| "user-facing titan commands" | `titan` (`version`, `setup`, `migrate`, `update`, `doctor`, `theme list|current|ID`, `settings …`, `wallpaper …`, `shell …`), `titan-shell`, and `~/dotfiles/scripts/workflow OPERATION` for everything else |
 | `titan dev link` (excluded) | No such workflow exists. Changing Titan's own source or defaults is development: follow `~/dotfiles/AGENTS.md` and [contributing.md](contributing.md), not this file |
 
 **Important:** `~/.config/hypr`, `kitty`, `quickshell` and `gtk-*` are symlinks

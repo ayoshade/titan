@@ -1,0 +1,14 @@
+# Meta-package: Titan plus the complete package set from packages/*.txt.
+pkgname=titan-desktop
+pkgver=0.2.0
+pkgrel=1
+pkgdesc="The complete Titan desktop (meta-package)"
+arch=('any')
+url="https://github.com/ayoshade/titan"
+license=('LicenseRef-unlicensed')
+_root="$startdir/../.."
+pkgver() { cat "$_root/version"; }
+# Dependencies are read from the manifests so there is one list to maintain.
+depends=('titan' $(grep -hv '^\s*#' "$startdir"/../../packages/*.txt | tr -s ' \n' ' '))
+source=()
+package() { :; }

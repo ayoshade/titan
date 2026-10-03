@@ -1,0 +1,44 @@
+# Titan: defaults, shell, scripts and migrations installed to /usr/share/titan.
+# Build from this directory: makepkg -f   (see docs/distribution.md)
+pkgname=titan
+pkgver=0.2.0
+pkgrel=1
+pkgdesc="Titan desktop: Hyprland + Quickshell defaults, shell, tools and migrations"
+arch=('any')
+url="https://github.com/ayoshade/titan"
+# TODO(owner): choose a license and add LICENSE to the repository. Until then
+# the package declares none; do not publish it outside your own machines.
+license=('LicenseRef-unlicensed')
+depends=('bash' 'python' 'hyprland' 'quickshell' 'kitty' 'hyprlock' 'wl-clipboard' 'libnotify')
+optdepends=('titan-desktop: the complete Titan desktop package set'
+            'snapper: snapshots before updates (scripts/install-snapshots)')
+source=()
+_root="$startdir/../.."
+
+pkgver() { cat "$_root/version"; }
+
+package() {
+  local share="$pkgdir/usr/share/titan"
+  install -d "$share"
+  # Defaults and code only: user state never ships.
+  cp -a --no-preserve=ownership "$_root"/{config,scripts,lib,assets,migrations,default,version} "$share/"
+  find "$share" -name __pycache__ -prune -exec rm -rf {} +
+  install -d "$pkgdir/usr/bin"
+  for cmd in titan titan-shell titan-session; do
+    ln -s "/usr/share/titan/scripts/$cmd" "$pkgdir/usr/bin/$cmd"
+  done
+  # Quickshell finds its configuration in every XDG config directory.
+  install -d "$pkgdir/etc/xdg/quickshell" "$pkgdir/etc/xdg/xdg-desktop-portal"
+  ln -s /usr/share/titan/config/quickshell/umbra "$pkgdir/etc/xdg/quickshell/umbra"
+  install -m644 "$_root/config/xdg-desktop-portal/hyprland-portals.conf" "$pkgdir/etc/xdg/xdg-desktop-portal/"
+  install -Dm644 /dev/stdin "$pkgdir/usr/share/wayland-sessions/titan.desktop" <<'DESKTOP'
+[Desktop Entry]
+Name=Titan
+Comment=The Titan desktop (Hyprland and Quickshell)
+Exec=titan-session
+Type=Application
+DesktopNames=Hyprland
+DESKTOP
+  install -d "$pkgdir/usr/share/doc/titan"
+  cp -a --no-preserve=ownership "$_root"/README.md "$_root"/docs "$pkgdir/usr/share/doc/titan/"
+}
