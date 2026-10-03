@@ -9,17 +9,20 @@ import "../theme"
 ColumnLayout {
  id: root
  property string pending: ""
- spacing: Theme.padding
- ShellText { text: "SESSION / UMBRA"; color: Theme.muted; font.family: Theme.mono }
- Action { Layout.fillWidth: true; text: "Lock"; onClicked: { Quickshell.execDetached([Quickshell.env("HOME")+"/dotfiles/scripts/lock"]); UiState.close() } }
- Action { Layout.fillWidth: true; text: "Suspend"; onClicked: { Quickshell.execDetached(["systemctl","suspend"]); UiState.close() } }
- Repeater {
-  model: ["Log out","Reboot","Power off"]
-  Action { required property string modelData; Layout.fillWidth: true; text: modelData; onClicked: root.pending=modelData }
+ spacing: 12
+ ShellText { text: "Session"; font.pixelSize: Theme.titleSize }
+ ShellText { text: "shade / umbra"; color: Theme.muted }
+ GridLayout {
+  Layout.fillWidth: true; columns: 2; columnSpacing: 8; rowSpacing: 8
+  ToggleTile { Layout.fillWidth: true; text: "Lock"; symbol: "lock"; subtitle: "Secure session"; onClicked: { Quickshell.execDetached([Quickshell.env("HOME")+"/dotfiles/scripts/lock"]); UiState.close() } }
+  ToggleTile { Layout.fillWidth: true; text: "Suspend"; symbol: "moon"; subtitle: "Sleep"; onClicked: { Quickshell.execDetached(["systemctl","suspend"]); UiState.close() } }
+  ToggleTile { Layout.fillWidth: true; text: "Reboot"; symbol: "refresh"; subtitle: "Restart system"; onClicked: root.pending="Reboot" }
+  ToggleTile { Layout.fillWidth: true; text: "Power off"; symbol: "power"; subtitle: "Shut down"; onClicked: root.pending="Power off" }
  }
- ShellText { text: "Confirm "+root.pending.toLowerCase()+"?"; visible: root.pending!=="" }
+ ToggleTile { Layout.fillWidth: true; text: "Log out"; symbol: "logout"; subtitle: "Return to login"; onClicked: root.pending="Log out" }
  RowLayout {
-  visible: root.pending!==""
+  visible: root.pending!==""; Layout.fillWidth: true
+  ShellText { text: root.pending+"?"; Layout.fillWidth: true }
   Action { text: "Cancel"; onClicked: root.pending="" }
   Action { text: "Confirm"; onClicked: {
    if(root.pending==="Log out") Hyprland.dispatch("hl.dsp.exit()")
@@ -27,4 +30,5 @@ ColumnLayout {
    UiState.close()
   } }
  }
+ Item { Layout.fillHeight: true }
 }

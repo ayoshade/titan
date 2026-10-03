@@ -8,7 +8,7 @@ import "../theme"
 ColumnLayout {
  spacing: Theme.padding
  RowLayout {
-  ShellText { text: "NOTIFICATIONS"; font.family: Theme.mono; Layout.fillWidth: true }
+  ShellText { text: "Notifications"; font.pixelSize: Theme.titleSize; Layout.fillWidth: true }
   Action { text: UiState.dnd ? "DND on" : "DND off"; selected: UiState.dnd; onClicked: UiState.dnd=!UiState.dnd }
   Action { text: "Clear"; onClicked: Notices.dismissAll() }
  }

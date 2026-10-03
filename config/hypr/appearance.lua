@@ -1,8 +1,8 @@
 hl.config({
- general={gaps_in=5, gaps_out=12, border_size=1, layout="dwindle",
+ general={gaps_in=5, gaps_out=14, border_size=1, layout="dwindle",
   col={active_border="rgba(8b929bff)", inactive_border="rgba(292d33ff)"}},
- decoration={rounding=8, active_opacity=1, inactive_opacity=1,
-  shadow={enabled=true, range=12, render_power=3, color=0x66000000},
+ decoration={rounding=16, active_opacity=1, inactive_opacity=1,
+  shadow={enabled=true, range=18, render_power=3, color=0x66000000},
   blur={enabled=true, size=3, passes=1, vibrancy=0}},
  animations={enabled=true}, dwindle={preserve_split=true},
  misc={key_press_enables_dpms=true, mouse_move_enables_dpms=true,

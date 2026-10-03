@@ -6,25 +6,28 @@ import "../theme"
 ColumnLayout {
  id: root
  property string label
+ property string symbol: "volume"
  property real value: 0
  signal adjusted(real level)
- spacing: Theme.small
+ spacing: 6
  RowLayout {
   Layout.fillWidth: true
-  ShellText { text: root.label; Layout.fillWidth: true }
-  ShellText { text: Math.round(root.value*100)+"%"; color: Theme.muted; font.family: Theme.mono }
+  ShellText { text: root.label; font.pixelSize: Theme.captionSize; color: Theme.muted; Layout.fillWidth: true }
+  ShellText { text: Math.round(root.value*100)+"%"; color: Theme.muted; font.pixelSize: Theme.captionSize }
  }
  Slider {
   id: slider
   Layout.fillWidth: true
-  from: 0; to: 1; value: root.value
+  from: 0; to: 1; value: root.value; implicitHeight: 28
+  leftPadding: 0; rightPadding: 0
   onMoved: root.adjusted(value)
-  implicitHeight: 26
   background: Rectangle {
-   x: slider.leftPadding; y: slider.topPadding + slider.availableHeight/2-height/2
-   width: slider.availableWidth; height: 3; radius: 2; color: Theme.border
-   Rectangle { width: slider.visualPosition*parent.width; height: parent.height; radius: 2; color: Theme.accent }
+   x: slider.leftPadding; y: slider.topPadding+slider.availableHeight/2-height/2
+   width: slider.availableWidth; height: 26; radius: 13; color: Theme.raised
+   Rectangle { width: Math.max(26,slider.visualPosition*parent.width); height: parent.height; radius: 13; color: Theme.accent }
+   ShellIcon { anchors { left: parent.left; leftMargin: 8; verticalCenter: parent.verticalCenter } name: root.symbol; size: 14; opacity: 0.8 }
   }
-  handle: Rectangle { x: slider.leftPadding+slider.visualPosition*(slider.availableWidth-width); y: slider.topPadding+slider.availableHeight/2-height/2; width: 12; height: 12; radius: 6; color: Theme.text }
+  handle: Item { width: 0; height: 0 }
+  Accessible.name: root.label
  }
 }

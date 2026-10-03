@@ -1,0 +1,58 @@
+# SaneAspect reference study — 2026-10-03
+
+Public channel: https://www.youtube.com/@saneAspect/videos
+
+## Material inspected
+
+- **Why I added a workspace switcher to my Dynamic Island** — October 2,
+  2026, https://www.youtube.com/watch?v=J8s7O2IGogE
+  Retrieved English automatic captions and inspected sampled video frames.
+  The latest form combines workspace marks, clock and status in one small
+  centered black pill. The active mark grows; occupied workspaces have a
+  lighter shade than empty ones. The expanded shell reuses rounded surfaces.
+- **Why I stopped looking at unixporn for Hyprland inspiration** — October 1,
+  2026, https://www.youtube.com/watch?v=Mcjr5T2pHxw
+  Read the English automatic captions. Focuses on interaction choices,
+  notification grouping, launcher ranking and OS control-center designs.
+- **A full walkthrough of my Dynamic Island Quickshell** — September 19,
+  2026, https://www.youtube.com/watch?v=5cp6DkClAuM
+  Inspected frames across the full 137-second visual demo. Its captions are
+  music lyrics, rather than a technical explanation. Shows compact circular
+  side buttons, rounded control tiles, filled sliders, notifications, theme
+  selection, and coordinated translucent windows over a landscape.
+
+This was caption and sampled-frame analysis, not continuous real-time viewing.
+Public downloads and captions were kept under /tmp; full transcripts are not
+redistributed in this repository. No paid course or proprietary dotfiles were
+accessed. No external desktop configuration or source code was copied.
+
+## Applied to Umbra
+
+The original full-width text bar has been replaced by a centered black island
+and two small side circles. Workspaces use animated vertical marks, a subtle
+halo and occupied/empty shades. The clock opens a calendar. Compact status
+icons open controls; media appears on hover, and hardware-key OSDs expand the
+pill. Panels share a central origin, black outer frame and graphite inner
+surface. Controls group radio/focus/power tiles, filled sound/display sliders,
+media and recent notifications. Launcher rows include icons and rank name
+matches ahead of description matches. Session actions retain confirmation.
+
+The user’s original black/graphite direction is retained instead of reproducing
+the reference’s turquoise or blue accents. The Blacksite SVG landscape and UI
+icons are original, authored for this laptop. Appearance controls persist a
+restrained silver/ice/sage accent, reduced motion and landscape visibility.
+They change shell appearance; GTK and terminal retain the coordinated graphite
+base. This is a close adaptation of the public visual approach, not an exact
+copy of every feature in the paid Dynamite shell.
+
+## Architecture and cost
+
+Existing native reactive services remain separate from presentation. New shared
+components are ShellIcon, IconButton and ToggleTile. Theme owns shape, spacing,
+font, motion and island/panel constants. Preferences use native FileView events
+and atomic writes. The static wallpaper is rendered once as an image texture.
+Workspace state comes from Hyprland, with no polling. Backlight’s existing
+visible-only refresh remains the one deliberate timer for system state.
+
+Preview images show the original artwork and shell without user applications:
+[desktop](previews/desktop.png), [controls](previews/controls.png).

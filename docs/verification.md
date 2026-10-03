@@ -75,3 +75,32 @@ kernel parameters or bootloader edits were applied.
   Hyprland started, and Quickshell/Hypridle launched automatically. Core system
   services and the repeatable doctor checks passed after reboot. No automatic
   login is configured.
+
+## Dynamic-island redesign — 2026-10-03
+
+- Studied English auto-captions from saneAspect's October 2 workspace-island
+  video and October 1 design discussion; inspected sampled frames of the
+  latest video and the full September 19 visual walkthrough. Source links and
+  adaptations are recorded in design-reference.md.
+- Rebuilt the bar as a centered island with native reactive workspace marks,
+  compact clock/status icons, two side buttons and expanding hardware OSDs.
+- Visually inspected controls, launcher, connections, calendar, appearance,
+  session, media, notifications and toast at 1366×768. The test workspace was
+  closed and the original workspace restored after captures.
+- Runtime opened every panel without warnings in the final clean shell run.
+  Launcher icons have a local vector fallback for unavailable theme icons.
+- Accent preference written through native FileView, persisted across shell
+  restart, then restored to silver. Original landscape rendered successfully.
+- Volume OSD rendered without changing volume; native notification appeared
+  both as a centered toast and in the history panel.
+- All QML passed syntax parsing. Static qmllint still has upstream type-analysis
+  warnings; this is not a claim of a warning-free static type check.
+- Doctor, compositor validation, live configerrors and git diff checks passed.
+- No additional packages, system login edits, boot edits, destructive operations,
+  radio changes, suspend or power actions were needed for the redesign.
+- Actual playback/artwork, tray menu interactions and external-monitor behavior
+  remain hands-on checks. Existing authentication/suspend limitations above
+  remain; this visual redesign does not resolve them.
+- Final shell RSS observed at 203728 KiB (about 199 MiB), with 0.6% CPU over
+  one five-second idle sample after panels closed. This is a brief observation,
+  not a sustained performance benchmark.

@@ -1,7 +1,9 @@
 pragma ComponentBehavior: Bound
 import QtQuick
+import QtQuick.Layouts
 import Quickshell
 import Quickshell.Wayland
+import "../components"
 import "../services"
 import "../theme"
 PanelWindow {
@@ -15,22 +17,43 @@ PanelWindow {
  WlrLayershell.layer: WlrLayer.Overlay
  WlrLayershell.keyboardFocus: visible ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
  color: "transparent"
+ SystemClock { id: clock; precision: SystemClock.Minutes }
  MouseArea { anchors.fill: parent; onClicked: UiState.close() }
  Rectangle {
   id: card
-  width: Math.min(UiState.panel==="launcher" ? 560 : 440,root.width-32)
-  height: Math.min(UiState.panel==="session" ? 390 : 650,root.height-100)
-  anchors.top: parent.top; anchors.topMargin: 58
-  anchors.right: parent.right; anchors.rightMargin: UiState.panel==="launcher" ? (root.width-width)/2 : 16
-  color: Theme.surface; radius: Theme.radius; border.width: 1; border.color: Theme.border
+  width: Math.min(UiState.panel==="launcher" ? Theme.launcherWidth : Theme.panelWidth,root.width-32)
+  height: Math.min(UiState.panel==="clock" ? 400 : UiState.panel==="session" ? 430 : UiState.panel==="appearance" ? 400 : 640,root.height-40)
+  anchors { top: parent.top; topMargin: 8; horizontalCenter: parent.horizontalCenter }
+  color: Theme.shell; radius: Theme.panelRadius; border.width: 1; border.color: "#262a30"
   MouseArea { anchors.fill: parent; onClicked: {} }
-  Loader {
-   id: loader
-   anchors { fill: parent; margins: Theme.padding }
-   active: root.visible
-   source: UiState.panel==="launcher" ? "Launcher.qml" : UiState.panel==="controls" ? "ControlCenter.qml" : UiState.panel==="notifications" ? "NotificationCenter.qml" : "SessionMenu.qml"
-   focus: true
-   Keys.onEscapePressed: UiState.close()
+  scale: root.visible ? 1 : 0.9
+  opacity: root.visible ? 1 : 0
+  transformOrigin: Item.Top
+  Behavior on scale { NumberAnimation { duration: Theme.duration; easing.type: Easing.OutCubic } }
+  Behavior on opacity { NumberAnimation { duration: Theme.duration } }
+  ColumnLayout {
+   anchors { fill: parent; margins: 10 } spacing: 8
+   RowLayout {
+    Layout.fillWidth: true; spacing: 0
+    ShellText { text: Qt.formatDateTime(clock.date,"HH:mm"); font.weight: Font.Medium; leftPadding: 8; Layout.fillWidth: true }
+    Repeater {
+     model: [{panel:"launcher",symbol:"apps",label:"Applications"},{panel:"controls",symbol:"controls",label:"Control center"},{panel:"media",symbol:"music",label:"Media"},{panel:"notifications",symbol:"bell",label:"Notifications"},{panel:"appearance",symbol:"settings",label:"Appearance"},{panel:"session",symbol:"power",label:"Session"}]
+     IconButton { required property var modelData; symbol: modelData.symbol; label: modelData.label; selected: UiState.panel===modelData.panel; onClicked: UiState.toggle(modelData.panel) }
+    }
+    IconButton { symbol: "close"; label: "Close"; onClicked: UiState.close() }
+   }
+   Rectangle {
+    Layout.fillWidth: true; Layout.fillHeight: true
+    color: Theme.surface; radius: Theme.innerRadius
+    Loader {
+     id: loader
+     anchors { fill: parent; margins: 14 }
+     active: root.visible
+     source: UiState.panel==="launcher" ? "Launcher.qml" : UiState.panel==="controls" ? "ControlCenter.qml" : UiState.panel==="notifications" ? "NotificationCenter.qml" : UiState.panel==="clock" ? "ClockPanel.qml" : UiState.panel==="appearance" ? "Appearance.qml" : UiState.panel==="media" ? "MediaPanel.qml" : UiState.panel==="connectivity" ? "Connectivity.qml" : "SessionMenu.qml"
+     focus: true
+     Keys.onEscapePressed: UiState.close()
+    }
+   }
   }
  }
 }

@@ -8,10 +8,10 @@ PanelWindow {
  required property var modelData
  screen: modelData
  visible: Notices.showToast && !!Notices.latest && modelData===Quickshell.screens[0] && UiState.panel!=="notifications"
- anchors { top: true; right: true }
- margins { top: 54; right: 16 }
+ anchors { top: true }
+ margins { top: 54 }
  exclusionMode: ExclusionMode.Ignore
- implicitWidth: 360
+ implicitWidth: 380
  implicitHeight: toast.item ? toast.item.implicitHeight : 0
  color: "transparent"
  WlrLayershell.namespace: "umbra-toast"

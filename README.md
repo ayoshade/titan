@@ -1,8 +1,11 @@
 # Umbra
 
 An original Quickshell-first desktop for shade's Intel laptop. Graphite surfaces,
-quiet typography, a compact contextual pill, and restrained motion. No prebuilt
+quiet typography, a centered dynamic island, and restrained motion. No prebuilt
 rice, no Waybar, no separate launcher or notification daemon.
+
+Reference research and visual decisions are documented in
+[design-reference.md](docs/design-reference.md).
 
 ## Reproduce
 
@@ -57,7 +60,9 @@ the next boot and preserves the currently running desktop.
 | Three-finger horizontal swipe | Change workspace |
 
 Launcher: type to filter, arrows to select, Enter to launch. Escape or clicking
-outside closes a panel. Bar sections open their related controls. Screenshots
+outside closes a panel. The left circle opens applications; the right circle opens controls. Click the
+island clock for the calendar. Panel header icons switch between applications,
+controls, media, notifications, appearance, and session. Screenshots
 are saved under `~/Pictures/Screenshots` and copied to the Wayland clipboard.
 No clipboard history daemon retains sensitive clipboard content.
 
@@ -69,15 +74,18 @@ dotfiles/
 │   ├── hypr/                  Lua compositor modules, Hypridle, Hyprlock
 │   ├── quickshell/umbra/
 │   │   ├── shell.qml          Root, screen lifecycle, typed IPC
-│   │   ├── theme/             Central Theme singleton
-│   │   ├── components/        Text, actions, slider rows
+│   │   ├── theme/             Central tokens + saved appearance preferences
+│   │   ├── components/        Text, icons, buttons, tiles, slider rows
 │   │   ├── services/          State, audio, network, media, notices, backlight
-│   │   └── modules/           Background, bar, tray, overlays, launcher,
-│   │                          control center, notifications, session menu
+│   │   ├── assets/icons/      Original vector UI icons
+│   │   └── modules/           Background, island, tray, overlays, launcher,
+│   │                          controls, connections, calendar, appearance,
+│   │                          media, notifications, session menu
 │   ├── kitty/                 Terminal palette and typography
 │   ├── gtk-{3,4}.0/            GTK dark defaults
 │   ├── xdg-desktop-portal/     Hyprland capture + GTK file chooser
 │   └── mimeapps.list          Browser and file manager associations
+├── assets/wallpapers/          Original Blacksite vector landscape
 ├── system/greetd/              Reviewed system login configuration
 ├── packages/                   Desktop and login package manifests
 ├── scripts/                    Install, link, verify, session, lock, capture
@@ -95,19 +103,21 @@ confirmation. Run `agent on`, `default-agent`, `scan on`, then `pair ADDRESS`,
 `trust ADDRESS`, and `connect ADDRESS` as appropriate. Advanced and enterprise
 network configuration opens `nmtui`.
 
-Network scanning runs only with the control center open. Bluetooth scanning
-stops when that panel closes. The clock updates once per minute. Backlight
+Network scanning runs only with controls or connections open. Bluetooth scanning
+stops when the connections panel closes. The clock updates once per minute. Backlight
 sysfs does not deliver reliable inotify events: it refreshes after hardware-key
 IPC and slider writes, plus every two seconds only while controls are open.
 No hidden panel polls. Media position is not continuously sampled.
 
-The bar exists per monitor; overlays open on the focused monitor. Notifications
-appear on the first monitor. Workspace buttons start with 1–5 and expand through
+The island exists per monitor; overlays open on the focused monitor. Notifications
+appear on the first monitor. Workspace marks start with 1–5 and expand through
 10 as those workspaces exist. Notifications are capped at 50 live tracked items;
 DND suppresses popups while retaining history. History survives QML reloads but
 is not stored on disk. Closing an application's notification removes it from
 live history. Media controls follow the playing player, falling back to the
-first registered player. No cover images are downloaded by the shell.
+first registered player. Cover images use the MPRIS artwork URL supplied by
+the player; this may load an image from its remote URL. No media position timer
+runs in the background. The tray is available inside the control center.
 
 QML file changes reload automatically. After changing a `qmldir` or imports,
 restart the shell:
@@ -117,6 +127,12 @@ restart the shell:
 ```
 
 Tune colors, spacing, radii, font defaults and durations in `theme/Theme.qml`.
+Appearance settings save accent, motion and landscape preferences in
+`theme/preferences.json`. Three restrained accents share the graphite base.
+The wallpaper is a static SVG; the shell does not repaint it on a timer.
+The island expands briefly for volume/brightness changes and shows media
+controls on hover while a player exists. Its fixed reserved space keeps
+windows from jumping during expansion.
 Hyprland appearance lives independently in `hypr/appearance.lua`. Monitor scale
 is 1 for this machine's 1366×768 display. Keyboard layout is US. The launcher
 only executes installed desktop entries; it is not a shell-command runner.
