@@ -9,7 +9,7 @@ import "../theme"
 QtObject {
  id: root
  readonly property string dir: Quickshell.env("HOME")+"/Pictures/Wallpapers"
- readonly property string bundled: Quickshell.env("HOME")+"/dotfiles/assets/wallpapers/blacksite.svg"
+ readonly property string bundled: Paths.root+"/assets/wallpapers/blacksite.svg"
  readonly property string theme: Theme.paletteName
  property FolderListModel folder: FolderListModel {
   folder: "file://"+root.dir+"/"+root.theme

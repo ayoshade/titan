@@ -26,7 +26,7 @@ Item {
  property string powerPending: ""
  // Lock runs at once; log out, reboot and power off need a second click or Confirm.
  function powerAction(id) {
-  if(id==="lock") { Quickshell.execDetached([Quickshell.env("HOME")+"/dotfiles/scripts/lock"]); UiState.close(); return }
+  if(id==="lock") { Quickshell.execDetached([Paths.script("lock")]); UiState.close(); return }
   if(powerPending!==id) { powerPending=id; return }
   if(id==="logout") Hyprland.dispatch("hl.dsp.exit()")
   else Quickshell.execDetached(["systemctl",id==="reboot" ? "reboot" : "poweroff"])

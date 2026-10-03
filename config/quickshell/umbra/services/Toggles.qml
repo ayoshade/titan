@@ -9,7 +9,7 @@ QtObject {
  id: root
  property bool nightlight: false
  property bool gameMode: false
- readonly property string workflow: Quickshell.env("HOME")+"/dotfiles/scripts/workflow"
+ readonly property string workflow: Paths.workflow
  function refresh() { if(!query.running) query.running=true }
  function toggle(op) { if(runner.running) return; runner.command=[workflow,op]; runner.running=true }
  property Process query: Process {

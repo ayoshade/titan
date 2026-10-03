@@ -16,7 +16,7 @@ def notify(text, detail=''):
     subprocess.run(['notify-send', 'Titan — '+text, detail], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 def require(name):
     if shutil.which(name): return
-    notify(name+' is not installed', 'Run ~/dotfiles/scripts/install-workflow for desktop tools. Optional apps have separate installation; see Super+K.')
+    notify(name+' is not installed', 'Run '+str(ROOT/'scripts/install-workflow')+' for desktop tools. Optional apps have separate installation; see Super+K.')
     raise SystemExit(1)
 def launch(*args):
     require(args[0]); subprocess.Popen([str(x) for x in args], start_new_session=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)

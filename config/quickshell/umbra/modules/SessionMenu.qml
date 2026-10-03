@@ -25,7 +25,7 @@ Item {
  Keys.onEscapePressed: pending ? pending="" : UiState.close()
  readonly property var labels: ({ logout:"Log out", reboot:"Reboot", poweroff:"Power off" })
  function choose(action) {
-  if(action==="lock") { Quickshell.execDetached([Quickshell.env("HOME")+"/dotfiles/scripts/lock"]); UiState.close(); return }
+  if(action==="lock") { Quickshell.execDetached([Paths.script("lock")]); UiState.close(); return }
   pending=pending===action ? "" : action
  }
  function confirm() {

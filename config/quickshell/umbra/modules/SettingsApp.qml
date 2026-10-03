@@ -229,13 +229,12 @@ FloatingWindow {
    visible: ["@theme","@wallpaper","@clearNotifications","@lockNow","@restartShell","@doctor"].includes(row.key)
    anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor
    onClicked: {
-    const home=Quickshell.env("HOME")
     if(row.key==="@theme") UiState.toggle("themes")
     else if(row.key==="@wallpaper") UiState.toggle("wallpapers")
     else if(row.key==="@clearNotifications") Notices.dismissAll()
-    else if(row.key==="@lockNow") Quickshell.execDetached([home+"/dotfiles/scripts/lock"])
-    else if(row.key==="@restartShell") Quickshell.execDetached([home+"/dotfiles/scripts/shell-restart"])
-    else if(row.key==="@doctor") Quickshell.execDetached(["kitty","--hold",home+"/dotfiles/scripts/doctor"])
+    else if(row.key==="@lockNow") Quickshell.execDetached([Paths.script("lock")])
+    else if(row.key==="@restartShell") Quickshell.execDetached([Paths.script("shell-restart")])
+    else if(row.key==="@doctor") Quickshell.execDetached(["kitty","--hold",Paths.script("doctor")])
    }
    Rectangle { anchors.fill: parent; radius: Theme.radius; color: Qt.alpha(Theme.text,parent.containsMouse ? 0.03 : 0) }
   }

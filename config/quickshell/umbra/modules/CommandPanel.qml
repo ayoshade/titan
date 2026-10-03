@@ -40,7 +40,7 @@ SearchMenu {
   if(kind==="worldclock") fetch("worldclock")
   if(kind==="emojis") emojiFile.reload()
  }
- function fetch(operation) { if(reader.running) return; readerKind=kind; reader.command=[Quickshell.env("HOME")+"/dotfiles/scripts/workflow",operation]; reader.running=true }
+ function fetch(operation) { if(reader.running) return; readerKind=kind; reader.command=[Paths.workflow,operation]; reader.running=true }
  function execute(action,value) {
   if(!action || action==="none") return
   if(action==="close") { UiState.close(); return }
@@ -51,7 +51,7 @@ SearchMenu {
   if(action==="bar") { UiState.barVisible=!UiState.barVisible; UiState.saveShell(); return }
   if(action==="dnd") { UiState.dnd=!UiState.dnd; return }
   if(action==="wallpaper") { Settings.set("wallpaperEnabled",value==="on"); UiState.close(); return }
-  const command=[Quickshell.env("HOME")+"/dotfiles/scripts/workflow",action].concat(value===undefined ? [] : [value])
+  const command=[Paths.workflow,action].concat(value===undefined ? [] : [value])
   if(!inputMode) { Quickshell.execDetached(command); UiState.close(); return }
   runner.command=command; runner.running=true
  }
@@ -66,7 +66,7 @@ SearchMenu {
   id: reader
   onExited: (code,status)=>{ if(root.kind!==root.readerKind) Qt.callLater(root.load) }
   stdout: StdioCollector { onStreamFinished: { try { if(root.kind===root.readerKind) root.entries=JSON.parse(text) } catch(e) { root.result="No items available" } } }
-  stderr: StdioCollector { onStreamFinished: { if(text.trim()) root.result="Required tool is unavailable. Run ~/dotfiles/scripts/install-workflow." } }
+  stderr: StdioCollector { onStreamFinished: { if(text.trim()) root.result="Required tool is unavailable. Run "+Paths.script("install-workflow")+"." } }
  }
  Process {
   id: runner
@@ -75,7 +75,7 @@ SearchMenu {
   onExited: (code,status) => { root.busy=false; if(code===0 && root.kind==="reminder") root.result="Reminder set" }
  }
  FileView {
-  id: emojiFile; path: Quickshell.env("HOME")+"/dotfiles/config/quickshell/umbra/assets/emojis.json"
+  id: emojiFile; path: Qt.resolvedUrl("../assets/emojis.json")
   onLoaded: { if(root.kind==="emojis") root.entries=JSON.parse(text()).map(e=>({label:e.name,glyph:e.symbol,action:"copy-text",value:e.symbol})) }
  }
  SystemClock { id: clock; precision: SystemClock.Minutes; enabled: root.kind==="worldclock"; onDateChanged: { if(root.kind==="worldclock") root.fetch("worldclock") } }

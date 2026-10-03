@@ -104,8 +104,13 @@ Today the shell, Hyprland and Kitty load their configs through
 `~/.config/{quickshell,hypr,kitty} → ~/dotfiles/config/...` symlinks, and
 scripts assume `~/dotfiles`.
 
-1. Replace the remaining hard-coded `~/dotfiles` paths with a single
-   `TITAN_ROOT`, discovered from the script location or `/usr/share/titan`.
+1. **Done (0.2.0):** one `TITAN_ROOT` instead of hard-coded `~/dotfiles`.
+   - `hyprland.lua` resolves it in this order: the environment variable,
+     `/usr/share/titan` (when it contains `version`), `~/dotfiles`. It exports
+     it with `hl.env`, so the shell and every launched script inherit it.
+   - Scripts resolve it from their own location.
+   - The shell uses the `Paths` singleton (`Paths.root`, `Paths.workflow`,
+     `Paths.script(name)`).
 2. Ship Titan as an Arch package:
    - `titan` contains defaults, scripts, shell, assets, migrations and
      `version`.

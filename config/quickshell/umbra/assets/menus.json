@@ -49,7 +49,7 @@
         "action": "menu",
         "value": "agent",
         "icon": "sparkle",
-        "detail": "Codex or Claude in ~/dotfiles"
+        "detail": "Codex or Claude in the Titan checkout"
       },
       {
         "label": "Keybindings",
@@ -263,7 +263,7 @@
     "items": [
       {
         "label": "Codex",
-        "detail": "Open in ~/dotfiles with AGENTS.md",
+        "detail": "Open in the Titan checkout with AGENTS.md",
         "action": "app",
         "value": "codex",
         "icon": "sparkle"

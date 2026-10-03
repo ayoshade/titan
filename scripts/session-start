@@ -8,6 +8,8 @@ dbus-update-activation-environment --systemd WAYLAND_DISPLAY HYPRLAND_INSTANCE_S
 if ! pgrep -f '^/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1' >/dev/null; then
  /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1 &
 fi
-"$HOME/dotfiles/scripts/workflow" shell-init
-if command -v cliphist >/dev/null; then "$HOME/dotfiles/scripts/workflow" clipboard-start; fi
+root=$(cd -- "$(dirname -- "$(readlink -f "${BASH_SOURCE[0]}")")/.." && pwd)
+export TITAN_ROOT=$root
+"$root/scripts/workflow" shell-init
+if command -v cliphist >/dev/null; then "$root/scripts/workflow" clipboard-start; fi
 exec qs -n -d -c umbra

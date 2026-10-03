@@ -115,7 +115,8 @@ hl.env("NAME", "value"); hl.gesture({ fingers = 3, direction = "horizontal", act
 
 ## Keybindings
 
-Bindings are registered through helpers defined in `bindings.lua`:
+Bindings are registered through helpers defined in `bindings.lua`. Use the
+`TITAN_ROOT` Lua global for Titan paths, never a hard-coded `~/dotfiles`:
 
 ```lua
 b.bind(KEY, DESCRIPTION, DISPATCHER, opts)   -- raw dispatcher

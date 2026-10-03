@@ -3,6 +3,7 @@ import QtQuick
 import Quickshell
 import Quickshell.Hyprland
 import Quickshell.Io
+import "../theme"
 QtObject {
  id: root
  property string panel: ""
@@ -33,7 +34,7 @@ QtObject {
   panel=wasOpen ? "" : "commands"
  }
  function saveShell() {
-  saver.command=[Quickshell.env("HOME")+"/dotfiles/scripts/workflow","bar-set",String(barVisible)]
+  saver.command=[Paths.workflow,"bar-set",String(barVisible)]
   saver.running=true
  }
  property Process saver: Process {}

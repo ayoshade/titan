@@ -1,6 +1,6 @@
 -- Exact Omarchy chords, independently implemented for Titan/Quickshell.
 -- Reference: a85e29abb556816f4644cf975e98da694b486aa8. See docs/keybindings.md.
-local root=os.getenv("HOME").."/dotfiles/"
+local root=TITAN_ROOT.."/"
 local b={}
 function b.bind(key,description,action,opts)
  opts=opts or {}; opts.description=description

@@ -9,7 +9,7 @@ QtObject {
  readonly property var palettes: JSON.parse(catalog.text() || "[]")
  readonly property var palette: palettes.find(p=>p.id===paletteName) || palettes[0] || ({})
  property FileView catalog: FileView { path: Qt.resolvedUrl("palettes.json"); blockLoading: true }
- function apply(name) { if(applicator.running || !palettes.some(p=>p.id===name)) return false; applyError=""; applicator.command=[Quickshell.env("HOME")+"/dotfiles/scripts/apply-theme",name]; applicator.running=true; return true }
+ function apply(name) { if(applicator.running || !palettes.some(p=>p.id===name)) return false; applyError=""; applicator.command=[Paths.script("apply-theme"),name]; applicator.running=true; return true }
  readonly property bool applying: applicator.running
  property Process applicator: Process { stderr: StdioCollector { onStreamFinished: { if(text.trim()) root.applyError=text.trim() } } onExited: (code,status)=>{ if(code!==0 && !root.applyError) root.applyError="Theme could not be applied" } }
  property string accentName: "silver"

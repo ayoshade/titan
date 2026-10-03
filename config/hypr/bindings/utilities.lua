@@ -67,5 +67,5 @@ return function(b)
  for i=1,9 do b.shell("SUPER + CTRL + code:"..(i+9),"Bar panel "..i,"panelAt "..i) end
  b.bind("SUPER + CTRL + Z","Zoom in",function() hl.config({cursor={zoom_factor=(hl.get_config("cursor.zoom_factor") or 1)+1}}) end)
  b.bind("SUPER + CTRL + ALT + Z","Reset zoom",function() hl.config({cursor={zoom_factor=1}}) end)
- b.run("SUPER + CTRL + L","Lock system",os.getenv("HOME").."/dotfiles/scripts/lock")
+ b.run("SUPER + CTRL + L","Lock system",TITAN_ROOT.."/scripts/lock")
 end

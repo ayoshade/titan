@@ -337,4 +337,10 @@ kernel parameters or bootloader edits were applied.
   `snapper`/`snap-pac`, and listed the five intended actions. The real run
   (sudo) is pending the user. Neither `undochange` nor the full rollback in
   `docs/snapshots.md` has been rehearsed; do that in a VM.
+- **`TITAN_ROOT`:** after the change, `hyprctl configerrors` was empty and the
+  restarted shell process carried `TITAN_ROOT=/home/shade/dotfiles`
+  (inherited from Hyprland's `hl.env`). `titan-shell ipc theme industrial` ran
+  `apply-theme` through `Paths.script()`. The root menu opened, and the shell
+  log was free of Titan warnings. Not exercised: key-triggered lock and
+  session-start, which run at the next login.
 
