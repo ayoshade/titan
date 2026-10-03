@@ -439,5 +439,8 @@ kernel parameters or bootloader edits were applied.
   warnings. On this laptop it behaves as before.
 - **VM test:** `vm-test --full` on the local 0.2.0-2 build passed 16/16,
   including `titan doctor (package mode)` and the shipped login inputs.
-  0.2.0-2 has not been published yet (it needs the owner's signing
-  passphrase).
+- **Release 2 published:** `titan 0.2.0-2` was signed and published, and the
+  stale `-1` package was pruned. `titan-desktop` stays `0.2.0-1` because its
+  contents did not change.
+- **Install from the published repository:** `vm-test --full --from-repo`
+  passed 16/16, with `Validated By: SHA-256 Sum  Signature`.
