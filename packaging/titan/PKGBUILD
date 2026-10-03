@@ -39,7 +39,7 @@ Type=Application
 DesktopNames=Hyprland
 DESKTOP
   install -Dm644 "$_root/NOTICE" "$pkgdir/usr/share/licenses/titan/NOTICE"
-  install -Dm644 "$_root/default/agents/LICENSE.omarchy" "$pkgdir/usr/share/licenses/titan/LICENSE.omarchy"
+  install -Dm644 "$_root/agents/LICENSE.omarchy" "$pkgdir/usr/share/licenses/titan/LICENSE.omarchy"
   install -d "$pkgdir/usr/share/doc/titan"
   cp -a --no-preserve=ownership "$_root"/README.md "$_root"/docs "$pkgdir/usr/share/doc/titan/"
 }

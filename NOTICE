@@ -5,7 +5,7 @@ Licensed under the Apache License, Version 2.0 (see LICENSE).
 
 This product includes:
 - Agent skill guidance adapted from Omarchy, Copyright (c) David Heinemeier
-  Hansson, under the MIT License (default/agents/LICENSE.omarchy). The seven
+  Hansson, under the MIT License (agents/LICENSE.omarchy). The seven
   developer guides originate from agents/skills/ at revision
   8e02fc84f5bdc511ed102e2a14f8935bba4f92bd of
   https://github.com/omacom/omarchy. Titan adapts commands, paths, architecture,

@@ -20,6 +20,7 @@ class AgentSkills(unittest.TestCase):
         self.home.mkdir()
         shutil.copy(SOURCE / "scripts/install-agent-skills", self.root / "scripts")
         shutil.copytree(SOURCE / "default/agents/skills", self.root / "default/agents/skills")
+        shutil.copytree(SOURCE / "agents/skills", self.root / "agents/skills")
         self.env = dict(os.environ, HOME=str(self.home), CODEX_HOME=str(self.home / "custom codex"))
         self.codex = self.home / "custom codex/skills"
         self.claude = self.home / ".claude/skills"
@@ -31,7 +32,8 @@ class AgentSkills(unittest.TestCase):
     def test_dry_run_never_creates_agent_directories(self):
         result = self.register("--dry-run")
         self.assertEqual(result.returncode, 0, result.stderr)
-        self.assertIn("titan-shell-dev", result.stdout)
+        self.assertIn("titan-app", result.stdout)
+        self.assertNotIn("titan-shell-dev", result.stdout)
         self.assertFalse(self.codex.parent.exists())
         self.assertFalse(self.claude.parent.exists())
 
@@ -39,6 +41,7 @@ class AgentSkills(unittest.TestCase):
         result = self.register()
         self.assertEqual(result.returncode, 0, result.stderr)
         names = {p.parent.name for p in (self.root / "default/agents/skills").glob("*/SKILL.md")}
+        self.assertEqual(names, {"titan", "titan-app", "diagnose-crash"})
         for directory in [self.codex, self.claude]:
             self.assertEqual({p.name for p in directory.iterdir()}, names)
             for name in names:
@@ -50,7 +53,7 @@ class AgentSkills(unittest.TestCase):
         self.assertEqual({p: p.lstat().st_ino for p in before}, before)
 
     def test_custom_skill_is_preserved_and_preflight_prevents_partial_install(self):
-        custom = self.claude / "titan-shell-dev"
+        custom = self.claude / "titan"
         custom.mkdir(parents=True)
         (custom / "SKILL.md").write_text("My own skill\n")
         result = self.register()
@@ -67,6 +70,15 @@ class AgentSkills(unittest.TestCase):
         self.assertEqual(self.register().returncode, 1)
         self.assertEqual(os.readlink(custom), "/missing/personal-skill")
         self.assertFalse(self.codex.exists())
+
+    def test_personal_development_skill_is_not_registered_or_replaced(self):
+        custom = self.codex / "titan-shell-dev"
+        custom.mkdir(parents=True)
+        (custom / "SKILL.md").write_text("Personal development guide\n")
+        self.assertEqual(self.register().returncode, 0)
+        self.assertEqual((custom / "SKILL.md").read_text(), "Personal development guide\n")
+        self.assertEqual({p.name for p in self.claude.iterdir()}, {"titan", "titan-app", "diagnose-crash"})
+        self.assertEqual({p.name for p in self.codex.iterdir()}, {"titan", "titan-app", "diagnose-crash", "titan-shell-dev"})
 
     def test_non_directory_parent_is_rejected_before_any_links(self):
         (self.home / ".claude").write_text("personal file\n")

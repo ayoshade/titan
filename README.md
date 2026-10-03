@@ -44,7 +44,8 @@ It has not been published. Licensed under
 - **Updates:** `titan update` takes a Snapper snapshot, runs a full Arch
   upgrade and applies migrations; your own settings are never overwritten.
 - **Agent support:** documented commands and skills for Claude Code and Codex
-  (see [AGENTS.md](AGENTS.md) and `default/agents/skills/`).
+  (see [AGENTS.md](AGENTS.md), `agents/skills/` for development and
+  `default/agents/skills/` for end users).
 
 Keyboard chords follow Omarchy's complete set (231 bindings), implemented
 independently. See [docs/keybindings.md](docs/keybindings.md).
@@ -132,7 +133,7 @@ titan wallpaper list | next | set PATH
 titan shell status | restart | ipc METHOD | open PANEL
 titan doctor                        # health check
 titan hardware --json                # read-only hardware inventory and installer packages
-titan skills [--dry-run]             # link bundled skills for Codex and Claude
+titan skills [--dry-run]             # link the three end-user skills for Codex and Claude
 titan update                        # snapshot, full upgrade, migrations (asks for sudo)
 ```
 
@@ -144,7 +145,8 @@ titan update                        # snapshot, full upgrade, migrations (asks f
   bundled Blacksite landscape is selectable under every theme.
 - **Agents:** the `titan` skill covers customization, `titan-app` building
   themed Qt Quick apps, and `diagnose-crash` reading core dumps. Seven development
-  skills adapt Omarchy's agent guides for Titan. Setup/update link bundled skills
+  guides under `agents/skills/` adapt Omarchy's development guidance for Titan.
+  Setup/update link only the three end-user skills under `default/agents/skills/`
   for Codex and Claude; `titan skills --dry-run` previews missing links without
   replacing personal skills. See [docs/agent-skills.md](docs/agent-skills.md).
 
@@ -204,7 +206,8 @@ The experimental ISO builder and installation tests run inside QEMU; see
 │   │   ├── modules/         Island, dashboard, calendar, control center, Settings, menus, panels
 │   │   └── assets/          Icons, menu definitions, emoji data
 │   ├── kitty/  gtk-3.0/  gtk-4.0/  xdg-desktop-portal/
-├── default/                 Defaults copied once (mimeapps.list) and agent skills
+├── agents/skills/           Development guides for repository agents
+├── default/                 Defaults copied once and the three end-user agent skills
 ├── lib/titan/               Python behind scripts/workflow (desktop operations, paths)
 ├── scripts/                 titan, titan-shell, titan-session, workflow, bootstrap, install-*,
 │                            apply-theme, fetch-wallpapers, build-repo, publish-repo, vm-test, doctor

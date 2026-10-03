@@ -167,14 +167,17 @@ width_before=\$(titan settings get islandWidth)
 titan setup >/dev/null && pass "titan setup (first run)" || fail "titan setup"
 titan setup >/dev/null && pass "titan setup is repeatable" || fail "titan setup repeat"
 skills_ok=1
-[[ -f /usr/share/licenses/titan/LICENSE.omarchy && -f /usr/share/titan/default/agents/LICENSE.omarchy ]] || skills_ok=0
+[[ -f /usr/share/licenses/titan/LICENSE.omarchy && ! -d /usr/share/titan/agents ]] || skills_ok=0
+skill_count=0
 for entry in /usr/share/titan/default/agents/skills/*/SKILL.md; do
  source=\${entry%/SKILL.md}; name=\${source##*/}
+ case \$name in titan|titan-app|diagnose-crash) ;; *) skills_ok=0 ;; esac
+ skill_count=\$((skill_count+1))
  for folder in "\${CODEX_HOME:-\$HOME/.codex}/skills" "\$HOME/.claude/skills"; do
   [[ \$(readlink -f "\$folder/\$name") == "\$source" ]] || skills_ok=0
  done
 done
-((skills_ok)) && pass "bundled skills registered for Codex and Claude; upstream license shipped" || fail "bundled skill links or license"
+((skill_count == 3 && skills_ok)) && pass "only three end-user skills packaged and registered; upstream license shipped" || fail "bundled skill scope, links or license"
 [[ \$(titan theme current) == \$theme_before ]] && pass "setup preserves theme (graphite on fresh installs)" || fail "theme preservation"
 titan migrate --status | grep -q pending && fail "migrations pending on a fresh install" || pass "fresh install has no pending migrations"
 [[ -e ~/.config/titan/preferences.json && -e ~/.local/state/titan/generated/kitty-theme.conf ]] && pass "user layer and generated theme" || fail "user layer"

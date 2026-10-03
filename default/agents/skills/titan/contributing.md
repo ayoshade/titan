@@ -7,7 +7,8 @@ this machine the personal checkout `~/dotfiles` *is* the live config (through
 symlinks), so both kinds of change touch the same files. The difference is
 intent and how much care the change needs.
 
-The development task table in `AGENTS.md` routes to seven Titan skills for
+The development task table in `AGENTS.md` routes to seven guides in
+`agents/skills/` for
 commands, installation, shell development, icons, acceptance tests, visual
 verification and migrations. Read the relevant one when working on Titan
 source; ordinary personal customization stays in this skill.
@@ -90,11 +91,13 @@ you could not test.
 
 ## Skills in this repo
 
-Skills live in `~/dotfiles/default/agents/skills/<name>/` and are symlinked into
+The three end-user skills live in `default/agents/skills/<name>/` and are symlinked into
 `~/.claude/skills/` and `${CODEX_HOME:-$HOME/.codex}/skills`. Edit them in the
 repo; the links pick the changes up. Run `titan skills --dry-run`, then
 `titan skills`, to register new bundled skills. Existing personal entries are
-never overwritten. See `docs/agent-skills.md` for the upstream port mapping.
+never overwritten. Development guides belong separately in `agents/skills/`
+and are read through the repository's `AGENTS.md`; do not add them to desktop
+defaults. See `docs/agent-skills.md` for the upstream port mapping.
 
 Quote a skill's `description:` in single quotes (doubling any `'`), because
 trigger lists contain `: `, which is invalid in a plain YAML scalar; GitHub

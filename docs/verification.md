@@ -522,6 +522,9 @@ kernel parameters or bootloader edits were applied.
 
 ## Omarchy developer skills port — 2026-10-03
 
+The initial location and registration described below were corrected in the
+following handoff section. The current inventory is `docs/agent-skills.md`.
+
 - Reviewed all seven guides in Omarchy's `agents/skills/` at quattro revision
   `8e02fc84f5bdc511ed102e2a14f8935bba4f92bd`, plus its existing end-user skill
   inventory. Added `titan-commands`, `titan-installation`, `titan-shell-dev`,
@@ -569,3 +572,30 @@ kernel parameters or bootloader edits were applied.
   skill opt-out yet: removing a discovery link is reversible, but setup/update
   registers it again. Static guide validation and package integration checks
   do not claim forward-testing every development recipe or a new public release.
+
+## Development and end-user skill locations corrected — 2026-10-03
+
+- The user clarified the two locations: all seven development guides now live
+  in `agents/skills/`; `default/agents/skills/` contains exactly `titan`,
+  `titan-app` and `diagnose-crash`. The guides were moved intact, with the MIT
+  notice at `agents/LICENSE.omarchy`. AGENTS task links, documentation, NOTICE
+  and the package's license source path now match this layout.
+- Development guides are read through repository `AGENTS.md`. Setup/update
+  and `titan skills` scan only end-user defaults. Packaging excludes the
+  repository's `agents/` tree while retaining the upstream license in
+  `/usr/share/licenses/titan/`.
+- Removed only the fourteen mistaken development-guide symlinks created by
+  the preceding task in the owner's Codex/Claude skill directories, checking
+  their exact targets first. The three end-user links in both homes and all
+  unrelated skills were preserved. No desktop configuration or service changed.
+- Validation passed: all ten skill definitions and their relative references,
+  AGENTS links, Bash syntax, `git diff --check`, host doctor, and 18 unittest
+  checks. Registration tests include a checkout with both trees and prove only
+  the three defaults are registered while a personal development skill remains
+  untouched.
+- The rebuilt package archive contains only the three end-user SKILL.md files
+  and the license. `scripts/vm-test --full --reuse …` passed 18/18 in QEMU,
+  explicitly asserting three packaged/registered end-user skills and no
+  `/usr/share/titan/agents` tree. Artifacts remain in
+  `~/.cache/titan/vm/runs/run.mkTYG7/`; QEMU stopped on exit. No ISO, graphical
+  layout, lock or suspend retest was needed for this location correction.

@@ -19,7 +19,7 @@ Usage: titan COMMAND [ARGS]
   update [--no-system]    Snapshot, update Titan and Arch packages, migrate, check
   doctor                  Health check
   hardware [--json|--packages]  Read-only hardware inventory and installer profile
-  skills [--dry-run]       Link bundled skills for Codex and Claude; preserve custom skills
+  skills [--dry-run]       Link end-user skills for Codex and Claude; preserve custom skills
   theme [list|current|ID] Show or apply a theme
   settings …              Same as: scripts/workflow settings …
   wallpaper …             Same as: scripts/workflow wallpaper …

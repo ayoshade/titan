@@ -38,10 +38,12 @@ Elsewhere:
   `default/mimeapps.list` once; applications may change it freely.
 - Wallpapers live in `~/Pictures/Wallpapers/<theme>/` and are never tracked.
 - Agent discovery links live in `${CODEX_HOME:-$HOME/.codex}/skills` and
-  `~/.claude/skills`; bundled sources remain in Titan's defaults. `titan skills`
+  `~/.claude/skills`; the three end-user skill sources remain in Titan's defaults.
+  `titan skills`
   registers missing links and refuses custom entries before writing. Setup and
   update call it too, reporting conflicts without overwriting them. See
-  [agent-skills.md](agent-skills.md) for the seven Omarchy development-guide ports.
+  [agent-skills.md](agent-skills.md). The seven Omarchy development-guide ports
+  live separately in `agents/skills/` and are not shipped as desktop defaults.
 
 The first migration (`migrations/1791060086-user-layer.sh`) moved this
 machine from the old layout. That layout tracked the user's theme in Git,
