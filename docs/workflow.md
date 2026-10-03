@@ -8,6 +8,10 @@ interpolation of user text, filenames or calculator expressions.
 
 ## Agent interfaces
 
+- `titan-shell status|restart|ipc METHOD [ARG…]|functions|log [-f]|open PANEL|close`
+  (`scripts/titan-shell`, linked into `~/.local/bin` by `scripts/bootstrap`) is
+  the user-facing shell command. Its IPC calls time out after 5 s, and `status`
+  exits 1 when the shell is unresponsive.
 - `qs -c umbra ipc call shell status`: JSON status, current menu/panel and bar.
 - `qs -c umbra ipc call shell menu NAME`: root, apps, system, capture, toggle,
   hardware, background, share, agent, clipboard, emojis, keybindings, calculator,

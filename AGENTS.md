@@ -26,7 +26,8 @@ instead of maintaining two competing instruction sets.
   changing shortcuts. Super+A/C/V/X are universal editing, Super+L changes
   workspace layout, and Super+Ctrl+L locks. Keep chords exact unless the user
   requests a change. Titan owns the implementation and Quickshell UI.
-- `scripts/workflow` is the shared desktop-operation interface; implementations
+- `titan-shell` (`scripts/titan-shell`) controls the Quickshell desktop shell;
+  `scripts/workflow` is the shared desktop-operation interface; implementations
   live under `lib/titan/`. Workflow packages have their own manifest and installer.
   User state lives outside Git. Clipboard labels contain private content; never
   dump clipboard-list into logs. Optional Omarchy apps are not bundled. Do not
@@ -159,7 +160,7 @@ wl-clipboard, grim/slurp and suitable XDG portals.
 | `packages/` | Explicit package manifests |
 | `scripts/` | Installation, bootstrap, checks, session and user operations |
 | `system/` | Reviewed templates for privileged system configuration |
-| `default/agents/skills/` | Agent skills shipped as Titan defaults (one `SKILL.md` per skill), symlinked into `~/.claude/skills/` and `~/.codex/skills/` |
+| `default/agents/skills/` | Agent skills shipped as Titan defaults (one `SKILL.md` per skill), symlinked into `~/.claude/skills/` and `~/.codex/skills/`; `titan` covers end-user customization, `diagnose-crash` covers core dumps |
 | `docs/` | Research, hardware, decisions, validation and recovery |
 
 Shell settings are declared once in `theme/settings-schema.json`. The Settings

@@ -14,6 +14,14 @@ for source in "$root"/config/*; do
  target="$config/${source##*/}"
  [[ -L "$target" ]] || ln -s "$source" "$target"
 done
+# User-facing commands go on PATH; existing files are never replaced.
+bin="$HOME/.local/bin"; mkdir -p "$bin"
+for name in titan-shell; do
+ target="$bin/$name"
+ if [[ -e "$target" || -L "$target" ]]; then
+  [[ "$(readlink -f "$target")" == "$root/scripts/$name" ]] || { printf 'Refusing existing target: %s\n' "$target" >&2; continue; }
+ else ln -s "$root/scripts/$name" "$target"; fi
+done
 if command -v gsettings >/dev/null && gsettings list-schemas | /usr/bin/grep -qx org.gnome.desktop.interface; then
  gsettings set org.gnome.desktop.interface color-scheme prefer-dark
  gsettings set org.gnome.desktop.interface gtk-theme Adwaita-dark

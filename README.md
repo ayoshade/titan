@@ -198,7 +198,8 @@ hands-on check in `docs/verification.md`.
 
 ## Recovery
 
-If the shell fails, Super+Return still opens Kitty. Run `scripts/shell-restart`;
+If the shell fails, Super+Return still opens Kitty. Run `titan-shell restart`
+(or `scripts/shell-restart` from a TTY);
 it escalates to TERM/KILL if Quickshell hangs while exiting.
 From a TTY it discovers the running Hyprland display. Inspect logs with:
 
