@@ -394,3 +394,23 @@ kernel parameters or bootloader edits were applied.
   and stops at once if QEMU dies. Package installs run as a detached
   `systemd-run` job polled over short SSH calls. A graphical login to the
   Titan session is still untested (Phase 2).
+
+## First public release — 2026-10-03
+
+- **Published:** `scripts/publish-repo --channel stable --sign 8A648F6B462B95C6
+  --yes` published Titan 0.2.0 as the `repo-stable` release, with 12 assets:
+  both packages, the database and files lists, and a `.sig` for each. The
+  owner entered the passphrase in GPG's own prompt.
+- **Visibility:** `ayoshade/titan` was private, so release assets returned
+  404 to anonymous clients. With the owner's approval the repository was made
+  public (a history scan found no secrets; the commit email and laptop notes
+  are visible). The first anonymous requests still returned 404 for a short
+  time while GitHub propagated the change.
+- **Anonymous check:** an unauthenticated download of `titan.db`, both
+  packages and their signatures, verified against
+  `raw.githubusercontent.com/.../keys/titan-packager.asc`, gave "Good
+  signature" for all three. The database lists `titan-0.2.0-1` and
+  `titan-desktop-0.2.0-1`.
+- **Not yet done:** a `pacman -Syu titan-desktop` from this public repository
+  on a clean machine. `vm-test` installs local files; adding a `--from-repo`
+  mode would cover it.
