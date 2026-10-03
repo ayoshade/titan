@@ -183,6 +183,10 @@ scripts in `migrations/`, run by `titan migrate` (and `titan update`).
 Packaging lives in `packaging/` (`titan`, `titan-desktop`); `titan setup` is
 shared first-run setup; `titan-session` is the login session; build a repository
 with `scripts/build-repo` and test packages only in a VM (`scripts/vm-test`).
+Titan is Apache-2.0 (`LICENSE`, `NOTICE`: record any third-party material
+there). `scripts/publish-repo` publishes GitHub releases. Publishing is public:
+run it with `--yes` only when the owner asks, and never handle the signing key
+or its passphrase.
 Never hard-code `~/dotfiles`: Lua uses the `TITAN_ROOT` global, shell QML uses
 `Paths.root`/`Paths.script()`, and scripts resolve their own location.
 Snapshots: `scripts/install-snapshots` (user runs it with sudo; `--dry-run` is

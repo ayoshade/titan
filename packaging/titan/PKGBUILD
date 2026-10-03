@@ -6,9 +6,7 @@ pkgrel=1
 pkgdesc="Titan desktop: Hyprland + Quickshell defaults, shell, tools and migrations"
 arch=('any')
 url="https://github.com/ayoshade/titan"
-# TODO(owner): choose a license and add LICENSE to the repository. Until then
-# the package declares none; do not publish it outside your own machines.
-license=('LicenseRef-unlicensed')
+license=('Apache-2.0')
 depends=('bash' 'python' 'hyprland' 'quickshell' 'kitty' 'hyprlock' 'wl-clipboard' 'libnotify')
 optdepends=('titan-desktop: the complete Titan desktop package set'
             'snapper: snapshots before updates (scripts/install-snapshots)')
@@ -39,6 +37,7 @@ Exec=titan-session
 Type=Application
 DesktopNames=Hyprland
 DESKTOP
+  install -Dm644 "$_root/NOTICE" "$pkgdir/usr/share/licenses/titan/NOTICE"
   install -d "$pkgdir/usr/share/doc/titan"
   cp -a --no-preserve=ownership "$_root"/README.md "$_root"/docs "$pkgdir/usr/share/doc/titan/"
 }

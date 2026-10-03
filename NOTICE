@@ -1,0 +1,15 @@
+Titan
+Copyright 2026 ayoshade and Titan contributors
+
+Licensed under the Apache License, Version 2.0 (see LICENSE).
+
+This product includes:
+- Emoji names in config/quickshell/umbra/assets/emojis.json, which are the
+  character names from the Unicode Character Database. Copyright © Unicode,
+  Inc. Used under the Unicode License v3 (https://www.unicode.org/license.txt).
+
+Acknowledgements (no code or assets copied):
+- Keyboard chords follow Omarchy (https://github.com/basecamp/omarchy, MIT);
+  Titan's implementation is independent.
+- The desktop design is inspired by saneAspect's public videos; Titan's QML,
+  icons and artwork are original.

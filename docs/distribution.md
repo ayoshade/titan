@@ -95,7 +95,7 @@ changes); they suggest it to the user.
 | Version, migrations, `titan` command | Done (0.2.0) |
 | `titan update` | Done; first real run by the user on 2026-10-03 (hyprland and libutf8proc upgraded, no kernel change) |
 | Snapshots before updates (Snapper on Btrfs) | Enabled on this machine 2026-10-03 (`scripts/install-snapshots`; see docs/snapshots.md) |
-| Packaging Titan (`titan` package, defaults in `/usr/share/titan`, own repo) | Done: `scripts/vm-test --full` passed 14/14 on a clean Arch VM. Hosting, signing and license are open owner decisions |
+| Packaging Titan (`titan` package, defaults in `/usr/share/titan`, own repo) | Done: `scripts/vm-test --full` passed 14/14 on a clean Arch VM; Apache-2.0; hosted as GitHub releases (`scripts/publish-repo`). Signing key pending the owner |
 | First-run setup | `titan setup` plus the shell's Welcome screen; tested in a throwaway home |
 
 ### Packaging (0.2.0)
@@ -116,14 +116,59 @@ Developer mode (this laptop) keeps the `~/.config → ~/dotfiles` symlinks
 through `scripts/bootstrap`, which then runs `titan setup`. Both modes share
 the same setup code.
 
-Still open before others can install Titan:
+## Releasing
 
-- Choose a license. The PKGBUILDs say `LicenseRef-unlicensed` until a LICENSE
-  file exists.
-- Create a packager GPG key for signing (`build-repo --sign`).
-- Decide where the repository is hosted (for example GitHub Pages or a VPS),
-  and document the `pacman.conf` entry plus key import.
-- A graphical VM login to the Titan session (Phase 2 installer work).
+Titan is licensed under Apache-2.0 (`LICENSE`; attributions in `NOTICE`,
+installed as `/usr/share/licenses/titan/NOTICE`). Packages are hosted for free
+as GitHub releases of this repository. The fixed tags `repo-stable` and
+`repo-edge` act as the two channels; pacman reads release assets directly.
+
+### 1. Packager signing key (once, by the owner)
+
+Signing proves packages came from you. The key's passphrase is a secret:
+create it yourself and never give it to an agent or put it in Git.
+
+```sh
+# Use a name and email you are happy to make public.
+gpg --quick-generate-key "Titan Packages <you@example.com>" ed25519 sign 3y
+gpg --list-secret-keys --keyid-format long      # the KEYID is after "ed25519/"
+mkdir -p ~/dotfiles/keys
+gpg --armor --export KEYID > ~/dotfiles/keys/titan-packager.asc   # public key: commit this
+gpg --armor --export-secret-keys KEYID > /path/to/offline-backup.asc   # private: offline backup, never in Git
+```
+
+### 2. Publish
+
+```sh
+scripts/publish-repo --channel edge                 # dry run: lists files and the pacman URL
+scripts/publish-repo --channel edge --yes           # publish edge (unsigned is allowed for testing)
+scripts/publish-repo --channel stable --sign KEYID --yes   # stable must be signed; needs a clean checkout
+```
+
+`publish-repo` builds through `build-repo`, creates the release if missing
+(edge is marked pre-release) and uploads with `gh`. It deletes package files
+no longer in the database, so files and database always match. Bump
+`version` (and add migrations) before publishing a release users should get.
+
+### 3. Users: add the repository
+
+```sh
+sudo pacman-key --add titan-packager.asc && sudo pacman-key --lsign-key KEYID
+```
+
+Then append to `/etc/pacman.conf`, after the official repositories:
+
+```ini
+[titan]
+Server = https://github.com/ayoshade/titan/releases/download/repo-stable
+```
+
+Install with `sudo pacman -Syu titan-desktop`. From then on, `titan update`
+(a full `pacman -Syu`) keeps Titan current. For edge, use `repo-edge` and add
+`SigLevel = Optional TrustAll` only on test machines while edge is unsigned.
+
+Still open: create the signing key (step 1); publish the first release; and
+graphical-login testing in a VM (Phase 2 installer work).
 
 ### Phase 2 onwards
 

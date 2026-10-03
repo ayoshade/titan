@@ -1,0 +1,50 @@
+#!/usr/bin/env bash
+# publish-repo [--channel stable|edge] [--sign KEYID] [--yes]
+# Build the Titan pacman repository and publish it as a GitHub release of this
+# repository (tag repo-stable or repo-edge), which pacman reads directly:
+#   [titan]
+#   Server = https://github.com/OWNER/REPO/releases/download/repo-CHANNEL
+# Without --yes it only prints what it would do. Publishing is public.
+# Stable releases must be signed (--sign); edge may be unsigned for testing.
+set -euo pipefail
+root=$(cd -- "$(dirname -- "$(readlink -f "${BASH_SOURCE[0]}")")/.." && pwd)
+channel=stable sign="" yes=0
+while (($#)); do
+ case $1 in
+  --channel) channel=$2; shift 2 ;;
+  --sign) sign=$2; shift 2 ;;
+  --yes) yes=1; shift ;;
+  -h|--help) sed -n 2,8p "$0"; exit 0 ;;
+  *) echo "publish-repo: unknown argument $1" >&2; exit 2 ;;
+ esac
+done
+[[ $channel == stable && -z $sign ]] && { echo "publish-repo: stable releases must be signed: --sign KEYID (see docs/distribution.md)" >&2; exit 1; }
+command -v gh >/dev/null || { echo "publish-repo: needs the GitHub CLI (gh) logged in" >&2; exit 1; }
+repo=$(gh repo view --json nameWithOwner -q .nameWithOwner)
+tag=repo-$channel
+out=${XDG_CACHE_HOME:-$HOME/.cache}/titan/publish/$channel
+rm -rf "$out"; mkdir -p "$out"
+args=(--channel "$channel"); [[ -n $sign ]] && args+=(--sign "$sign")
+"$root/scripts/build-repo" "${args[@]}" "$out" >/dev/null
+# Upload real files: the .db/.files names are symlinks made by repo-add.
+files=()
+for f in "$out"/*; do
+ [[ $f == *.old || $f == *.old.sig ]] && continue
+ files+=("$f")
+done
+echo "Release $repo@$tag ($channel):"
+printf '  %s\n' "${files[@]##*/}"
+echo "pacman Server = https://github.com/$repo/releases/download/$tag"
+if ((!yes)); then echo "(dry run: add --yes to publish)"; exit 0; fi
+if ! gh release view "$tag" >/dev/null 2>&1; then
+ flags=(--title "Titan packages ($channel)" --notes "pacman repository for the $channel channel. Not a source release.")
+ [[ $channel == edge ]] && flags+=(--prerelease)
+ gh release create "$tag" "${flags[@]}"
+fi
+# Remove packages that are no longer in the database so files and db agree.
+keep=" ${files[*]##*/} "
+for asset in $(gh release view "$tag" --json assets -q '.assets[].name'); do
+ [[ $keep == *" $asset "* ]] || gh release delete-asset "$tag" "$asset" --yes
+done
+gh release upload "$tag" "${files[@]}" --clobber
+echo "Published Titan $(cat "$root/version") to $repo@$tag."

@@ -5,7 +5,7 @@ pkgrel=1
 pkgdesc="The complete Titan desktop (meta-package)"
 arch=('any')
 url="https://github.com/ayoshade/titan"
-license=('LicenseRef-unlicensed')
+license=('Apache-2.0')
 _root="$startdir/../.."
 pkgver() { cat "$_root/version"; }
 # Dependencies are read from the manifests so there is one list to maintain.
