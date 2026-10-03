@@ -1,0 +1,12 @@
+local base = os.getenv("HOME") .. "/.config/hypr/"
+dofile(base .. "appearance.lua")
+dofile(base .. "input.lua")
+dofile(base .. "bindings.lua")
+hl.monitor({output="", mode="preferred", position="auto", scale="1"})
+hl.env("XCURSOR_SIZE", "24")
+hl.env("HYPRCURSOR_SIZE", "24")
+hl.env("MOZ_ENABLE_WAYLAND", "1")
+hl.env("QT_QPA_PLATFORM", "wayland")
+hl.on("hyprland.start", function()
+    hl.exec_cmd(os.getenv("HOME") .. "/dotfiles/scripts/session-start")
+end)

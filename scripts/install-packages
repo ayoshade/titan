@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+set -euo pipefail
+root=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)
+mapfile -t packages < "$root/packages/desktop.txt"
+# A full transaction avoids an unsupported Arch partial upgrade.
+sudo pacman -Syu --needed "${packages[@]}"
+pacman -Q "${packages[@]}" > "$root/docs/installed-versions.txt"
+printf '\nPackages installed. Return to Codex with Ctrl+Alt+F1.\n'

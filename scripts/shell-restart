@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+set -euo pipefail
+if [[ -z ${WAYLAND_DISPLAY:-} ]]; then
+ read -r HYPRLAND_INSTANCE_SIGNATURE WAYLAND_DISPLAY < <(hyprctl instances -j | python -c 'import json,sys; a=json.load(sys.stdin); print(a[0]["instance"],a[0]["wl_socket"]) if a else sys.exit(1)')
+ export HYPRLAND_INSTANCE_SIGNATURE WAYLAND_DISPLAY
+fi
+export QT_QPA_PLATFORM=wayland
+qs -c umbra kill || true
+exec qs -n -d -c umbra

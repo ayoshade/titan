@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+set -euo pipefail
+root=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)
+config="${XDG_CONFIG_HOME:-$HOME/.config}"
+# Preflight every target before creating links. Existing user files are never replaced.
+for source in "$root"/config/*; do
+ target="$config/${source##*/}"
+ if [[ -e "$target" || -L "$target" ]]; then
+  [[ "$(readlink -f "$target")" == "$source" ]] || { printf 'Refusing existing target: %s\n' "$target" >&2; exit 1; }
+ fi
+done
+mkdir -p "$config"
+for source in "$root"/config/*; do
+ target="$config/${source##*/}"
+ [[ -L "$target" ]] || ln -s "$source" "$target"
+done
+if command -v gsettings >/dev/null && gsettings list-schemas | /usr/bin/grep -qx org.gnome.desktop.interface; then
+ gsettings set org.gnome.desktop.interface color-scheme prefer-dark
+ gsettings set org.gnome.desktop.interface gtk-theme Adwaita-dark
+ gsettings set org.gnome.desktop.interface font-name 'Inter 10'
+fi
+if command -v systemctl >/dev/null; then
+ systemctl --user enable --now pipewire.socket pipewire-pulse.socket wireplumber.service
+fi
+printf 'Configuration linked. Start Hyprland from your login console.\n'

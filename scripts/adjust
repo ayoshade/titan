@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+set -euo pipefail
+case "${1:-}:${2:-}" in
+ volume:up) wpctl set-volume -l 1 @DEFAULT_AUDIO_SINK@ 5%+ ;;
+ volume:down) wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%- ;;
+ volume:mute) wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle ;;
+ brightness:up) brightnessctl -d intel_backlight -n 1 set 5%+ ;;
+ brightness:down) brightnessctl -d intel_backlight -n 1 set 5%- ;;
+ *) exit 2 ;;
+esac
+qs -c umbra ipc call shell osd "$1" || true

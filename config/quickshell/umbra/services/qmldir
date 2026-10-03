@@ -1,0 +1,6 @@
+singleton UiState 1.0 UiState.qml
+singleton Audio 1.0 Audio.qml
+singleton NetState 1.0 NetState.qml
+singleton Media 1.0 Media.qml
+singleton Notices 1.0 Notices.qml
+singleton Brightness 1.0 Brightness.qml

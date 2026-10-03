@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+set -euo pipefail
+root=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)
+mapfile -t packages < "$root/packages/desktop.txt"
+pacman -Q "${packages[@]}"
+for script in "$root"/scripts/*; do bash -n "$script"; done
+Hyprland --verify-config -c "$root/config/hypr/hyprland.lua"
+for source in "$root"/config/*; do
+ target="${XDG_CONFIG_HOME:-$HOME/.config}/${source##*/}"
+ [[ $(readlink -f "$target") == "$source" ]] || { printf 'Missing config link: %s\n' "$target" >&2; exit 1; }
+done
+systemctl is-active NetworkManager bluetooth power-profiles-daemon ufw
+systemctl --user is-active pipewire.socket pipewire-pulse.socket wireplumber
+if [[ -n ${WAYLAND_DISPLAY:-} ]]; then
+ pgrep -x hypridle >/dev/null
+ qs -c umbra list
+ hyprctl configerrors
+fi
+printf '\nStatic configuration, packages, links, and core services checked.\n'
