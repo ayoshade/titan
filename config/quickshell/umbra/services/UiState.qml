@@ -12,6 +12,11 @@ QtObject {
  property bool dnd: false
  property bool barVisible: true
  property string menuKind: "root"
+ property string controlsPage: "main"
+ // Settings window state; the window is created on first open.
+ property bool settingsOpen: false
+ property string settingsSection: "island"
+ function openSettings(section) { if (section) settingsSection = section; settingsOpen = true; panel = "" }
  // Expanded island dashboard, shown on one screen at a time.
  property string islandScreen: ""
  function focusedScreen() { return Hyprland.focusedMonitor ? Hyprland.focusedMonitor.name : (Quickshell.screens.length ? Quickshell.screens[0].name : "") }
@@ -41,6 +46,9 @@ QtObject {
  function toggle(name) {
   // The calendar is an island state, not an overlay panel.
   if (name === "clock") { toggleCalendar(""); return }
+  // Connections live inside the control center; appearance lives in Settings.
+  if (name === "connectivity") { controlsPage = "wifi"; name = "controls"; if (panel === "controls") { return } }
+  if (name === "appearance") { openSettings("appearance"); return }
   panelScreen = Hyprland.focusedMonitor ? Hyprland.focusedMonitor.name : (Quickshell.screens.length ? Quickshell.screens[0].name : "")
   panel = panel === name ? "" : name
   if (panel) islandScreen = ""

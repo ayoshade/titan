@@ -37,7 +37,7 @@ ColumnLayout {
    id: entry
    required property var modelData
    required property int index
-   width: apps.width; implicitHeight: 58; selected: apps.currentIndex===index
+   width: apps.width; implicitHeight: Settings.values.launcherDescriptions ? 58 : 44; selected: apps.currentIndex===index
    contentItem: RowLayout {
     spacing: 12
     Rectangle {
@@ -47,7 +47,7 @@ ColumnLayout {
     ColumnLayout {
      spacing: 3; Layout.fillWidth: true
      ShellText { text: entry.modelData.name; Layout.fillWidth: true; font.weight: Font.Medium }
-     ShellText { text: entry.modelData.genericName || entry.modelData.comment || "Application"; Layout.fillWidth: true; color: Theme.muted; font.pixelSize: Theme.captionSize }
+     ShellText { visible: Settings.values.launcherDescriptions; text: entry.modelData.genericName || entry.modelData.comment || "Application"; Layout.fillWidth: true; color: Theme.muted; font.pixelSize: Theme.captionSize }
     }
     ShellText { visible: entry.selected; text: "↵"; color: Theme.muted }
    }

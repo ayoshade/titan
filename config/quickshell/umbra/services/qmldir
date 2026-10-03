@@ -4,3 +4,4 @@ singleton NetState 1.0 NetState.qml
 singleton Media 1.0 Media.qml
 singleton Notices 1.0 Notices.qml
 singleton Brightness 1.0 Brightness.qml
+singleton Toggles 1.0 Toggles.qml

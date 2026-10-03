@@ -2,6 +2,7 @@ local base = os.getenv("HOME") .. "/.config/hypr/"
 dofile(base .. "appearance.lua")
 dofile(base .. "input.lua")
 dofile(base .. "bindings.lua")
+dofile(base .. "rules.lua")
 hl.monitor({output="", mode="preferred", position="auto", scale="1"})
 hl.env("XCURSOR_SIZE", "24")
 hl.env("HYPRCURSOR_SIZE", "24")

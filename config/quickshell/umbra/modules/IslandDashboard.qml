@@ -18,7 +18,6 @@ Item {
  width: Theme.dashboardWidth; height: Theme.dashboardHeight
  readonly property int rowTop: 43
  readonly property int rowPitch: 19
- readonly property string workflow: Quickshell.env("HOME")+"/dotfiles/scripts/workflow"
  SystemClock { id: clock; precision: SystemClock.Minutes }
 
  function appIcon(appId) {
@@ -109,7 +108,7 @@ Item {
  }
  ShellText {
   anchors.horizontalCenter: parent.horizontalCenter; y: 13
-  text: Qt.formatDateTime(clock.date,"HH:mm")
+  text: Qt.formatDateTime(clock.date,Settings.values.clock24 ? "HH:mm" : "h:mm")
   font.pixelSize: 23; font.weight: Font.DemiBold; font.features: { "tnum": 1 }
  }
  Row {
@@ -142,7 +141,7 @@ Item {
  }
  Item {
   id: media
-  visible: !!Media.player
+  visible: !!Media.player && Settings.values.dashboardMedia
   x: 209; y: 108; width: 236; height: 32
   readonly property var player: Media.player
   Rectangle {
@@ -189,7 +188,7 @@ Item {
   Timer { interval: 1000; repeat: true; running: root.open && !!media.player && media.player.isPlaying; onTriggered: media.player.positionChanged() }
  }
  ShellText {
-  visible: !Media.player
+  visible: !Media.player && Settings.values.dashboardMedia
   anchors.horizontalCenter: parent.horizontalCenter; y: 116
   text: "Nothing playing"; font.pixelSize: 12; color: Qt.alpha(Theme.muted,0.6)
  }
@@ -229,14 +228,7 @@ Item {
    Accessible.role: Accessible.Button; Accessible.name: modelData.value+" "+modelData.detail; Accessible.onPressAction: UiState.toggle(modelData.panel)
   }
  }
- property var toggleState: ({nightlight:false,gameMode:false})
- Process {
-  id: toggleQuery
-  command: [root.workflow,"toggles"]
-  stdout: StdioCollector { onStreamFinished: { try { root.toggleState=JSON.parse(text) } catch(e) {} } }
- }
- Process { id: toggleRunner; onExited: toggleQuery.running=true }
- onOpenChanged: if(open) toggleQuery.running=true
+ onOpenChanged: if(open) Toggles.refresh()
  Row {
   x: 457; y: 136; spacing: 5
   Repeater {
@@ -244,7 +236,7 @@ Item {
    Rectangle {
     id: chip
     required property var modelData
-    readonly property bool on: !!root.toggleState[modelData.key]
+    readonly property bool on: Toggles[modelData.key]
     width: chipRow.implicitWidth+16; height: 21; radius: height/2
     color: on ? Qt.alpha(Theme.accent,chipMouse.containsMouse ? 0.32 : 0.24) : Qt.alpha(Theme.text,chipMouse.containsMouse ? 0.11 : 0.07)
     Behavior on color { ColorAnimation { duration: Theme.duration } }
@@ -253,7 +245,7 @@ Item {
      ShellIcon { anchors.verticalCenter: parent.verticalCenter; name: chip.modelData.symbol; size: 11; opacity: chip.on ? 1 : 0.7 }
      ShellText { anchors.verticalCenter: parent.verticalCenter; text: chip.modelData.label; font.pixelSize: 11; font.weight: Font.Medium; color: chip.on ? Theme.accent : Qt.alpha(Theme.text,0.85) }
     }
-    MouseArea { id: chipMouse; anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor; onClicked: { if(toggleRunner.running) return; toggleRunner.command=[root.workflow,chip.modelData.op]; toggleRunner.running=true } }
+    MouseArea { id: chipMouse; anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor; onClicked: Toggles.toggle(chip.modelData.op) }
     Accessible.role: Accessible.CheckBox; Accessible.checked: on; Accessible.name: modelData.label
    }
   }

@@ -15,7 +15,7 @@ Item {
  function shift(delta) { monthShift+=delta }
  SystemClock { id: clock; precision: SystemClock.Minutes }
  readonly property date month: new Date(clock.date.getFullYear(),clock.date.getMonth()+monthShift,1)
- readonly property int firstDay: Qt.locale().firstDayOfWeek%7
+ readonly property int firstDay: Settings.values.weekStart==="sunday" ? 0 : Settings.values.weekStart==="monday" ? 1 : Qt.locale().firstDayOfWeek%7
  readonly property int lead: (month.getDay()-firstDay+7)%7
  readonly property date gridStart: new Date(month.getFullYear(),month.getMonth(),1-lead)
 

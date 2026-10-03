@@ -2,6 +2,7 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import QtQuick.Effects
 import QtQuick.Layouts
+import QtQuick.Shapes
 import Quickshell
 import Quickshell.Wayland
 import Quickshell.Hyprland
@@ -35,12 +36,31 @@ PanelWindow {
   offset.y: 4; blur: 22; spread: 0
   color: Qt.rgba(0,0,0,0.55)
  }
+ // Concave fillets that blend the notch into the top edge (Settings → Notch flare).
+ component Flare: Shape {
+  id: flare
+  property bool mirrored: false
+  visible: Theme.notchMode && Theme.notchFlare>0
+  width: Theme.notchFlare; height: Theme.notchFlare
+  y: 0
+  preferredRendererType: Shape.CurveRenderer
+  transform: Scale { origin.x: flare.width/2; xScale: flare.mirrored ? -1 : 1 }
+  ShapePath {
+   strokeWidth: 0; strokeColor: "transparent"; fillColor: Theme.notch
+   startX: 0; startY: 0
+   PathLine { x: flare.width; y: 0 }
+   PathLine { x: flare.width; y: flare.height }
+   PathArc { x: 0; y: 0; radiusX: flare.width; radiusY: flare.height; direction: PathArc.Counterclockwise }
+  }
+ }
+ Flare { x: island.x-width }
+ Flare { x: island.x+island.width; mirrored: true }
  Rectangle {
   id: island
   anchors { top: parent.top; topMargin: Theme.islandTop; horizontalCenter: parent.horizontalCenter }
   // Hovering the compact pill widens it slightly, as in the reference.
   property real bump: state==="" && hover.hovered ? 10 : 0
-  Behavior on bump { NumberAnimation { duration: Theme.duration; easing.type: Easing.OutCubic } }
+  Behavior on bump { NumberAnimation { duration: Theme.hover; easing.type: Easing.OutCubic } }
   width: Theme.islandWidth+(bar.workspaceCount-5)*11+bump
   height: Theme.islandHeight
   radius: height/2
@@ -55,27 +75,33 @@ PanelWindow {
   // Measured at 30 fps: opening overshoots ~1% and settles in ~330 ms;
   // closing drops the height first, then narrows. The calendar morph uses the
   // same spring; collapsing from it shrinks both axes together (~370 ms).
+  // Durations scale from Settings → Motion (330 ms and 45% bounce by default).
   transitions: [
    Transition {
     to: "dashboard,calendar"
-    NumberAnimation { properties: "width,height,radius"; duration: Theme.motion ? 330 : 0; easing.type: Easing.OutBack; easing.overshoot: 0.45 }
+    NumberAnimation { properties: "width,height,radius"; duration: Theme.movement; easing.type: Easing.OutBack; easing.overshoot: Theme.bounce }
    },
    Transition {
     from: "dashboard"
     SequentialAnimation {
-     NumberAnimation { properties: "height,radius"; duration: Theme.motion ? 140 : 0; easing.type: Easing.InOutCubic }
-     NumberAnimation { property: "width"; duration: Theme.motion ? 380 : 0; easing.type: Easing.OutCubic }
+     NumberAnimation { properties: "height,radius"; duration: Theme.movement*0.42; easing.type: Easing.InOutCubic }
+     NumberAnimation { property: "width"; duration: Theme.movement*1.15; easing.type: Easing.OutCubic }
     }
    },
    Transition {
     from: "calendar"
     ParallelAnimation {
-     NumberAnimation { property: "width"; duration: Theme.motion ? 240 : 0; easing.type: Easing.OutCubic }
-     NumberAnimation { properties: "height,radius"; duration: Theme.motion ? 370 : 0; easing.type: Easing.InOutCubic }
+     NumberAnimation { property: "width"; duration: Theme.movement*0.73; easing.type: Easing.OutCubic }
+     NumberAnimation { properties: "height,radius"; duration: Theme.movement*1.12; easing.type: Easing.InOutCubic }
     }
    },
    Transition { NumberAnimation { properties: "width,height,radius"; duration: Theme.duration; easing.type: Easing.OutCubic } }
   ]
+  // Notch mode squares the top corners so the island meets the screen edge.
+  Rectangle {
+   visible: Theme.notchMode
+   width: parent.width; height: Math.min(parent.radius,parent.height/2); color: parent.color
+  }
   HoverHandler {
    id: hover
    onHoveredChanged: if(bar.islandOpen) { if(hovered) leave.stop(); else leave.restart() }
@@ -94,7 +120,7 @@ PanelWindow {
    height: Theme.islandHeight
    opacity: bar.islandOpen ? 0 : 1
    visible: opacity>0
-   Behavior on opacity { NumberAnimation { duration: Theme.motion ? 120 : 0 } }
+   Behavior on opacity { NumberAnimation { duration: Theme.duration*0.6 } }
    MouseArea {
     anchors { fill: parent; leftMargin: -Theme.islandPadding; rightMargin: -Theme.islandPadding }
     cursorShape: Qt.PointingHandCursor
@@ -120,7 +146,7 @@ PanelWindow {
    SystemClock { id: clock; precision: SystemClock.Minutes }
    ShellText {
     anchors.centerIn: parent
-    text: Qt.formatDateTime(clock.date,"HH:mm")
+    text: Qt.formatDateTime(clock.date,Settings.values.clock24 ? "HH:mm" : "h:mm")
     font.pixelSize: Theme.clockSize; font.weight: Font.Medium
     font.features: { "tnum": 1 }
     Accessible.role: Accessible.Button; Accessible.name: "Open island dashboard"; Accessible.onPressAction: UiState.toggleIsland(bar.modelData.name)
@@ -146,7 +172,7 @@ PanelWindow {
    open: bar.dashboard
    opacity: bar.dashboard ? 1 : 0
    visible: opacity>0
-   Behavior on opacity { NumberAnimation { duration: Theme.motion ? (bar.dashboard ? 220 : 90) : 0 } }
+   Behavior on opacity { NumberAnimation { duration: bar.dashboard ? Theme.duration*1.1 : Theme.duration*0.45 } }
   }
   IslandCalendar {
    id: calendarView
@@ -154,7 +180,7 @@ PanelWindow {
    open: bar.calendar
    opacity: bar.calendar ? 1 : 0
    visible: opacity>0
-   Behavior on opacity { NumberAnimation { duration: Theme.motion ? (bar.calendar ? 160 : 110) : 0 } }
+   Behavior on opacity { NumberAnimation { duration: bar.calendar ? Theme.duration*0.8 : Theme.duration*0.55 } }
   }
   RowLayout {
    anchors { left: parent.left; right: parent.right; bottom: parent.bottom; leftMargin: 18; rightMargin: 18; bottomMargin: 13 }

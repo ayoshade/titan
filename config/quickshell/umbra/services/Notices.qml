@@ -1,6 +1,7 @@
 pragma Singleton
 import QtQuick
 import "."
+import "../theme"
 import Quickshell.Services.Notifications
 QtObject {
  id: root
@@ -22,6 +23,6 @@ QtObject {
    if(trackedNotifications.values.length>50) trackedNotifications.values[0].dismiss()
   }
  }
- property Timer expiry: Timer { interval: 5000; onTriggered: root.showToast=false }
+ property Timer expiry: Timer { interval: Settings.values.toastSeconds*1000; onTriggered: root.showToast=false }
  property Connections latestConnection: Connections { target: root.latest; function onClosed() { root.showToast=false; root.latest=null } }
 }

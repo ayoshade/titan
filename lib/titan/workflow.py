@@ -220,6 +220,38 @@ def toggles():
     nightlight=subprocess.run(['systemctl','--user','is-active','--quiet','titan-nightlight.service']).returncode==0
     print(json.dumps({'nightlight':nightlight,'gameMode':game_mode_active()}))
 
+SCHEMA=ROOT/'config/quickshell/umbra/theme/settings-schema.json'
+def settings_valid(spec,value):
+    kind=spec['type']
+    if kind=='bool': return isinstance(value,bool)
+    if kind=='int': return isinstance(value,int) and not isinstance(value,bool) and spec['min']<=value<=spec['max']
+    if kind=='choice': return value in spec['options']
+    if kind=='color': return value=='' or bool(re.fullmatch(r'#[0-9a-fA-F]{6}',str(value)))
+    if kind=='string': return isinstance(value,str) and len(value)<=64
+    if kind=='map': return isinstance(value,dict)
+    return False
+def settings(action,args):
+    # Same file and schema as the Settings app; the shell reloads it on change.
+    schema=json.loads(SCHEMA.read_text())['settings']; path=STATE/'settings.json'
+    try: stored=json.loads(path.read_text())
+    except (FileNotFoundError,json.JSONDecodeError): stored={}
+    current={k:stored.get(k,v['default']) for k,v in schema.items()}
+    if action=='get':
+        if args and args[0] not in schema: raise ValueError('Unknown setting: '+args[0])
+        print(json.dumps(current[args[0]] if args else current,indent=None if args else 2)); return
+    if action=='schema': print(json.dumps(schema,indent=2)); return
+    key=args[0]
+    if key not in schema: raise ValueError('Unknown setting: '+key)
+    if action=='reset': stored.pop(key,None)
+    elif action=='set':
+        raw=args[1]
+        try: value=json.loads(raw)
+        except json.JSONDecodeError: value=raw
+        if not settings_valid(schema[key],value): raise ValueError(f'Invalid value for {key}: {raw}')
+        stored[key]=value
+    else: raise ValueError('settings get|set|reset|schema')
+    atomic(path,json.dumps(stored,indent=2)+'\n')
+
 def calculate(expression):
     if len(expression)>200: raise ValueError('Expression too long')
     def visit(node,depth=0):
@@ -400,6 +432,7 @@ def main(argv):
     elif name=='nightlight': nightlight()
     elif name=='game-mode': game_mode()
     elif name=='toggles': toggles()
+    elif name=='settings': settings(args[0] if args else 'get',args[1:])
     elif name=='calculator': print(calculate(args[0]))
     elif name=='copy-text': run('wl-copy',input=args[0].encode()); notify('Copied')
     elif name=='capture': capture(args[0])
@@ -437,7 +470,7 @@ if __name__=='__main__':
     try:
         # Serial state writers avoid lost changes from simultaneous key presses.
         lock=open(STATE/'workflow.lock','a')
-        if len(sys.argv)>1 and sys.argv[1] in ('game-mode','layout','gaps','square','desktop','width','touchpad','scale','mirror','reminder-set','reminder-clear'):
+        if len(sys.argv)>1 and sys.argv[1] in ('settings','game-mode','layout','gaps','square','desktop','width','touchpad','scale','mirror','reminder-set','reminder-clear'):
             fcntl.flock(lock,fcntl.LOCK_EX)
         main(sys.argv[1:])
     except (ValueError,KeyError,SyntaxError,ZeroDivisionError,OverflowError,OSError,subprocess.CalledProcessError) as error:

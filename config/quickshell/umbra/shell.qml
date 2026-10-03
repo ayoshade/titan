@@ -19,6 +19,7 @@ ShellRoot {
   function media(): void { UiState.toggle("media") }
   function clock(): void { UiState.toggle("clock") }
   function island(): void { UiState.toggleIsland("") }
+  function settings(section: string): void { UiState.openSettings(section) }
   function connectivity(): void { UiState.toggle("connectivity") }
   function session(): void { UiState.toggle("session") }
   function menu(kind: string): void { UiState.menu(kind) }
@@ -38,6 +39,7 @@ ShellRoot {
   function osd(kind: string): void { UiState.osd(kind) }
  }
  Variants { model: Quickshell.screens; Background {} }
+ LazyLoader { active: UiState.settingsOpen; SettingsApp {} }
  Variants { model: Quickshell.screens; Bar {} }
  Variants { model: Quickshell.screens; Overlay {} }
  Variants { model: Quickshell.screens; Toast {} }

@@ -1,11 +1,13 @@
 pragma ComponentBehavior: Bound
 import QtQuick
-import QtQuick.Layouts
 import Quickshell
 import Quickshell.Wayland
 import "../components"
 import "../services"
 import "../theme"
+// Pop-up panels. Each panel stands alone in a black outer frame with a graphite
+// inner surface, as in the reference. The control center drops below the
+// island's status icons; other panels open at the top centre.
 PanelWindow {
  id: root
  required property var modelData
@@ -17,44 +19,40 @@ PanelWindow {
  WlrLayershell.layer: WlrLayer.Overlay
  WlrLayershell.keyboardFocus: visible ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
  color: "transparent"
- SystemClock { id: clock; precision: SystemClock.Minutes }
+ readonly property string panel: UiState.panel
+ readonly property bool docked: panel==="controls"
+ readonly property bool carousel: panel==="themes" || panel==="wallpapers"
+ readonly property int frame: carousel ? 0 : 8
+ readonly property var fixedHeight: ({ launcher: 100+Settings.values.launcherResults*((Settings.values.launcherDescriptions ? 58 : 44)+4), notifications: 560, session: 430, media: 300, commands: 560 })
  MouseArea { anchors.fill: parent; onClicked: UiState.close() }
  Rectangle {
   id: card
-  width: Math.min(UiState.panel==="themes" ? 580 : UiState.panel==="launcher" ? Theme.launcherWidth : Theme.panelWidth,root.width-32)
-  height: Math.min(UiState.panel==="themes" ? 164 : UiState.panel==="session" ? 430 : UiState.panel==="appearance" ? 400 : 640,root.height-40)
-  anchors { top: parent.top; topMargin: 8; horizontalCenter: parent.horizontalCenter }
-  color: Theme.shell; radius: Theme.panelRadius; border.width: 1; border.color: Theme.border
+  readonly property int contentWidth: root.panel==="themes" || root.panel==="wallpapers" ? 600 : root.panel==="launcher" ? Theme.launcherWidth : root.docked ? 440+24 : Theme.panelWidth
+  width: Math.min(contentWidth+root.frame*2,root.width-32)
+  height: Math.min(root.panel==="themes" ? 170 : root.panel==="wallpapers" ? 200 : root.docked ? (loader.item ? loader.item.implicitHeight : 400)+24+root.frame*2 : root.fixedHeight[root.panel] || 560, root.height-card.y-24)
+  y: root.docked ? Theme.islandTop+Theme.islandHeight+8 : 8
+  x: root.docked ? Math.max(16,Math.min(root.width-width-16,root.width/2+Theme.islandWidth/2-120)) : (root.width-width)/2
+  color: Theme.notch; radius: Theme.panelRadius+root.frame
   MouseArea { anchors.fill: parent; onClicked: {} }
-  scale: root.visible ? 1 : 0.9
+  scale: root.visible ? 1 : 0.94
   opacity: root.visible ? 1 : 0
   transformOrigin: Item.Top
-  Behavior on scale { NumberAnimation { duration: Theme.duration; easing.type: Easing.OutCubic } }
+  Behavior on scale { NumberAnimation { duration: Theme.movement*0.7; easing.type: Easing.OutBack; easing.overshoot: Theme.bounce } }
   Behavior on opacity { NumberAnimation { duration: Theme.duration } }
-  Loader { anchors { fill: parent; margins: 14 } active: root.visible && UiState.panel==="themes"; source: "ThemeSwitcher.qml" }
-  ColumnLayout {
-   visible: UiState.panel!=="themes"
-   anchors { fill: parent; margins: 10 } spacing: 8
-   RowLayout {
-    Layout.fillWidth: true; spacing: 0
-    ShellText { text: Qt.formatDateTime(clock.date,"HH:mm"); font.weight: Font.Medium; leftPadding: 8; Layout.fillWidth: true }
-    Repeater {
-     model: [{panel:"launcher",symbol:"apps",label:"Applications"},{panel:"controls",symbol:"controls",label:"Control center"},{panel:"media",symbol:"music",label:"Media"},{panel:"notifications",symbol:"bell",label:"Notifications"},{panel:"appearance",symbol:"settings",label:"Appearance"},{panel:"session",symbol:"power",label:"Session"}]
-     IconButton { required property var modelData; symbol: modelData.symbol; label: modelData.label; selected: UiState.panel===modelData.panel; onClicked: UiState.toggle(modelData.panel) }
-    }
-    IconButton { symbol: "close"; label: "Close"; onClicked: UiState.close() }
-   }
-   Rectangle {
-    Layout.fillWidth: true; Layout.fillHeight: true
-    color: Theme.surface; radius: Theme.innerRadius
-    Loader {
-     id: loader
-     anchors { fill: parent; margins: 14 }
-     active: root.visible && UiState.panel!=="themes"
-     source: UiState.panel==="commands" ? "CommandPanel.qml" : UiState.panel==="launcher" ? "Launcher.qml" : UiState.panel==="controls" ? "ControlCenter.qml" : UiState.panel==="notifications" ? "NotificationCenter.qml" : UiState.panel==="appearance" ? "Appearance.qml" : UiState.panel==="media" ? "MediaPanel.qml" : UiState.panel==="connectivity" ? "Connectivity.qml" : "SessionMenu.qml"
-     focus: true
-     Keys.onEscapePressed: UiState.close()
-    }
+  Behavior on height { enabled: root.docked; NumberAnimation { duration: Theme.movement*0.8; easing.type: Easing.OutCubic } }
+  Rectangle {
+   id: surface
+   anchors { fill: parent; margins: root.frame }
+   radius: Theme.panelRadius
+   color: root.carousel ? "transparent" : Theme.surface
+   clip: true
+   Loader {
+    id: loader
+    anchors { fill: parent; margins: root.carousel ? 14 : 12 }
+    active: root.visible
+    source: root.panel==="themes" ? "ThemeSwitcher.qml" : root.panel==="wallpapers" ? "WallpaperSwitcher.qml" : root.panel==="commands" ? "CommandPanel.qml" : root.panel==="launcher" ? "Launcher.qml" : root.panel==="controls" ? "ControlCenter.qml" : root.panel==="notifications" ? "NotificationCenter.qml" : root.panel==="media" ? "MediaPanel.qml" : "SessionMenu.qml"
+    focus: true
+    Keys.onEscapePressed: UiState.close()
    }
   }
  }

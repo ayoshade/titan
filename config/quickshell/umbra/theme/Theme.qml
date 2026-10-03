@@ -22,26 +22,29 @@ QtObject {
  readonly property color border: palette.border || "#30343b"
  readonly property color text: palette.text || "#e1e5e9"
  readonly property color muted: palette.muted || "#9299a3"
- readonly property color accent: accentName==="theme" ? palette.accent || "#aeb8c4" : accentName==="ice" ? "#8faebc" : accentName==="sage" ? "#9fae9d" : "#aeb8c4"
+ readonly property color accent: accentName==="custom" && Settings.values.accentCustom ? Settings.values.accentCustom : accentName==="theme" ? palette.accent || "#aeb8c4" : accentName==="ice" ? "#8faebc" : accentName==="sage" ? "#9fae9d" : "#aeb8c4"
  // Notch surface: saneAspect keeps the island pure black under every palette.
  readonly property color notch: palette.notch || "#000000"
  readonly property color danger: palette.danger || "#c48787"
- readonly property string sans: "Inter"
+ readonly property string sans: Settings.values.bodyFont || "Inter"
+ readonly property string display: Settings.values.displayFont || sans
  readonly property string mono: "JetBrains Mono"
  readonly property int small: 4
  readonly property int gap: 8
  readonly property int padding: 16
- readonly property int radius: 16
+ readonly property int radius: Settings.values.cornerRadius
  readonly property int pill: 22
- readonly property int fontSize: 12
- readonly property int titleSize: 20
- readonly property int subtitleSize: 14
- readonly property int captionSize: 10
- readonly property int heroSize: 28
+ readonly property int fontSize: Settings.values.fontSize
+ readonly property int titleSize: fontSize+8
+ readonly property int subtitleSize: fontSize+2
+ readonly property int captionSize: fontSize-2
+ readonly property int heroSize: fontSize+16
  // Compact notch geometry measured from saneAspect's 2026-10-02 island at 1920×1080.
- readonly property int islandWidth: 230
- readonly property int islandHeight: 33
- readonly property int islandTop: 11
+ readonly property int islandWidth: Settings.values.islandWidth
+ readonly property int islandHeight: Settings.values.islandHeight
+ readonly property bool notchMode: Settings.values.notchMode
+ readonly property int notchFlare: Settings.values.notchFlare
+ readonly property int islandTop: notchMode ? 0 : Settings.values.islandGap
  readonly property int islandPadding: 20
  readonly property int clockSize: 16
  // Click-expanded dashboard island (same reference, 10:36–10:49).
@@ -55,17 +58,22 @@ QtObject {
  readonly property int expandedIslandHeight: 78
  readonly property int panelWidth: 420
  readonly property int launcherWidth: 520
- readonly property int panelRadius: 26
- readonly property int innerRadius: 18
+ readonly property int panelRadius: Settings.values.panelRadius
+ readonly property int innerRadius: Math.max(6,panelRadius-8)
  readonly property int barHeight: 48
- readonly property int duration: motion ? 220 : 0
+ // Motion timings from Settings (Motion section); zero when motion is reduced.
+ readonly property bool animate: motion && !Settings.values.reduceMotion
+ readonly property int duration: animate ? Settings.values.fadeMs : 0
+ readonly property int movement: animate ? Settings.values.movementMs : 0
+ readonly property int hover: animate ? Settings.values.hoverMs : 0
+ readonly property real bounce: Settings.values.bounce/100
  function save() { preferences.setText(JSON.stringify({theme:paletteName,accent:accentName,motion:motion,wallpaper:wallpaperEnabled},null,2)+"\n") }
  property FileView preferences: FileView {
   path: Quickshell.env("HOME")+"/dotfiles/config/quickshell/umbra/theme/preferences.json"
   watchChanges: true
   onFileChanged: reload()
   onLoaded: {
-   try { const p=JSON.parse(text()); root.paletteName=root.palettes.some(t=>t.id===p.theme) ? p.theme : "graphite"; root.accentName=["theme","silver","ice","sage"].includes(p.accent) ? p.accent : "silver"; root.motion=p.motion!==false; root.wallpaperEnabled=p.wallpaper!==false }
+   try { const p=JSON.parse(text()); root.paletteName=root.palettes.some(t=>t.id===p.theme) ? p.theme : "graphite"; root.accentName=["theme","silver","ice","sage","custom"].includes(p.accent) ? p.accent : "silver"; root.motion=p.motion!==false; root.wallpaperEnabled=p.wallpaper!==false }
    catch(e) { console.warn("Invalid shell preferences:",e) }
   }
  }
