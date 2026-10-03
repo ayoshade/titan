@@ -252,6 +252,25 @@ def settings(action,args):
     else: raise ValueError('settings get|set|reset|schema')
     atomic(path,json.dumps(stored,indent=2)+'\n')
 
+WALLPAPERS=pathlib.Path(os.environ.get('TITAN_WALLPAPERS',str(pathlib.Path.home()/'Pictures/Wallpapers')))
+def wallpaper(action,args):
+    # Same per-theme map the shell's wallpaper picker writes in settings.json.
+    theme=json.loads((ROOT/'config/quickshell/umbra/theme/preferences.json').read_text()).get('theme','graphite')
+    files=sorted(str(p) for p in (WALLPAPERS/theme).glob('*') if p.suffix.lower() in ('.jpg','.jpeg','.png','.webp'))
+    files.append(str(ROOT/'assets/wallpapers/blacksite.svg'))
+    path=STATE/'settings.json'
+    try: stored=json.loads(path.read_text())
+    except (FileNotFoundError,json.JSONDecodeError): stored={}
+    chosen=stored.get('wallpapers',{}).get(theme) or (files[0] if files else '')
+    if action=='list': print(json.dumps({'theme':theme,'current':chosen,'files':files},indent=2)); return
+    if action=='current': print(chosen); return
+    if action=='next': target=files[(files.index(chosen)+1)%len(files)] if chosen in files else (files[0] if files else '')
+    elif action=='set': target=str(pathlib.Path(args[0]).expanduser().resolve(strict=True))
+    else: raise ValueError('wallpaper list|current|next|set PATH')
+    if not target: raise ValueError('No wallpapers for '+theme+'; run scripts/fetch-wallpapers '+theme)
+    stored.setdefault('wallpapers',{})[theme]=target
+    atomic(path,json.dumps(stored,indent=2)+'\n'); print(target)
+
 def calculate(expression):
     if len(expression)>200: raise ValueError('Expression too long')
     def visit(node,depth=0):
@@ -433,6 +452,7 @@ def main(argv):
     elif name=='game-mode': game_mode()
     elif name=='toggles': toggles()
     elif name=='settings': settings(args[0] if args else 'get',args[1:])
+    elif name=='wallpaper': wallpaper(args[0] if args else 'current',args[1:])
     elif name=='calculator': print(calculate(args[0]))
     elif name=='copy-text': run('wl-copy',input=args[0].encode()); notify('Copied')
     elif name=='capture': capture(args[0])
@@ -470,7 +490,7 @@ if __name__=='__main__':
     try:
         # Serial state writers avoid lost changes from simultaneous key presses.
         lock=open(STATE/'workflow.lock','a')
-        if len(sys.argv)>1 and sys.argv[1] in ('settings','game-mode','layout','gaps','square','desktop','width','touchpad','scale','mirror','reminder-set','reminder-clear'):
+        if len(sys.argv)>1 and sys.argv[1] in ('settings','wallpaper','game-mode','layout','gaps','square','desktop','width','touchpad','scale','mirror','reminder-set','reminder-clear'):
             fcntl.flock(lock,fcntl.LOCK_EX)
         main(sys.argv[1:])
     except (ValueError,KeyError,SyntaxError,ZeroDivisionError,OverflowError,OSError,subprocess.CalledProcessError) as error:

@@ -1,0 +1,88 @@
+#!/usr/bin/env python3
+"""Download wallpapers per Titan theme from Wallhaven's public API.
+
+Follows saneAspect's sourcing (Wallhaven Toplist): SFW, general+anime,
+at least 1920x1080, 16:9/16:10, filtered by the Wallhaven colour nearest each
+palette's accent. Files land in ~/Pictures/Wallpapers/<theme>/ (outside Git)
+with SOURCES.json recording each image's page for attribution. Images remain
+their authors' work: keep them for personal desktop use and do not commit or
+redistribute them.
+
+Usage: fetch-wallpapers [--count N] [--dry-run] [THEME ...]
+"""
+import argparse, json, os, pathlib, sys, tempfile, time, urllib.parse, urllib.request
+
+ROOT = pathlib.Path(__file__).resolve().parents[1]
+PALETTES = ROOT/'config/quickshell/umbra/theme/palettes.json'
+DEST = pathlib.Path(os.environ.get('TITAN_WALLPAPERS', pathlib.Path.home()/'Pictures/Wallpapers'))
+API = 'https://wallhaven.cc/api/v1/search'
+# Wallhaven only accepts these colour filters.
+COLOURS = ['660000','990000','cc0000','cc3333','ea4c88','993399','663399','333399','0066cc','0099cc','66cccc','77cc33','669900','336600','666600','999900','cccc33','ffff00','ffcc33','ff9900','ff6600','cc6633','996633','663300','000000','999999','cccccc','ffffff','424153']
+# Neutral palettes read better with dark, low-saturation images than with grey filters.
+OVERRIDES = {'graphite': '424153', 'industrial': '000000'}
+MAX_BYTES = 12*1024*1024
+AGENT = 'Titan-fetch-wallpapers/1 (personal desktop setup)'
+
+def rgb(hexcode): return tuple(int(hexcode[i:i+2],16) for i in (0,2,4))
+def nearest(hexcode):
+    r,g,b = rgb(hexcode.lstrip('#'))
+    return min(COLOURS, key=lambda c: sum((x-y)**2 for x,y in zip(rgb(c),(r,g,b))))
+
+def get(url, timeout=30):
+    request = urllib.request.Request(url, headers={'User-Agent': AGENT})
+    with urllib.request.urlopen(request, timeout=timeout) as response:
+        return response.read()
+
+def search(colour, page):
+    query = urllib.parse.urlencode({'sorting':'toplist','topRange':'1y','categories':'110','purity':'100',
+        'atleast':'1920x1080','ratios':'16x9,16x10','colors':colour,'page':page})
+    return json.loads(get(f'{API}?{query}'))['data']
+
+def atomic_write(path, data):
+    fd, name = tempfile.mkstemp(dir=path.parent, prefix='.'+path.name)
+    with os.fdopen(fd,'wb') as file: file.write(data)
+    os.replace(name, path)
+
+def fetch(theme, accent, count, dry_run):
+    colour = OVERRIDES.get(theme, nearest(accent))
+    folder = DEST/theme; folder.mkdir(parents=True, exist_ok=True)
+    sources_path = folder/'SOURCES.json'
+    try: sources = json.loads(sources_path.read_text())
+    except (FileNotFoundError, json.JSONDecodeError): sources = {}
+    have = sum(1 for p in folder.iterdir() if p.suffix.lower() in ('.jpg','.jpeg','.png'))
+    print(f'{theme}: colour #{colour}, {have} present, want {count}', flush=True)
+    page = 1
+    while have < count and page <= 5:
+        results = search(colour, page); time.sleep(1.5)
+        if not results: break
+        for item in results:
+            if have >= count: break
+            name = 'wallhaven-'+item['id']+pathlib.Path(item['path']).suffix
+            if (folder/name).exists() or item['file_size'] > MAX_BYTES: continue
+            if dry_run: print('  would fetch', item['url']); have += 1; continue
+            data = get(item['path'], timeout=90); time.sleep(1.0)
+            atomic_write(folder/name, data)
+            sources[name] = {'page': item['url'], 'resolution': item['resolution'], 'category': item['category'], 'colors': item['colors'], 'source': item.get('source','')}
+            have += 1
+            print(f'  {name} {item["resolution"]}', flush=True)
+        page += 1
+    if not dry_run: atomic_write(sources_path, (json.dumps(sources, indent=2)+'\n').encode())
+    return have
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
+    parser.add_argument('--count', type=int, default=15, help='wallpapers per theme (default 15)')
+    parser.add_argument('--dry-run', action='store_true')
+    parser.add_argument('themes', nargs='*')
+    args = parser.parse_args()
+    palettes = json.loads(PALETTES.read_text())
+    chosen = [p for p in palettes if not args.themes or p['id'] in args.themes]
+    unknown = set(args.themes) - {p['id'] for p in palettes}
+    if unknown: sys.exit('Unknown theme: '+', '.join(sorted(unknown)))
+    total = 0
+    for palette in chosen:
+        try: total += fetch(palette['id'], palette['accent'], max(1, min(args.count, 60)), args.dry_run)
+        except OSError as error: print(f'{palette["id"]}: {error}', file=sys.stderr)
+    print(f'{total} wallpapers available under {DEST}')
+
+if __name__ == '__main__': main()
