@@ -1,5 +1,70 @@
 # Verification
 
+## Update readiness, private stages and interruption diagnostics — 2026-10-04
+
+Original Bash `lib/titan/update.sh` now owns update execution and the new
+read-only `titan update check|status [--json]` interfaces. Readiness checks
+commands, pacman's installed-package database/required jq/lock, root space,
+the update lock, writable state and tracked checkout changes. Linked worktrees
+are recognized; Git status disables optional index writes and changed filenames
+are omitted. Missing snapshots/upstream are warnings. No remote or package
+database is refreshed by inspection. Execution rechecks mutable prerequisites
+under its exclusive lock, preserves `sudo pacman -Syu` and its confirmation,
+and saves atomic 0600 machine-state records without command output.
+
+- **Failure behavior:** required-stage errors stop later work and retain their
+  exit code. Doctor failure now exits 1 instead of reporting success. INT/TERM
+  save 130/143; after SIGKILL, inspection reports `interrupted` when the lock is
+  no longer held, without rewriting the saved record. Ordinary workers inherit
+  the update lock. Privileged pacman has its separate database lock; this is
+  not detached transaction or cross-boot automatic-resume support.
+- **Local checks:** 100 tests pass, including 17 update checks for side-effect-
+  free inspection, absent jq, failed package queries, missing managed jq,
+  low/unknown/failed free-space measurements, literal spaced paths, lock
+  contention, linked record refusal, dirty linked worktrees, full-upgrade argv,
+  snapshot/package/migration/doctor failures, retry and INT/TERM/KILL. Local
+  transactions use recorded stubs, never host package writes. Syntax and
+  `git diff --check` pass. The suite used the previously extracted official
+  Arch jq/oniguruma binaries; a first run through the mise jq shim caused mise
+  itself to create a parent state directory and failed the stronger no-state
+  assertion. Repeating with the actual binary removes that external shim effect.
+- **Host:** `scripts/doctor` still stops at missing pacman-managed jq.
+  `titan update check --json` with the existing mise shims also reports that
+  dependency, plus the expected in-progress checkout changes; no update was
+  started on the laptop. `sudo -n true` confirms local authentication is needed.
+  The terminal remedy remains `sudo pacman -Syu --needed jq`, followed by
+  `titan doctor`; no host upgrade was attempted. The ordinary text readiness
+  command works even without jq on PATH.
+- **Packages:** `tools/vm-test --full --stay --reuse run.OWNZaL` rebuilt and
+  passed all 19 standard package/config checks, including packaged doctor.
+  A later read-only Git-status refinement was rebuilt and installed into that
+  same owned VM before the focused suite verified the final runtime hashes.
+- **Focused real acceptance:** `tools/vm-update-checks run.OWNZaL` passes all
+  six checks: installed bin/library/doctor hashes; real package readiness and
+  no-state inspection; held update-lock refusal; a test-owned actual pacman
+  lock refusal before transactions; a real full Arch update ending at complete
+  with a 0600 record and preserved theme/settings JSON; and failed/killed
+  migration handling. The latter kills updater shells while their ordinary
+  migration/sleep worker survives and verifies the lock stays held. After
+  ending only that test process group, status reports interruption without
+  rewriting the record; fixing the guest-only migration permits a normal
+  successful retry. The migration is removed afterwards. No runtime source
+  overlay, new ISO, signing, publishing, host shell restart or UI change occurs.
+
+Artifacts: `run.OWNZaL/{update-package-checks.log,update-rebuild.log,
+update-package-refresh.log,update-source.json,update-results.json,
+update-commands.log,update-acceptance.log}` and host
+`~/.cache/titan/{update-host-doctor.log,update-local-tests.log}`. The task-owned
+VM is stopped after final inspection. Runtime stage status is not upstream
+update availability. Coverage is 75 adapted, 107 partial, 6 policy and 291
+pending of 479; only free-space gating becomes an adapted helper and integrated
+update locking becomes partial.
+
+Next: reconcile host jq through a normal reviewed full Arch transaction, then
+the focused package transaction-family Bash migration. Detached privileged
+updates, channel/keyring validation, automatic conflict repair, space sizing
+beyond the existing root minimum and richer restart advice remain open.
+
 ## Small portable dependency/package/mise ports — 2026-10-04
 
 Added original Bash `commands.sh`, `packages.sh` and `development.sh` with

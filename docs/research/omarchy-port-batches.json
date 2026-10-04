@@ -41,7 +41,7 @@
         "boot"
       ],
       "language": "Shell. Keep versioned migrations and compatible public command paths.",
-      "scope": "Add observable update stages, detached transactions, keyring/channel validation, restart advice and failure recovery. Review cache/orphan/AUR/mise handling independently; the Omarchy quattro migration is source-specific and needs Titan lifecycle design rather than literal reproduction.",
+      "scope": "Local read-only readiness/status and private atomic update-stage records exist; failures stop later required stages and worker-held locks/interruption/retry are VM-tested. Next: detached transactions, keyring/channel validation, restart advice and failure recovery. Review cache/orphan/AUR/mise handling independently; the Omarchy quattro migration is source-specific and needs Titan lifecycle design rather than literal reproduction.",
       "acceptance": "VM full upgrades, lock contention, low space, interrupted transactions, preserved user choices and recoverable errors; no implicit reboot, forced conflict overwrite or unrequested removal."
     },
     {

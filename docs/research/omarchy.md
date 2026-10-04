@@ -18,10 +18,10 @@ Titan's older shortcut reference. Preserve Titan's researched appearance and
   commands, source hash, summary and coverage, plus hashes for 878 reference
   files under config/default/install/shell/manual/themes.
 - [omarchy-equivalents.json](omarchy-equivalents.json): maintained explicit
-  mappings for 186 commands. **293 remain pending implementation or detailed
-  behavioral review.** That isn't a count of 293 distinct missing user features;
+  mappings for 188 commands. **291 remain pending implementation or detailed
+  behavioral review.** That isn't a count of 291 distinct missing user features;
   many are internal helpers.
-- 74 commands have adapted Titan operations, 106 have partial equivalents and
+- 75 commands have adapted Titan operations, 107 have partial equivalents and
   6 relate to the laptop's differing idle/power policy. Adapted means a Titan
   implementation exists, not that every hardware path was acceptance-tested.
 - [omarchy-port-plan.md](omarchy-port-plan.md): all originally pending commands,
@@ -77,10 +77,29 @@ optional pacman-contrib package and retains at least two versions.
 See [operations](../operations.md) and the dated [verification](../verification.md)
 entry for exact acceptance scope and host dependency limitations.
 
-Next portable work should extend package/update preflight and diagnostics,
-then migrate existing package transactions with their full-upgrade, recipe and
-confirmation contracts. Keep hardware/security/authentication tasks in their
-separate batches; a small helper port does not establish those integrations.
+## Update readiness and stage diagnostics — 2026-10-04
+
+`titan update check [--json] [--no-system]` provides original Bash local
+readiness without privileges, package-database refreshes, remote fetches or
+Titan state creation. `titan update status [--json]` reads the most recent
+atomic private stage/result record and the update lock. Failures preserve the
+failed stage and exit code; a failed doctor stops success reporting. A killed
+updater becomes `interrupted` after inherited ordinary workers release the
+lock. Read-only status does not rewrite that saved record.
+
+The free-space helper now has a verified adaptation: Titan retains its
+existing 2 GiB minimum on `/`, rather than Omarchy's 10 GiB, and rejects failed
+measurements without a force bypass. The integrated update-lock equivalent
+remains partial: no generic held/run API or detached privileged transaction
+exists. Update-stage status is not an adaptation of Omarchy's update-availability
+shell refresh command. Coverage is 75 adapted, 107 partial, 6 policy and 291
+pending; no availability/channel/keyring or automatic repair parity is claimed.
+See [workflow](../workflow.md) and the dated [verification](../verification.md).
+
+Next portable work should migrate existing package transactions with their
+full-upgrade, recipe and confirmation contracts. Detached update transactions,
+keyring/channel validation and restart advice remain separate update work.
+Keep hardware/security/authentication tasks in their own batches.
 
 ## Implemented in the initial foundation batch
 

@@ -13,7 +13,7 @@ Shell and QML are the primary implementation languages. Existing Python APIs rem
 | Batch | Pending | Partial | Policy |
 | --- | ---: | ---: | ---: |
 | [Boot, snapshots and installed-system recovery](#boot) | 13 | 8 | 0 |
-| [Packages, channels, upgrades and migrations](#updates) | 24 | 6 | 0 |
+| [Packages, channels, upgrades and migrations](#updates) | 22 | 7 | 0 |
 | [Agent launch, accounts, usage and optional runtimes](#agents) | 33 | 1 | 0 |
 | [Theme lifecycle, palettes, applications and branding](#themes) | 36 | 9 | 0 |
 | [Authentication, privilege and SSH service lifecycle](#security) | 14 | 0 | 0 |
@@ -70,7 +70,7 @@ Owner/language: Shell. Keep versioned migrations and compatible public command p
 
 Prerequisites: boot.
 
-Add observable update stages, detached transactions, keyring/channel validation, restart advice and failure recovery. Review cache/orphan/AUR/mise handling independently; the Omarchy quattro migration is source-specific and needs Titan lifecycle design rather than literal reproduction.
+Local read-only readiness/status and private atomic update-stage records exist; failures stop later required stages and worker-held locks/interruption/retry are VM-tested. Next: detached transactions, keyring/channel validation, restart advice and failure recovery. Review cache/orphan/AUR/mise handling independently; the Omarchy quattro migration is source-specific and needs Titan lifecycle design rather than literal reproduction.
 
 Acceptance: VM full upgrades, lock contention, low space, interrupted transactions, preserved user choices and recoverable errors; no implicit reboot, forced conflict overwrite or unrequested removal.
 
@@ -90,11 +90,10 @@ Acceptance: VM full upgrades, lock contention, low space, interrupted transactio
 | `omarchy-update-dev` | pending | 21 | Update the active Omarchy dev checkout | — |
 | `omarchy-update-firmware` | pending | 18 | Update system firmware using fwupd. Ensures the fwupd EFI binary is installed | `cmd-missing`, `pkg-add` |
 | `omarchy-update-keyring` | pending | 31 | Ensure the Omarchy and Arch keyring packages are installed and populated | `pkg-add`, `pkg-missing`, `update`, `update-system-pkgs` |
-| `omarchy-update-lock` | pending | 47 | Run a command while holding the Omarchy update lock | `update` |
+| `omarchy-update-lock` | partial | 47 | Run a command while holding the Omarchy update lock | `update` |
 | `omarchy-update-orphan-pkgs` | pending | 29 | Review and optionally remove orphaned system packages after updates | — |
 | `omarchy-update-pacman` | pending | 25 | Run a pacman transaction for the Omarchy update flow, shielded from desktop session teardown. | — |
 | `omarchy-update-pacman-guard` | pending | 64 | Prevent direct pacman system upgrades from bypassing omarchy update. | — |
-| `omarchy-update-requires-free-space` | pending | 17 | Check free disk space required for an update | — |
 | `omarchy-update-restart` | pending | 66 | Prompt for required reboot or service restarts after updates | `restart-shell`, `state`, `system-reboot` |
 | `omarchy-update-status` | pending | 12 | Refresh the shell update status | `shell`, `update-available` |
 | `omarchy-update-stay-awake` | pending | 596 | Manage sleep and idle inhibition during an update | `security-functions`, `toggle-idle`, `update` |

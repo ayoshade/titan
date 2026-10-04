@@ -17,6 +17,8 @@ Usage: titan COMMAND [ARGS]
   migrate --status        List migrations and whether each has run
   setup                   Per-user first-run setup (idempotent; never overwrites)
   update [--no-system]    Snapshot, update Titan and Arch packages, migrate, check
+  update check [--json] [--no-system]  Read-only update readiness checks
+  update status [--json]  Inspect the last update and its current stage
   doctor                  Health check
   boot status|refresh     Experimental Limine status and QEMU-only refresh
   snapshot               Experimental QEMU previews and offline restore (see snapshot --help)
@@ -107,45 +109,6 @@ setup() {
  "$root/scripts/titan-hooks" hook post-setup || true
 }
 
-update() {
- local system=1; [[ ${1:-} == --no-system ]] && system=0
- exec 9>"$state/update.lock"; flock -n 9 || { echo "titan: another update is running" >&2; exit 1; }
- echo "Titan $(cat "$root/version") — update"
- # Preflight: never start half-way into a broken state.
- [[ -e /var/lib/pacman/db.lck ]] && { echo "titan: pacman is busy (/var/lib/pacman/db.lck)" >&2; exit 1; }
- local free; free=$(df --output=avail -k / | tail -1)
- (( free > 2*1024*1024 )) || { echo "titan: less than 2 GiB free on /" >&2; exit 1; }
- local checkout=0; [[ -d $root/.git ]] && checkout=1
- if ((checkout)) && [[ -n $(git -C "$root" status --porcelain --untracked-files=no) ]]; then
-  echo "titan: the Titan checkout has local changes; commit or move them first:" >&2
-  git -C "$root" status --short --untracked-files=no >&2; exit 1
- fi
- # Snapshot first when Snapper is configured (scripts/install-snapshots).
- if command -v snapper >/dev/null && snapper list-configs 2>/dev/null | grep -q '^root '; then
-  sudo snapper -c root create -c number -d "titan update $(date -Is)" && echo "Snapshot taken."
- else
-  echo "No root snapshot configured (run scripts/install-snapshots to enable); continuing."
- fi
- local before; before=$( ((checkout)) && git -C "$root" rev-parse HEAD || cat "$root/version")
- # A checkout updates through Git; a packaged Titan updates with pacman below.
- if ((checkout)) && git -C "$root" rev-parse --abbrev-ref '@{upstream}' >/dev/null 2>&1; then
-  git -C "$root" pull --ff-only
- fi
- if ((system)); then
-  sudo pacman -Syu   # full upgrade only: Arch does not support partial upgrades
- fi
- migrate
- "$root/scripts/install-agent-skills" || echo 'titan: custom skill conflict; resolve it and run titan skills' >&2
- "$root/scripts/doctor" >/dev/null && echo "Doctor: OK" || echo "Doctor reported problems: run titan doctor" >&2
- local after; after=$( ((checkout)) && git -C "$root" rev-parse HEAD || cat "$root/version")
- if [[ $after != "$before" ]] && { ((!checkout)) || ! git -C "$root" diff --quiet "$before" HEAD -- config/quickshell; }; then
-  "$root/bin/titan-shell" restart && echo "Shell restarted."
- fi
- [[ -d /usr/lib/modules/$(uname -r) ]] || echo "The running kernel was updated: reboot when convenient."
- echo "Titan $(cat "$root/version") is up to date."
- "$root/scripts/titan-hooks" hook post-update || true
-}
-
 case "${1:-help}" in
  boot) shift; exec "$root/scripts/titan-boot" "$@" ;;
  snapshot) shift; exec "$root/scripts/titan-snapshot" "$@" ;;
@@ -153,7 +116,7 @@ case "${1:-help}" in
  version)
   echo "Titan $(cat "$root/version") ($(git -C "$root" rev-parse --short HEAD 2>/dev/null || echo package), $root)" ;;
  migrate) shift; migrate "$@" ;;
- update) shift; update "$@" ;;
+ update) shift; source "$root/lib/titan/update.sh"; titan_update "$@" ;;
  doctor) exec "$root/scripts/doctor" ;;
  hardware) shift; exec "$root/scripts/titan-hardware" "$@" ;;
  skills) shift; exec "$root/scripts/install-agent-skills" "$@" ;;

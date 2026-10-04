@@ -23,6 +23,31 @@ work is tracked in [the Omarchy ledger](research/omarchy.md).
   `~/.config` links. On packaged installs missing packages, `titan setup` and
   optional services are warnings. `titan setup` is safe to repeat;
   `titan update` needs the user (sudo).
+- `titan update check [--json] [--no-system]`: read-only local readiness;
+  schema 1 reports `ready`, `system`, root free/minimum bytes and a `checks`
+  array of `{id,status,message}`. It checks command dependencies, installed jq,
+  pacman's database/lock, at least 2 GiB on `/`, the update lock, state storage
+  and tracked checkout changes (including linked worktrees). Snapshot and
+  missing-upstream warnings do not block. It creates no Titan state, acquires
+  no privileges and does not fetch remotes or refresh package databases.
+  Exit 0 ready, 1 blocked, 2 invalid arguments. Text checks work without jq;
+  JSON output requires it. Readiness is rechecked under the execution lock.
+- `titan update status [--json]`: inspect the last attempt and lock, without
+  writing. Schema 1 reports `status`, `stage`, `exit_code` and `busy`; an attempt
+  adds `pid`, `started_at`, `updated_at` and `system`. No record means `idle`.
+  A saved `running` record with no held lock is returned as `interrupted`;
+  inspection leaves its bytes unchanged. Failed/interrupted attempts include
+  recovery guidance. Successful inspection exits 0 even for a failed attempt;
+  unreadable/invalid state exits 1, invalid arguments 2. It requires jq/flock.
+- `titan update [--no-system]` saves atomic 0600 stage records in
+  `$XDG_STATE_HOME/titan/update.json`: snapshot, checkout, packages (unless
+  skipped), migrations, skills, doctor, shell, hooks and complete. Failures
+  stop later required stages and retain the command's exit code; a failed
+  doctor exits 1 instead of announcing success. INT/TERM record 130/143;
+  SIGKILL is detected by later status inspection. The update lock is inherited
+  by ordinary workers; privileged pacman also owns its separate database lock.
+  Inspect a failed transaction before retrying. There is no automatic resume,
+  lock deletion, transaction detachment, reboot or added cleanup operation.
 - `titan skills [--dry-run]`: link the three end-user skills from
   `default/agents/skills/` into
   `${CODEX_HOME:-$HOME/.codex}/skills` and `~/.claude/skills`. Preflight all
@@ -146,7 +171,9 @@ User choices live in `~/.config/titan` (`preferences.json`, `settings.json`,
 - `workflow.json`, `hypr-runtime.lua` and `shell-settings.json`;
 - `generated/` theme files and `migrations/` markers;
 - `setup-version` and `welcome-done`;
-- writer and update locks.
+- writer and update locks;
+- `update.json`, the most recent update's stages/result, containing no
+  subprocess output, credentials or changed checkout filenames.
 
 Directory mode is 0700;
 atomic replacement files are 0600. Runtime Lua is generated only from validated

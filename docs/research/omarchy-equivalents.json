@@ -890,7 +890,7 @@
     "omarchy-update": {
       "status": "partial",
       "equivalent": "titan version|migrate|update",
-      "notes": "Titan package/Git updates and migrations exist; release-channel selection and reference notices differ."
+      "notes": "Titan package/Git updates, migrations, local readiness and private failure/interruption stage records exist. Detached transactions, channel/keyring lifecycle, conflict repair and reference notices remain separate work."
     },
     "omarchy-update-mise": {
       "status": "adapted",
@@ -931,6 +931,16 @@
       "status": "partial",
       "equivalent": "titan webapp",
       "notes": "Managed launchers and Chromium app windows; installed icon names only, no automatic favicon downloads."
+    },
+    "omarchy-update-requires-free-space": {
+      "status": "adapted",
+      "equivalent": "titan update check [--json] / lib/titan/update.sh",
+      "notes": "Original Bash readiness/execution gate retains Titan's 2 GiB minimum on / rather than the reference's 10 GiB; invalid/failed measurements refuse, with no force bypass. Rechecked after acquiring the update lock; low-space refusals use recorded df fixtures."
+    },
+    "omarchy-update-lock": {
+      "status": "partial",
+      "equivalent": "titan update / update check|status / lib/titan/update.sh",
+      "notes": "Integrated per-user exclusive lock and read-only inspection, rechecked preflight and inherited ordinary-worker lock verified in QEMU after updater SIGKILL. Privileged pacman owns its database lock; generic held/run and detached privileged transaction lifecycle remain absent."
     }
   }
 }

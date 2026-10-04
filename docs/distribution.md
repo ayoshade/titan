@@ -31,6 +31,7 @@ Machine state:
 | `hypr-runtime.lua`, `workflow.json` | Workflow toggles: per-workspace layout, gaps, scale, reminders |
 | `shell-settings.json` | Bar visibility |
 | `migrations/` | One empty marker per applied migration |
+| `update.json` | Atomic private record of the last update's stage and result |
 
 Elsewhere:
 
@@ -86,17 +87,34 @@ Generated application palettes stay in machine state and custom configs win.
 `titan update` (run by the user in a terminal; it asks for sudo) does the
 following, in order:
 
-1. Takes a lock; refuses to start while pacman is busy, with less than 2 GiB
-   free on `/`, or with local changes in the checkout.
+1. Runs local readiness checks, takes a lock and rechecks. It refuses to start
+   while pacman is busy, with less than 2 GiB free on `/`, with tracked changes
+   in the checkout, or with missing dependencies/unwritable update state.
 2. Takes a Snapper snapshot of `/` when a `root` config exists
    (`scripts/install-snapshots`). Otherwise it says so and continues.
 3. Fast-forwards the checkout (`git pull --ff-only`) when it tracks a remote.
 4. Runs `sudo pacman -Syu`. This is always a full upgrade: Arch does not
    support partial upgrades. `--no-system` skips this step.
 5. Runs `titan migrate`, registers bundled agent skills, then `scripts/doctor`.
+   A failed doctor stops the update with a failed stage record.
    It restarts the shell when shell files changed, and reports when the running
    kernel was replaced, so a
    reboot is due.
+
+`titan update check [--json] [--no-system]` exposes these readiness checks
+without state writes, sudo, remote fetches or package-database refreshes.
+`titan update status [--json]` reads the last stage/result and lock; if a
+running record survives after the lock is released, it reports `interrupted`
+without changing the record. Execution records are atomic 0600 JSON under
+machine state. They contain stage/timestamps/exit status, not command output.
+Readiness uses the existing 2 GiB minimum, rather than Omarchy's 10 GiB policy;
+a failed/invalid measurement refuses instead of bypassing the gate.
+Both APIs and recovery exit codes are documented in [workflow.md](workflow.md).
+
+After a failure, inspect the reported command and run `titan doctor` and
+`titan update check` before retrying. Wait for a surviving worker/transaction;
+never delete an active pacman lock. This batch provides observation and normal
+retry, not detached transactions, automatic resume or package conflict repair.
 
 Agents must not run `titan update` themselves (sudo, network, system
 changes); they suggest it to the user.

@@ -40,7 +40,9 @@ approval.
    for JSON and argv arrays for subprocess arguments.
    Dependency predicates (`commands.sh`), package predicates/drop/history/cache
    helpers (`packages.sh`) and mise list/upgrade wrappers (`development.sh`) now
-   use Bash. Package installation/catalogs and developer recipes/databases remain
+   use Bash. Update readiness/status and staged execution live in `update.sh`,
+   preserving full upgrades and recording failures/interruption for inspection.
+   Package installation/catalogs and developer recipes/databases remain
    Python until their transaction/provisioning paths pass a focused migration;
    this keeps existing menus usable on checkouts missing jq.
 3. Migrate developer environment/jobs, defaults/launchers and configuration

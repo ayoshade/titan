@@ -152,6 +152,8 @@ titan settings get | set KEY VALUE | reset KEY | schema
 titan wallpaper list | next | set PATH
 titan shell status | restart | ipc METHOD | open PANEL
 titan doctor                        # health check
+titan update check --json           # read-only local update readiness
+titan update status --json          # last update stage/result and current lock
 titan boot status --json             # experimental installer bootloader status
 titan snapshot list --json           # experimental Limine recovery preview inventory
 titan hardware --json                # read-only hardware inventory and installer packages
@@ -179,6 +181,8 @@ titan update                        # snapshot, full upgrade, migrations (asks f
   Titan (Git or package), runs `pacman -Syu`, applies migrations, runs the
   health check, restarts the shell when needed and tells you when a reboot is
   due.
+  `titan update check` checks readiness without starting an update;
+  `titan update status` explains the last stage/result, including interruption.
 - **Snapshots:** `scripts/install-snapshots` enables Snapper and snap-pac on a
   Btrfs root, so every pacman transaction is snapshotted. Inspecting, undoing,
   rolling back and removing are covered in

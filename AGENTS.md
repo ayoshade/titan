@@ -44,6 +44,13 @@ instead of maintaining two competing instruction sets.
   User state lives outside Git. Clipboard labels contain private content; never
   dump clipboard-list into logs. Optional Omarchy apps are not bundled. Do not
   mistake an assigned shortcut for an installed app or complete feature parity.
+- `titan update check|status [--json]` provides read-only local readiness and
+  last-attempt diagnostics. Bash `lib/titan/update.sh` writes atomic private
+  stage records to machine-state `update.json` only during execution; doctor
+  failure stops the update. Missing jq, locks and failed space measurements
+  refuse. Ordinary workers inherit the lock; privileged pacman has its own
+  database lock. No automatic resume/detached transaction exists. See
+  `docs/workflow.md`; focused guest acceptance is `tools/vm-update-checks RUN`.
 - **mise** is Titan's default tool and runtime manager (`packages/workflow.txt`).
   `titan setup` appends a marked line to `~/.bashrc` sourcing `default/bash/rc`,
   and `hyprland.lua` puts mise shims on the session `PATH`. Install developer
@@ -238,7 +245,7 @@ wl-clipboard, grim/slurp and suitable XDG portals.
 | `default/agents/skills/` | Three bundled end-user skills: `titan`, `titan-app`, `diagnose-crash`; `titan skills` links them into Claude and Codex (respecting `CODEX_HOME`) |
 | `default/config/`, `default/catalog/`, `default/bash/` | Copied-once developer dotfiles, optional package/runtime/database recipes, modular interactive Bash defaults |
 | `lib/titan/{apps,configuration,packages,development,utilities,media_tools,system_status,plugins}.py` | Remaining Python operations behind `scripts/titan-*` and `titan`; shared primitives in `ops.py`, parser in `desktop_cli.py` |
-| `lib/titan/{services,boot,snapshots,snapshot_restore,commands,packages,development}.sh` | Original Bash services, guarded boot/recovery, dependency/package helpers and mise wrappers; package installation and developer recipes still use Python |
+| `lib/titan/{services,boot,snapshots,snapshot_restore,commands,packages,development,update}.sh` | Original Bash services, guarded boot/recovery, dependency/package helpers, mise wrappers and update diagnostics/stages; package installation and developer recipes still use Python |
 | `docs/` | Research, hardware, decisions, validation and recovery |
 
 Shell settings are declared once in `theme/settings-schema.json`. The Settings

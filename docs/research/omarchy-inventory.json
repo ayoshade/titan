@@ -3,9 +3,9 @@
   "source": "https://github.com/omacom/omarchy",
   "revision": "5c4da021469517449770579793b37ce26d0a0d48",
   "counts": {
-    "adapted": 74,
-    "pending": 293,
-    "partial": 106,
+    "adapted": 75,
+    "pending": 291,
+    "partial": 107,
     "titan-policy": 6
   },
   "commands": [
@@ -3503,7 +3503,7 @@
       "summary": "Update Omarchy and system packages",
       "status": "partial",
       "equivalent": "titan version|migrate|update",
-      "notes": "Titan package/Git updates and migrations exist; release-channel selection and reference notices differ."
+      "notes": "Titan package/Git updates, migrations, local readiness and private failure/interruption stage records exist. Detached transactions, channel/keyring lifecycle, conflict repair and reference notices remain separate work."
     },
     {
       "command": "omarchy-update-analyze-logs",
@@ -3565,9 +3565,9 @@
       "command": "omarchy-update-lock",
       "sha256": "9448e1748b10e46bb4310be37d69d0eba6090f69c71264cce4fc6f344278cb7d",
       "summary": "Run a command while holding the Omarchy update lock",
-      "status": "pending",
-      "equivalent": "",
-      "notes": "Behavioral review and implementation remain; no parity claimed."
+      "status": "partial",
+      "equivalent": "titan update / update check|status / lib/titan/update.sh",
+      "notes": "Integrated per-user exclusive lock and read-only inspection, rechecked preflight and inherited ordinary-worker lock verified in QEMU after updater SIGKILL. Privileged pacman owns its database lock; generic held/run and detached privileged transaction lifecycle remain absent."
     },
     {
       "command": "omarchy-update-mise",
@@ -3613,9 +3613,9 @@
       "command": "omarchy-update-requires-free-space",
       "sha256": "50a5ddef021dac5e79f789a53643fa91a6b8d7193b4d27786516d142525eca93",
       "summary": "Check free disk space required for an update",
-      "status": "pending",
-      "equivalent": "",
-      "notes": "Behavioral review and implementation remain; no parity claimed."
+      "status": "adapted",
+      "equivalent": "titan update check [--json] / lib/titan/update.sh",
+      "notes": "Original Bash readiness/execution gate retains Titan's 2 GiB minimum on / rather than the reference's 10 GiB; invalid/failed measurements refuse, with no force bypass. Rechecked after acquiring the update lock; low-space refusals use recorded df fixtures."
     },
     {
       "command": "omarchy-update-restart",
