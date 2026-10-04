@@ -11,6 +11,7 @@ confirms the right password, Hyprland shows no desktop content.
 | Clock, `U M B R A / ACCESS RESTRICTED`, password field | Normal | Type your password and press Enter |
 | A red line: "Too many failed attempts: locked for about N min…" | `pam_faillock` locked the account after 3 failures within 15 minutes (Arch defaults), for 10 minutes after the last one. **The right password is rejected until then** | Wait, or reset the tally from a TTY (below) |
 | "Lockout over: if your password is refused once more, enter it again" | The lockout ended, but Hyprlock's next attempt started while it was active | Enter the password; if it is refused (often with a stale "N minutes left" message), enter it again |
+| Lock looks frozen or ignores typing after switching to a text console and back | Seen on the Intel laptop (2026-10-03), not reproduced in QEMU. Typed passwords were rejected. Keys held during the switch (Ctrl+Alt) may be stuck | Tap Ctrl and Alt once, then type. If it stays stuck, run `scripts/lock-rescue` from a TTY. **Don't restart the display manager: that closes every app** |
 | Plain near-black screen, no clock or field | Hyprlock is not drawing. The lock background is `#08090b`, so a lock with missing widgets looks black | Recover from a TTY (below) |
 | Hyprland's "lockdead" screen | Hyprlock crashed; the session stays locked by design | Recover from a TTY (below) |
 
@@ -19,6 +20,22 @@ confirms the right password, Hyprland shows no desktop content.
 Switch to a text console with Ctrl+Alt+F3 and log in as yourself. Return to
 the desktop afterwards with Ctrl+Alt+F1, or with the VT that `loginctl` lists
 for your graphical session.
+
+**First choice: `lock-rescue`** keeps your session and apps:
+
+```sh
+~/dotfiles/scripts/lock-rescue        # packaged: /usr/share/titan/scripts/lock-rescue
+```
+
+It saves diagnostics to `~/.local/state/titan/lock-rescue/TIME/`: a screenshot
+of the lock, Hyprlock's journal, the process state, Caps Lock and the faillock
+tally. Keystrokes are never recorded. It then replaces Hyprlock with a fresh
+one. Return to the desktop, tap Ctrl and Alt, and unlock.
+`--diagnose-only` saves the diagnostics without replacing Hyprlock. Restarting
+greetd (`systemctl restart display-manager`) also unlocks, but it ends the
+whole desktop session.
+
+Manual steps, if needed:
 
 ```sh
 faillock --user "$USER"                    # see recent failures (V = counted)

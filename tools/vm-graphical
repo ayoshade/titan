@@ -135,14 +135,17 @@ try:
     monitor.screenshot(run / "lock-dead.png")
     if json.loads(guest(prefix + "hyprctl getoption misc:allow_session_lock_restore -j").stdout).get("bool") is not True:
         raise RuntimeError("allow_session_lock_restore is not enabled")
-    # The documented TTY command (docs/lock-recovery.md), without the instance signature.
-    guest(user_prefix + "hyprctl --instance 0 dispatch 'hl.dsp.exec_cmd(\"/usr/share/titan/scripts/lock\")'")
+    # The documented TTY rescue (docs/lock-recovery.md), run as the session's user.
+    rescue = guest(f"sudo -H -u {user} /usr/share/titan/scripts/lock-rescue")
+    if "fresh lock screen is running" not in rescue.stdout:
+        raise RuntimeError(f"lock-rescue did not restore the lock: {rescue.stdout}{rescue.stderr}")
+    guest(f"sudo -H -u {user} sh -c 'test -s \"$(ls -d ~/.local/state/titan/lock-rescue/* | tail -1)/state.txt\"'")
     wait_for(f"pgrep -u {user} -x hyprlock >/dev/null", 20)
     time.sleep(3)
     lit, _ = lock_frame("lock-restored")
     if not 0.002 < lit < 0.5:
         raise RuntimeError(f"Restored lock is not visibly rendered (lit {lit:.4f})")
-    print("PASS  a killed Hyprlock is replaced from outside the session and renders again", flush=True)
+    print("PASS  scripts/lock-rescue saves diagnostics and replaces a killed Hyprlock, which renders again", flush=True)
 
     # pam_faillock: three failures lock the account; the lock screen must say so.
     for _ in range(3):

@@ -31,8 +31,9 @@
 
 ## Hands-on checks still required
 
-1. Retest visible lock rendering on the laptop (Super+Ctrl+L, then once with a
-   TTY switch while locked). The QEMU test now covers rendering, crash restore
+1. Lock after a TTY switch on the laptop: rendering and unlock work (owner,
+   2026-10-03), but after a console switch and return the lock appeared frozen.
+   Next: tap Ctrl/Alt, else run `scripts/lock-rescue` and share its output. The QEMU test now covers rendering, crash restore
    and faillock lockouts; see "Lock screen diagnosis" below and
    `docs/lock-recovery.md`.
 2. Suspend/resume verification is deferred: the user now requires always-awake
@@ -798,3 +799,33 @@ All runs used the local 0.3.0 build of `6dd8bd2`, one 2 GiB VM at a time.
   `allow_session_lock_restore` is on. No lock was started on the owner's
   session. Still open: a hands-on Super+Ctrl+L on the Intel laptop, including a
   TTY switch while locked.
+
+## Lock after a console switch (laptop) and lock-rescue — 2026-10-03
+
+- **Owner test:** Super+Ctrl+L showed the clock, label and field, and the password
+  unlocked. With the screen locked, switching to a text console and back left
+  the lock looking frozen and ignoring typing. The owner restarted greetd from
+  tty2, which ended the session.
+- **Journal:**
+  - The 20:14 lock got four "stray release" key events at the return
+    (20:14:22). Three typed passwords then failed (20:14:51–20:15:16),
+    `pam_faillock` locked the account, and greetd was restarted at 20:26:21.
+  - The 20:28:41 lock logged two "key already pressed" events at 20:28:58,
+    and greetd was restarted at 20:29:02.
+  - Aquamarine logged "Restoring after VT switch" and restored the CRTC.
+    Hyprlock received key events, so input reached it. Hyprland's own logging
+    is disabled, so its render and keyboard state are not recorded.
+- **QEMU:** not reproduced. Ctrl+Alt+F2, typing on tty2, then Ctrl+Alt+F1 with
+  quick QMP keys and with separate slow press/release events: the correct
+  password unlocked first time, with no key errors after the return.
+- **Leading hypothesis (unconfirmed):** Ctrl/Alt state is lost across the
+  switch on real hardware, so typed letters arrive as shortcuts (no dots, wrong
+  password). Verbose Hyprland/Hyprlock input logging was deliberately not
+  enabled, because it could record the password.
+- **Added `scripts/lock-rescue`** for use from a TTY:
+  - It saves a lock screenshot (grim works from outside the session while
+    locked; verified in QEMU), Hyprlock's journal, the process state, Caps
+    Lock, the faillock tally and the sessions. It never records keys.
+  - It then replaces Hyprlock in the same session.
+  - The QEMU graphical test now uses it for the restore stage. A fresh VM
+    passed all 19 package checks and 7 graphical/lock checks.

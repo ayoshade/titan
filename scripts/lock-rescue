@@ -1,0 +1,48 @@
+#!/usr/bin/env bash
+# lock-rescue [--diagnose-only]: run from a text console (Ctrl+Alt+F3) when the
+# lock screen is frozen or ignores typing. Saves diagnostics, then replaces the
+# running Hyprlock with a fresh one, keeping the desktop session and its apps
+# (docs/lock-recovery.md). Never records keystrokes or the password.
+set -euo pipefail
+root=$(cd -- "$(dirname -- "$(readlink -f "${BASH_SOURCE[0]}")")/.." && pwd)
+relaunch=1; [[ ${1:-} == --diagnose-only ]] && relaunch=0
+export XDG_RUNTIME_DIR=${XDG_RUNTIME_DIR:-/run/user/$(id -u)}
+instance=$(hyprctl instances -j 2>/dev/null | python3 -c 'import json,sys; i=json.load(sys.stdin); print(i[0]["instance"], i[0]["wl_socket"]) if i else None') \
+ || { echo "lock-rescue: no Hyprland session for $(id -un) is running" >&2; exit 1; }
+read -r signature socket <<<"$instance"
+export HYPRLAND_INSTANCE_SIGNATURE=$signature WAYLAND_DISPLAY=$socket
+out=${XDG_STATE_HOME:-$HOME/.local/state}/titan/lock-rescue/$(date +%Y%m%d-%H%M%S)
+mkdir -p "$out"; chmod 700 "$out"
+pid=$(pgrep -u "$(id -u)" -x hyprlock | head -n1 || true)
+{
+ echo "time: $(date -Is)"
+ echo "hyprlock pid: ${pid:-none}"
+ [[ -n $pid ]] && ps -o pid,stat,wchan:32,etime,%cpu -p "$pid"
+ [[ -n $pid ]] && echo "threads: $(ls /proc/"$pid"/task | wc -l)"
+ echo "session lock restore: $(hyprctl getoption misc:allow_session_lock_restore -j 2>/dev/null | tr -d '\n ')"
+ echo "keyboards (caps lock):"; hyprctl devices -j 2>/dev/null | python3 -c 'import json,sys; [print(" ",k["name"],"capsLock="+str(k["capsLock"]),"main="+str(k["main"])) for k in json.load(sys.stdin)["keyboards"]]'
+ echo "faillock:"; faillock --user "$(id -un)" 2>/dev/null | tail -n +3 | sed 's/^/  /'
+ loginctl list-sessions --no-legend 2>/dev/null | sed 's/^/session: /'
+} >"$out/state.txt" 2>&1
+# What the compositor last showed: only the lock screen (clock, label, dots).
+timeout 5 grim "$out/screen.png" 2>>"$out/state.txt" || echo "screenshot failed or timed out" >>"$out/state.txt"
+journalctl --user -b -t titan-lock --since '-30 min' --no-pager -o short-precise 2>/dev/null \
+ | grep -vE 'got iface|Bound to' >"$out/hyprlock.log" || true
+echo "Diagnostics saved in $out"
+((relaunch)) || exit 0
+if [[ -n $pid ]]; then
+ kill "$pid" 2>/dev/null || true
+ for _ in 1 2 3 4 5; do kill -0 "$pid" 2>/dev/null || break; sleep 1; done
+ kill -0 "$pid" 2>/dev/null && kill -KILL "$pid" 2>/dev/null || true
+fi
+# allow_session_lock_restore lets the new locker take over the existing lock.
+hyprctl dispatch "hl.dsp.exec_cmd(\"$root/scripts/lock\")" >/dev/null
+for _ in $(seq 1 10); do pgrep -u "$(id -u)" -x hyprlock >/dev/null && break; sleep 1; done
+if pgrep -u "$(id -u)" -x hyprlock >/dev/null; then
+ echo "A fresh lock screen is running. Return with Ctrl+Alt+F1 (or your session's VT),"
+ echo "tap Ctrl and Alt once, then type your password."
+else
+ echo "lock-rescue: the new lock did not start. As a last resort, without losing apps:" >&2
+ echo "  hyprctl --instance 0 eval 'hl.clear_crashed_lockscreen()'" >&2
+ exit 1
+fi

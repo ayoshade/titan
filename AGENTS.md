@@ -65,8 +65,12 @@ instead of maintaining two competing instruction sets.
   correct password is also refused. The lock screen now explains both, logs to
   the journal (`-t titan-lock`) and can be replaced if it crashes
   (`allow_session_lock_restore`). See `docs/lock-recovery.md`. The QEMU graphical
-  test covers rendering, restore and lockout. Visible rendering on the Intel
-  laptop, including during TTY switches, still needs a hands-on test.
+  test covers rendering, `scripts/lock-rescue` and lockout. On the Intel laptop
+  the lock renders and unlocks (owner, 2026-10-03), but after switching to a
+  text console and back it looked frozen and rejected typed passwords. That
+  happened twice and was not reproduced in QEMU. The cause is unconfirmed;
+  stuck Ctrl/Alt is the leading hypothesis. Recover with `scripts/lock-rescue`
+  from a TTY, not by restarting greetd.
   Suspend/resume testing is deferred while the always-awake policy is active.
   Do not confuse a successful password check with a verified visible lock screen.
 
