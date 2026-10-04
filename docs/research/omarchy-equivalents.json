@@ -732,6 +732,11 @@
       "equivalent": "titan config install|diff|backup|reset|restore",
       "notes": "Original Titan operation; CLI and desktop implementation follow Titan interfaces."
     },
+    "omarchy-refresh-limine": {
+      "status": "partial",
+      "equivalent": "titan-install --bootloader limine / titan boot status|refresh / lib/titan/boot.sh",
+      "notes": "Original Bash fresh-UEFI-QEMU installation and guarded kernel-menu/EFI refresh exist. Appearance overrides and prior changed-file backups are preserved. Limine snapshot synchronization/boot/restore and existing-machine migration remain missing."
+    },
     "omarchy-reminder": {
       "status": "partial",
       "equivalent": "bin/workflow reminder-*",

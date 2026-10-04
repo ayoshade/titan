@@ -1,0 +1,330 @@
+{
+  "schema": 1,
+  "revision": "5c4da021469517449770579793b37ce26d0a0d48",
+  "review_level": "Source triage of summaries, function/option names and lexical command references; not a line-by-line behavioral or acceptance review.",
+  "batches": [
+    {
+      "id": "boot",
+      "title": "Boot, snapshots and installed-system recovery",
+      "prefixes": [
+        "refresh-limine",
+        "snapshot",
+        "plymouth-",
+        "refresh-plymouth",
+        "refresh-sddm",
+        "setup-direct-boot",
+        "hibernation-",
+        "system-factory-reset",
+        "provision-owner",
+        "drive-password",
+        "apply-system",
+        "apply-lock"
+      ],
+      "depends_on": [],
+      "language": "Shell; isolate privileged target operations from per-user UI.",
+      "scope": "Opt-in Limine install and refresh first; then version-matched snapshot boot assets, read-only overlay boot, explicit restore and recovery. Encryption, hibernation, direct UKI boot and factory reset need separate fixtures.",
+      "acceptance": "Fresh UEFI disk boot with ISO detached; real kernel and bootloader upgrades; preserved custom settings; snapshot boot with matching kernel/modules; explicit restore and failed-boot recovery. No host disk or bootloader changes."
+    },
+    {
+      "id": "updates",
+      "title": "Packages, channels, upgrades and migrations",
+      "prefixes": [
+        "update",
+        "channel-",
+        "version",
+        "refresh-pacman",
+        "reinstall-pkgs",
+        "upgrade-",
+        "migrate"
+      ],
+      "depends_on": [
+        "boot"
+      ],
+      "language": "Shell. Keep versioned migrations and compatible public command paths.",
+      "scope": "Add observable update stages, detached transactions, keyring/channel validation, restart advice and failure recovery. Review cache/orphan/AUR/mise handling independently; the Omarchy quattro migration is source-specific and needs Titan lifecycle design rather than literal reproduction.",
+      "acceptance": "VM full upgrades, lock contention, low space, interrupted transactions, preserved user choices and recoverable errors; no implicit reboot, forced conflict overwrite or unrequested removal."
+    },
+    {
+      "id": "agents",
+      "title": "Agent launch, accounts, usage and optional runtimes",
+      "prefixes": [
+        "agent",
+        "default-agent",
+        "install-ai-",
+        "remove-ai-",
+        "install-hermes",
+        "install-openclaw",
+        "launch-openclaw",
+        "openclaw-"
+      ],
+      "depends_on": [
+        "apps",
+        "core"
+      ],
+      "language": "Shell orchestration and QML views; provider protocols require a documented implementation decision.",
+      "scope": "Current agent selection/launch/skills are a base. Separate account registry, authenticated provider usage, process environments, provider installers and gateways. Never inherit upstream permission-bypass switches or copy credentials into logs.",
+      "acceptance": "Isolated fake profiles plus explicit real-login checks where authorized; launch arguments stay exact; concurrent account state and stale/offline usage handling; removal preserves user data unless separately requested."
+    },
+    {
+      "id": "themes",
+      "title": "Theme lifecycle, palettes, applications and branding",
+      "prefixes": [
+        "theme-",
+        "font-",
+        "install-font",
+        "branding-",
+        "ascii",
+        "dev-theme-preview",
+        "dev-font",
+        "dev-benchmark-theme",
+        "toggle-theme-sync"
+      ],
+      "depends_on": [
+        "core",
+        "apps"
+      ],
+      "language": "Shell for lifecycle/rendering orchestration; QML for chooser, previews and reactive consumers.",
+      "scope": "Finish import/install/update/remove, validated palette/template schema and application reloads; preserve the graphite baseline. Separate cross-machine sync and hardware RGB adapters. Omarchy templates and fonts cannot be used as Titan runtime dependencies.",
+      "acceptance": "Import a new theme, reject invalid or linked files, update and remove safely, restore original preferences, and inspect real app rendering/reload. Font switching and screenshots at matched scale."
+    },
+    {
+      "id": "security",
+      "title": "Authentication, privilege and SSH service lifecycle",
+      "prefixes": [
+        "setup-security-",
+        "remove-security-",
+        "remove-service-ssh-agent",
+        "security-",
+        "sudo-"
+      ],
+      "depends_on": [
+        "core",
+        "services"
+      ],
+      "language": "Shell with reviewed privileged templates and root validation.",
+      "scope": "Add SSH agent/server lifecycle, FIDO2/fingerprint PAM setup/removal and command-scoped privilege contracts. Passwordless sudo and Docker-group access change security boundaries; expose explicit choices rather than enabling them through a broad port.",
+      "acceptance": "Disposable VM PAM/sudo validation and refusal paths before hardware tests; preserve a recovery login; track owned firewall rules and authorized keys; no secret or key output."
+    },
+    {
+      "id": "hardware",
+      "title": "Detection, monitors, input, audio tuning and power",
+      "prefixes": [
+        "hw-",
+        "hyprland-monitor-",
+        "hyprland-reload",
+        "monitor-",
+        "brightness-",
+        "audio-tuning",
+        "audio-sink-availability",
+        "toggle-hybrid",
+        "toggle-input",
+        "toggle-touch",
+        "toggle-suspend",
+        "restart-trackpad",
+        "apply-hardware",
+        "power-",
+        "idle-",
+        "system-sleep",
+        "system-suspend",
+        "display-",
+        "powerprofiles-",
+        "hyprland-session-locked"
+      ],
+      "depends_on": [
+        "core"
+      ],
+      "language": "Shell for detected system operations; QML/native services for reactive state; Lua compositor rules.",
+      "scope": "Extend conservative hardware profiles and safe display recovery, DDC/Apple brightness, input and audio adapters. Distinguish read-only predicates from driver/sysfs mutations. Portable power policy must not alter the owner's always-awake policy.",
+      "acceptance": "VM monitor fixtures plus explicitly documented physical-device tests; unplug recovery, no available internal-output lockout, profile matching, audio/output checks and reduced-motion paths."
+    },
+    {
+      "id": "services",
+      "title": "Optional service lifecycle and file sharing",
+      "prefixes": [
+        "install-service-",
+        "remove-service-",
+        "installed-service-",
+        "tailscale-",
+        "dns",
+        "network-band",
+        "restart-audio",
+        "restart-bluetooth",
+        "restart-wifi"
+      ],
+      "depends_on": [
+        "core",
+        "apps"
+      ],
+      "language": "Shell operations; QML status and controls using native events when available.",
+      "scope": "Extend existing Docker/CUPS/Tailscale lifecycle, receipt/send and owned activation units. Third-party services need separate setup/auth/remove recipes; DNS changes must preserve working connections and pre-existing configuration.",
+      "acceptance": "Real package setup/start/disable/re-enable and restore; no socket reactivation after disable; explicit external authentication/device tests; owned firewall and data preservation."
+    },
+    {
+      "id": "developer",
+      "title": "Developer environments, config recovery and workspace jobs",
+      "prefixes": [
+        "dev-",
+        "config-",
+        "refresh-config",
+        "refresh-tmux",
+        "refresh-hyprland",
+        "refresh-hyprsunset",
+        "refresh-herdr",
+        "refresh-chromium",
+        "reinstall",
+        "worktree",
+        "tmux",
+        "ssh",
+        "rsync",
+        "watch",
+        "forward",
+        "install-dev",
+        "install-docker",
+        "install-database",
+        "database-",
+        "mise-",
+        "nvim-",
+        "git-",
+        "provision-first-run",
+        "provision-user"
+      ],
+      "depends_on": [
+        "core",
+        "apps"
+      ],
+      "language": "Shell for system tools, mise, jobs and per-user config operations.",
+      "scope": "Verify existing framework/runtime and SSH/rsync operations, then migrate Python command families in focused batches with the same CLI contracts. Keep copied-once defaults, backups and owned jobs; dev-link needs explicit source/package switching and recovery design.",
+      "acceptance": "Real provisioning, executable tools and Bash activation; worktree and backup data preservation; authenticated localhost SSH forward and rsync event delivery; unit/process cleanup; no implicit mise project trust."
+    },
+    {
+      "id": "apps",
+      "title": "Application bundles, browser integration, gaming and launchers",
+      "prefixes": [
+        "install-",
+        "remove-",
+        "installed-",
+        "chromium-",
+        "webapp-",
+        "tui-",
+        "games-",
+        "launch-battlenet",
+        "launch-discord",
+        "windows-",
+        "default-browser",
+        "default-terminal",
+        "default-editor",
+        "launch-browser",
+        "launch-webapp",
+        "launch-tui",
+        "launch-editor",
+        "launch-terminal",
+        "launch-or-focus",
+        "cmd-browser",
+        "launch-",
+        "refresh-applications",
+        "pkg-"
+      ],
+      "depends_on": [
+        "core"
+      ],
+      "language": "Shell, declarative catalogs and desktop files; QML selectors.",
+      "scope": "Separate package availability from complete provisioning. Add paired install/remove behavior, native messaging/protocol handlers, TUI and retro launchers, GPU-aware gaming and a dedicated Windows VM milestone. Removal defaults preserve profiles, models, saves and game libraries.",
+      "acceptance": "Actual official/AUR package builds in guests; quoted filenames/URLs; default launch/cwd behavior; native messaging framing and protocol ownership; install/remove restores previous user choices."
+    },
+    {
+      "id": "plugins",
+      "title": "Plugin manifest, catalog, cloning and updates",
+      "prefixes": [
+        "plugin-",
+        "menu-plugin"
+      ],
+      "depends_on": [
+        "core",
+        "themes"
+      ],
+      "language": "QML extensions and Shell lifecycle management; maintain Titan's own manifest/API.",
+      "scope": "Extend existing install/validate/enable/disable/remove with built-in clone, catalog, capability reporting and validated update rollback. A renamed Omarchy plugin is not compatible with Titan automatically.",
+      "acceptance": "Real QML load/unload; broken update restores a working plugin; enabled registry and user edits remain intact; permissions and compatibility are reviewable."
+    },
+    {
+      "id": "capture",
+      "title": "Capture, media, dictation and picker workflows",
+      "prefixes": [
+        "capture-",
+        "transcode-",
+        "voxtype-",
+        "file-select",
+        "clipboard-",
+        "menu-emoji",
+        "menu-file",
+        "menu-time",
+        "menu-picker",
+        "menu-screenshot"
+      ],
+      "depends_on": [
+        "core",
+        "apps"
+      ],
+      "language": "Shell tool orchestration and QML interactive controls.",
+      "scope": "Finish frozen screenshot selection, webcam synchronization, safe file/timezone picking, ASCII conversion and explicit Voxtype model provisioning/status. Preserve clipboard and QR secrecy.",
+      "acceptance": "Real files and frames, output preservation, cancellation/keyboard navigation, recording teardown and dictated input on explicitly tested hardware; no private-content logs."
+    },
+    {
+      "id": "desktop",
+      "title": "Shell surfaces, notifications, toggles, state and watchers",
+      "prefixes": [
+        "bar",
+        "battery",
+        "crash-",
+        "notification-",
+        "launch-shell",
+        "launch-screensaver",
+        "launch-floating",
+        "screensaver",
+        "shell-",
+        "toggle",
+        "osd",
+        "menu",
+        "state",
+        "done",
+        "show-",
+        "hook",
+        "system-stats",
+        "weather-",
+        "restart-",
+        "system-",
+        "lock-",
+        "settings",
+        "audio-",
+        "network",
+        "bluetooth",
+        "hyprland-toggle",
+        "refresh-shell",
+        "reminder",
+        "launch-about"
+      ],
+      "depends_on": [
+        "core",
+        "themes"
+      ],
+      "language": "QML/native Quickshell APIs for UI/reactive services; Shell CLI adapters.",
+      "scope": "Replace generic state/file-flag helpers with documented Titan preferences and operations. Add persistent reminders, battery/crash watchers, weather state and shell restart/reload contracts. Preserve researched appearance and exact key chords.",
+      "acceptance": "Actual Wayland/QML interactions, event lifetimes and CPU cost, persistence/restart and reduced motion; restore panel/theme baseline; no broad application killing."
+    },
+    {
+      "id": "core",
+      "title": "Shared command primitives and distribution diagnostics",
+      "prefixes": [
+        "cmd-",
+        "drive-",
+        "disk-",
+        "upload-",
+        "debug"
+      ],
+      "depends_on": [],
+      "language": "Shell shared helpers; development analysis/tests may use Python.",
+      "scope": "Implement stable command-presence, diagnostics and selection contracts where needed. Drive selection/password and log upload require narrowly scoped UI/privileged workflows; never expose firmware keys or auto-upload logs.",
+      "acceptance": "Argument boundaries, missing-command exit codes and side-effect-free status; cancel leaves state unchanged; explicit redacted-log upload destination before network writes."
+    }
+  ]
+}

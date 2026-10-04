@@ -33,6 +33,9 @@ called by path). Helpers go in `scripts/`, developer tooling in `tools/`.
 Moving or renaming anything in `bin/` needs a migration and a compatibility
 link; see `docs/layout-plan.md`.
 
+Use Shell for new CLI/system workflow implementations and QML/native services
+for desktop state and UI. Preserve existing Python command contracts while
+migrating focused families; see `docs/implementation-languages.md`.
 Prefer a shared operation called by both UI and CLI. Add a standalone script
 only when it has a distinct responsibility. Top-level commands belong in
 `bin/titan`; do not invent Omarchy's prefix scanner or an unimplemented

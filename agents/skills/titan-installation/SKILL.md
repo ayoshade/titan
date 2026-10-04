@@ -26,6 +26,10 @@ installation workflows as behavior references; preserve Titan's VM guards.
 | ISO and VM orchestration | `tools/build-iso`, `tools/vm-build-iso`, `tools/vm-install-test` |
 | Reviewed privileged templates | `system/`, installed through the relevant `scripts/install-*` |
 
+Use Shell for new provisioning and boot workflow operations. Existing Python
+installer safety logic remains supported until a separately verified migration.
+Opt-in Limine is a fresh QEMU-target path, not a live-machine migration.
+
 Titan's scripts are separate executable programs with their own shebangs and
 strict error handling, not Omarchy's sourced setup leaves. Resolve paths from
 the entrypoint and pass explicit context; do not introduce `OMARCHY_PATH`,

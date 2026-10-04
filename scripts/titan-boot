@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+# Original Shell interface for Titan's experimental Limine support.
+set -euo pipefail
+root=$(cd -- "$(dirname -- "$(readlink -f "${BASH_SOURCE[0]}")")/.." && pwd)
+source "$root/lib/titan/boot.sh"
+case ${1:-} in
+ status)
+  [[ $# == 1 || ( $# == 2 && $2 == --json ) ]] || { echo 'Usage: titan boot status [--json]' >&2; exit 2; }
+  titan_boot_status ;;
+ refresh)
+  [[ $# == 1 ]] || { echo 'Usage: titan boot refresh' >&2; exit 2; }
+  titan_boot_refresh ;;
+ -h|--help|help) echo 'Usage: titan boot status [--json] | refresh (fresh UEFI QEMU installs only)' ;;
+ *) echo 'Usage: titan boot status [--json] | refresh' >&2; exit 2 ;;
+esac

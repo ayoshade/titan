@@ -6,8 +6,8 @@ repository still contains 0.2.0; 0.3.0 has not been published. The installer
 checks repository compatibility before any erase, so development tests use a
 local repository built from this checkout.
 
-The initial scope is x86_64, UEFI/systemd-boot, one whole disk of at least
-32 GiB, an unencrypted Btrfs root and a 1 GiB EFI partition mounted at `/boot`.
+The initial scope is x86_64, UEFI (systemd-boot by default, opt-in Limine),
+one whole disk of at least 32 GiB, an unencrypted Btrfs root and a 1 GiB EFI partition mounted at `/boot`.
 It creates `@`, `@home`, `@log` and `@pkg`, with zstd compression. The account
 uses a US keyboard and en_US.UTF-8; its timezone and hostname are configurable.
 Root password login is locked; the new account belongs to wheel and uses its
@@ -35,6 +35,40 @@ environment, UEFI, QEMU/KVM, a working compatible repository and a terminal.
 It rechecks the disk immediately before writes. The user must type
 `ERASE /dev/vda` (the exact selected path) and enter the new account password
 twice in that terminal. Passwords are never command arguments or log output.
+
+## Opt-in Limine in a fresh VM
+
+```sh
+bin/titan-install --disk /dev/vda --user titan --bootloader limine --json
+# In the live QEMU ISO, repeat with --apply after reviewing the plan.
+titan boot status --json
+sudo titan boot refresh              # installed Titan Limine VM only
+```
+
+The Limine choice adds the official Arch `limine` package and includes `jq`
+in the base plan; `jq` is also a Titan package dependency for Shell JSON
+operations. The installer writes a Titan appearance file to `/etc/titan/limine.conf` and
+installs a pacman hook for supported kernel and Limine/Titan transactions.
+The original Bash helper `scripts/titan-boot` generates `/boot/limine.conf`
+and deploys `/usr/share/limine/BOOTX64.EFI` to the fresh target's UEFI fallback
+path `/boot/EFI/BOOT/BOOTX64.EFI`. It does not register NVRAM entries.
+Configuration follows the [Limine 12.9.1 reference](https://github.com/Limine-Bootloader/Limine/blob/v12.9.1/CONFIG.md).
+
+Refresh checks root, QEMU/KVM, UEFI, the installer plan and matching Btrfs `@`
+root/UUID plus a mounted FAT `/boot` before writes. It refuses linked paths,
+unmanaged menus and incomplete kernel/initramfs pairs. Linux, LTS, Zen and
+Hardened image pairs are supported; only Linux and LTS have VM acceptance.
+Changed generated menus and EFI binaries retain their prior contents as
+`.previous`; these are file backups, not a complete system rollback.
+The user's appearance file is preserved. No existing-machine bootloader
+migration is provided, and the laptop remains on systemd-boot.
+
+Limine snapshot entries, matched historical kernel/module assets, read-only
+snapshot overlay boot and an explicit restore workflow remain unimplemented.
+The existing Snapper tooling is unchanged. Installing Limine does not complete
+snapshot recovery. See the [boot port batch](research/omarchy-port-plan.md#boot).
+The live ISO continues to use Archiso's systemd-boot path; this choice controls
+the bootloader on the newly installed virtual disk.
 
 ## Recover an interrupted attempt
 
@@ -91,6 +125,8 @@ tools/vm-build-iso RUN_DIRECTORY
 tools/vm-install-test RUN_DIRECTORY
 # Include failure/interruption and safe-recovery checks before installing:
 tools/vm-install-test RUN_DIRECTORY --recovery
+# Fresh opt-in Limine install, kernel refresh and upgraded-disk boot:
+tools/vm-install-test RUN_DIRECTORY --bootloader limine
 ```
 
 `vm-test --graphical` implies `--full --keep`. It drives real ReGreet

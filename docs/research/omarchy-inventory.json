@@ -4,8 +4,8 @@
   "revision": "5c4da021469517449770579793b37ce26d0a0d48",
   "counts": {
     "adapted": 66,
-    "pending": 299,
-    "partial": 108,
+    "pending": 298,
+    "partial": 109,
     "titan-policy": 6
   },
   "commands": [
@@ -2349,9 +2349,9 @@
       "command": "omarchy-refresh-limine",
       "sha256": "cd0c5bbfa0e3122661a505a81c8de7abccd0b7c09a092b77e7465fe8974f850f",
       "summary": "Overwrite the user config for the Limine bootloader and rebuild it.",
-      "status": "pending",
-      "equivalent": "",
-      "notes": "Behavioral review and implementation remain; no parity claimed."
+      "status": "partial",
+      "equivalent": "titan-install --bootloader limine / titan boot status|refresh / lib/titan/boot.sh",
+      "notes": "Original Bash fresh-UEFI-QEMU installation and guarded kernel-menu/EFI refresh exist. Appearance overrides and prior changed-file backups are preserved. Limine snapshot synchronization/boot/restore and existing-machine migration remain missing."
     },
     {
       "command": "omarchy-refresh-pacman",

@@ -159,3 +159,13 @@ windows may require pointer selection. Recording/OCR/webcam and multi-monitor
 behavior still need hands-on validation; only picker geometry and lifetime were
 exercised against the live desktop. Never validate lock/sleep/power/bulk-close by
 executing it on the user's working session.
+
+## Experimental boot management
+
+`titan boot status [--json]` reads the installer bootloader choice and generated
+file presence without mutation (schema 1; `snapshot_boot` is currently false).
+`titan boot refresh` is the Bash Limine generator for fresh UEFI QEMU Titan
+installations. It requires root, validates the installed root/ESP and retains
+changed output files as `.previous`. It cannot migrate the laptop's bootloader.
+See [installation](installation.md#opt-in-limine-in-a-fresh-vm) for selection,
+supported kernels, appearance overrides and the still-open snapshot work.

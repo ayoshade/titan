@@ -260,9 +260,14 @@ def plan(args):
     disk = check_disk(args.disk)
     hardware = detect()
     packages = (ROOT / "installation/packages.txt").read_text().split()
+    bootloader = getattr(args, "bootloader", "systemd-boot")
+    if bootloader not in {"systemd-boot", "limine"}:
+        raise ValueError("Unsupported bootloader")
+    if bootloader == "limine":
+        packages.extend(["limine", "jq"])
     return {"schema": 1, "experimental": True, "apply_scope": "QEMU live VM only",
             "disk": {key: disk[key] for key in ["name", "size", "model"]},
-            "firmware": "UEFI", "partition_table": "GPT", "efi_size_mib": 1024,
+            "firmware": "UEFI", "bootloader": bootloader, "partition_table": "GPT", "efi_size_mib": 1024,
             "filesystem": "btrfs", "encryption": False, "subvolumes": SUBVOLUMES,
             "user": args.user, "hostname": args.hostname, "timezone": args.timezone,
             "hardware": hardware, "packages": sorted(set(packages + hardware["packages"])),
@@ -402,13 +407,19 @@ def _apply(args, installation):
         chroot("systemctl", "enable", "NetworkManager", "bluetooth", "power-profiles-daemon")
         # Keep the hardware plan for diagnostics; no machine-specific config
         # is written into the user's overrides or shipped defaults.
+        uuid = run("blkid", "-s", "UUID", "-o", "value", root, capture=True).strip()
+        installation["root_uuid"] = uuid
         write("/etc/titan/install-plan.json", json.dumps(installation, indent=2) + "\n")
         checkpoint(record, step="bootloader")
-        chroot("bootctl", "--esp-path=/boot", "--no-variables", "install")
-        uuid = run("blkid", "-s", "UUID", "-o", "value", root, capture=True).strip()
-        write("/boot/loader/loader.conf", "default titan.conf\ntimeout 3\nconsole-mode keep\n")
-        write("/boot/loader/entries/titan.conf", "title Titan\nlinux /vmlinuz-linux\n"
-              f"initrd /initramfs-linux.img\noptions root=UUID={uuid} rw rootflags=subvol=@ quiet splash plymouth.ignore-serial-consoles\n")
+        if installation["bootloader"] == "systemd-boot":
+            chroot("bootctl", "--esp-path=/boot", "--no-variables", "install")
+            write("/boot/loader/loader.conf", "default titan.conf\ntimeout 3\nconsole-mode keep\n")
+            write("/boot/loader/entries/titan.conf", "title Titan\nlinux /vmlinuz-linux\n"
+                  f"initrd /initramfs-linux.img\noptions root=UUID={uuid} rw rootflags=subvol=@ quiet splash plymouth.ignore-serial-consoles\n")
+        else:
+            write("/etc/titan/limine.conf", (TARGET / "usr/share/titan/system/limine/menu.conf").read_text())
+            write("/etc/pacman.d/hooks/99-titan-limine.hook",
+                  (TARGET / "usr/share/titan/system/limine/99-titan-limine.hook").read_text())
         shutil.copytree(TARGET / "usr/share/titan/system/plymouth/titan",
                         TARGET / "usr/share/plymouth/themes/titan")
         chroot("plymouth-set-default-theme", "titan")
@@ -417,6 +428,8 @@ def _apply(args, installation):
         # microcode is embedded by mkinitcpio's hook; rebuild after all packages.
         checkpoint(record, step="initramfs")
         chroot("mkinitcpio", "-P")
+        if installation["bootloader"] == "limine":
+            chroot("/usr/share/titan/scripts/titan-boot", "refresh")
         checkpoint(record, step="unmounting")
         release_target(record)
         checkpoint(record, status="installed", step="complete")

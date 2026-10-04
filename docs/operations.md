@@ -253,7 +253,12 @@ catalogs and defaults as the CLI. Package/development actions open a maintenance
 terminal for transaction review and local sudo; the panel never holds secrets.
 The existing visual design and keyboard chords are preserved.
 
-`bin/titan` routes to distinct scripts and Python modules: `apps`,
+Shell and QML are the primary language direction; see
+[implementation languages](implementation-languages.md) for current byte
+concentrations and a focused migration sequence. The new `titan boot` route
+uses Bash. Existing interfaces remain supported while their operations migrate.
+
+Currently, `bin/titan` routes to distinct scripts and Python modules: `apps`,
 `configuration`, `packages`, `development`, `utilities`, `media_tools`,
 `system_status`, `services`, `plugins`, with shared primitives in `ops`. New functionality
 does not accumulate in the legacy `workflow.py`; it only adapts shortcuts and

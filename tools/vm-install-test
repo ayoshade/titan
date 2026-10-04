@@ -5,9 +5,17 @@
 set -euo pipefail
 root=$(cd -- "$(dirname -- "$(readlink -f "${BASH_SOURCE[0]}")")/.." && pwd)
 [[ -f $root/tests/vm_install_driver.py && -f $root/packaging/titan/PKGBUILD ]] || { echo 'vm-install-test: use a Titan development checkout' >&2; exit 1; }
-[[ $# == 1 || ( $# == 2 && $2 == --recovery ) ]] || { echo 'Usage: vm-install-test BUILD_RUN_DIRECTORY [--recovery]' >&2; exit 2; }
-recovery=${2:-}
-source_run=$(realpath "$1")
+[[ $# -ge 1 ]] || { echo 'Usage: vm-install-test BUILD_RUN_DIRECTORY [--recovery] [--bootloader systemd-boot|limine]' >&2; exit 2; }
+source_run=$(realpath "$1"); shift
+recovery="" bootloader=systemd-boot
+while (($#)); do
+ case $1 in
+  --recovery) recovery=--recovery; shift ;;
+  --bootloader) [[ $# -ge 2 ]] || exit 2; bootloader=$2; shift 2 ;;
+  *) echo 'vm-install-test: unexpected argument' >&2; exit 2 ;;
+ esac
+done
+[[ $bootloader == systemd-boot || $bootloader == limine ]] || { echo 'vm-install-test: invalid bootloader' >&2; exit 2; }
 cache=${XDG_CACHE_HOME:-$HOME/.cache}/titan/vm
 [[ $source_run == "$(realpath "$cache/runs")/"run.* && -f $source_run/key ]] || { echo 'vm-install-test: provide a kept ISO build run' >&2; exit 2; }
 mapfile -t images < <(find "$source_run/iso" -maxdepth 1 -name '*.iso')
@@ -74,9 +82,9 @@ SOURCE
 # build must contain these same files before recording an ISO release check.
 scp "${sshargs[@]}" -P "$sshport" "$root/lib/titan/install.py" root@127.0.0.1:/usr/share/titan-installer/lib/titan/install.py
 scp "${sshargs[@]}" -P "$sshport" "$root/bin/titan-install" root@127.0.0.1:/usr/share/titan-installer/bin/titan-install
-ssh_vm 'titan-install --disk /dev/vda --user tester --json' >"$run/install-plan.json"
-scp "${sshargs[@]}" -P "$sshport" "$root/tests/"{vm_install_driver,vm_installer_recovery}.py root@127.0.0.1:/root/
-ssh_vm "systemd-run --unit=titan-install-test --property=Type=oneshot --no-block /usr/bin/python3 /root/vm_install_driver.py http://10.0.2.2:$port/repo $recovery"
+ssh_vm "titan-install --disk /dev/vda --user tester --bootloader $bootloader --json" >"$run/install-plan.json"
+scp "${sshargs[@]}" -P "$sshport" "$root/tests/"{vm_install_driver,vm_installer_recovery,vm_bootloader}.py root@127.0.0.1:/root/
+ssh_vm "systemd-run --unit=titan-install-test --property=Type=oneshot --no-block /usr/bin/python3 /root/vm_install_driver.py http://10.0.2.2:$port/repo $recovery --bootloader $bootloader"
 echo 'Installing onto the blank virtual disk…'
 state=activating
 for i in $(seq 1 360); do
@@ -104,7 +112,13 @@ mount /dev/vda1 /mnt/titan-check/boot
 arch-chroot /mnt/titan-check pacman -Syu --needed --noconfirm openssh
 install -Dm600 /root/.ssh/authorized_keys /mnt/titan-check/root/.ssh/authorized_keys
 arch-chroot /mnt/titan-check systemctl enable sshd
-test -e /mnt/titan-check/boot/loader/entries/titan.conf
+if grep -q '"bootloader": "limine"' /mnt/titan-check/etc/titan/install-plan.json; then
+ test -e /mnt/titan-check/boot/limine.conf
+ test -e /mnt/titan-check/boot/EFI/BOOT/BOOTX64.EFI
+ install -m644 /root/vm_bootloader.py /mnt/titan-check/root/vm_bootloader.py
+else
+ test -e /mnt/titan-check/boot/loader/entries/titan.conf
+fi
 test -e /mnt/titan-check/etc/titan/install-plan.json
 umount --recursive /mnt/titan-check
 sync
@@ -132,4 +146,22 @@ wait "$capture"
 ssh_vm 'findmnt -no FSTYPE / | grep -qx btrfs && systemctl is-active --quiet greetd && titan hardware --json' >"$run/hardware.json"
 export TITAN_VM_RUN=$run TITAN_VM_SSH_PORT=$sshport TITAN_VM_SSH_USER=root
 "$root/tools/vm-graphical"
+if [[ $bootloader == limine ]]; then
+ ssh_vm 'python3 /root/vm_bootloader.py' >"$run/bootloader-checks.log" 2>&1
+ ssh_vm 'bootctl status --no-pager' >"$run/bootloader-status.txt"
+ # A real kernel-package transaction must rebuild the menu through its hook.
+ ssh_vm 'pacman -Syu --needed --noconfirm linux-lts limine' >"$run/bootloader-upgrade.log" 2>&1
+ ssh_vm 'grep -q "/Titan (linux-lts)" /boot/limine.conf && sync'
+ ssh_vm 'python3 /root/vm_bootloader.py --select-lts' >"$run/bootloader-select-lts.log" 2>&1
+ disk_pid=$(cat "$run/qemu.pid")
+ kill "$disk_pid"
+ for i in $(seq 1 50); do kill -0 "$disk_pid" 2>/dev/null || break; sleep .1; done
+ boot_vm
+ wait_ssh
+ ssh_vm 'uname -r | grep -q -- "-lts$"'
+ ssh_vm 'bootctl status --no-pager; uname -r; systemctl is-active greetd' >"$run/bootloader-after-upgrade.txt"
+ ssh_vm 'python3 /root/vm_bootloader.py' >"$run/bootloader-checks-after-upgrade.log" 2>&1
+ "$root/tools/vm-graphical"
+ echo 'PASS  Limine cold boot, refresh boundaries, kernel hook and updated-disk graphical login'
+fi
 echo 'All installer and installed-disk graphical checks passed.'

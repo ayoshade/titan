@@ -20,7 +20,9 @@ tools/vm-test --full --reuse RUN_DIRECTORY
 `--graphical` implies full packages and kept artifacts. `--stay` deliberately
 keeps QEMU running for debugging or ISO building. See `docs/installation.md`
 for `vm-build-iso` followed by `vm-install-test`, which installs a new disk and
-boots it with the ISO detached. These are Titan's own harnesses; it has no
+boots it with the ISO detached. `vm-install-test RUN --bootloader limine`
+adds booted-loader, refresh/backup/refusal, real LTS-kernel transaction and
+upgraded-disk graphical checks. Snapshot boot/restore is not covered. These are Titan's own harnesses; it has no
 Omarchy `test/acceptance.d` suite or sibling `omarchy-iso` checkout.
 
 `--workflows` tests the local checkout only and keeps command logs, JSON

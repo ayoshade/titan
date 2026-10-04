@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Drive only the interactive installer inside the disposable live QEMU guest."""
+import argparse
 import os
 import pty
 import select
@@ -42,9 +43,9 @@ def drive(command, prompts, *, env=None, on_data=None, timeout=1800):
         os.close(terminal)
 
 
-def install_command(repository):
+def install_command(repository, bootloader="systemd-boot"):
     return ["titan-install", "--apply", "--disk", "/dev/vda", "--user", "tester",
-            "--timezone", "UTC", "--vm-repo", repository]
+            "--timezone", "UTC", "--vm-repo", repository, "--bootloader", bootloader]
 
 
 def install_prompts():
@@ -54,7 +55,12 @@ def install_prompts():
 
 
 if __name__ == "__main__":
-    if len(sys.argv) == 3 and sys.argv[2] == "--recovery":
+    parser = argparse.ArgumentParser()
+    parser.add_argument('repository')
+    parser.add_argument('--recovery', action='store_true')
+    parser.add_argument('--bootloader', choices=('systemd-boot', 'limine'), default='systemd-boot')
+    args = parser.parse_args()
+    if args.recovery:
         from vm_installer_recovery import check_recovery
-        check_recovery(sys.argv[1])
-    raise SystemExit(drive(install_command(sys.argv[1]), install_prompts()))
+        check_recovery(args.repository)
+    raise SystemExit(drive(install_command(args.repository, args.bootloader), install_prompts()))

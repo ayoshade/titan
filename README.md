@@ -152,6 +152,7 @@ titan settings get | set KEY VALUE | reset KEY | schema
 titan wallpaper list | next | set PATH
 titan shell status | restart | ipc METHOD | open PANEL
 titan doctor                        # health check
+titan boot status --json             # experimental installer bootloader status
 titan hardware --json                # read-only hardware inventory and installer packages
 titan skills [--dry-run]             # link the three end-user skills for Codex and Claude
 titan update                        # snapshot, full upgrade, migrations (asks for sudo)

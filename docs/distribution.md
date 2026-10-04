@@ -207,6 +207,11 @@ Plymouth template are described in [installation.md](installation.md). Apply
 is guarded to live QEMU VMs; no physical installation is supported yet. The
 public stable repository remains 0.2.0, and the new installer rejects that older
 version before writes. Use the explicit local VM repository for development.
+Fresh QEMU installations may select Limine with `--bootloader limine`;
+`systemd-boot` remains the default. The Bash refresh helper owns generated
+kernel entries and a guarded EFI update hook. Snapshot boot/restore and
+existing-machine migration remain open; see [installation](installation.md).
+
 The UEFI ISO → dedicated-disk install → ISO-detached boot → ReGreet
 authentication → fresh-account Welcome path passed in QEMU. Local package
 regression checks passed 17/17. See [verification.md](verification.md) for

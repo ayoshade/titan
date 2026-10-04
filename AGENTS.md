@@ -19,8 +19,11 @@ instead of maintaining two competing instruction sets.
   `github.com/ayoshade/titan`. Titan 0.2.0 ships as signed Arch packages
   (`titan`, `titan-desktop`) through GitHub releases. The 0.3.0 development
   tree adds an experimental UEFI ISO/installer, currently confined to live
-  QEMU VMs; it is not published. See `docs/installation.md`. The owner's
-  development checkout is `~/dotfiles` on the laptop
+  QEMU VMs; it is not published. Fresh VM installs default to systemd-boot
+  with an opt-in Limine path (`--bootloader limine`). `titan boot refresh`
+  uses original Bash and refuses physical machines; Limine snapshot boot/restore
+  and live bootloader migration remain unimplemented. See `docs/installation.md`.
+  The owner's development checkout is `~/dotfiles` on the laptop
   `umbra`, local user `shade`.
 - **Titan** is the product name. **Umbra** is the existing shell/configuration
   name; `umbra` is also the laptop hostname, and `shade` is the local user.
@@ -169,6 +172,18 @@ Study its current public documentation and relevant workflows when designing
 Titan's installation, upgrades, customization and agent experience. Record the
 specific lessons adopted; verify current behavior instead of guessing.
 
+## Implementation languages
+
+Shell and QML are Titan's primary implementation languages (owner direction,
+2026-10-04). Use Bash for CLI routes, package/service operations, provisioning,
+updates and desktop workflow orchestration; use QML and native Quickshell APIs
+for presentation and reactive desktop state. Lua owns Hyprland configuration.
+New Omarchy workflow ports should follow these boundaries. Existing Python
+modules remain supported while operations migrate in focused, tested batches;
+do not bulk-rewrite them or alter GitHub language detection to hide their size.
+Python may remain where structured algorithms or development/test tooling
+benefit from it; record exceptions before adding new runtime Python modules.
+
 ## Desktop architecture
 
 **Do not use Waybar. Quickshell is Titan's primary desktop shell and UI layer.**
@@ -214,6 +229,7 @@ wl-clipboard, grim/slurp and suitable XDG portals.
 | `scripts/` | Internal helpers: installation, bootstrap, checks, session and desktop operations; callers in the tree are updated with any change |
 | `tools/` | Developer and release tooling (package builds, publishing, QEMU tests, ISO); never packaged |
 | `system/` | Reviewed templates for privileged system configuration |
+| `lib/titan/boot.sh`, `system/limine/` | QEMU-only Limine refresh and fresh-target templates; no laptop migration |
 | `installation/`, `lib/titan/install.py` | Experimental QEMU-only dedicated-disk installer and its base packages |
 | `system/hardware/profiles.json`, `lib/titan/hardware.py` | Read-only detection and conservative hardware package selection (`titan hardware`) |
 | `agents/skills/` | Repository development guides, read through the task table above; not shipped as desktop defaults |

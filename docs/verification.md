@@ -1,5 +1,91 @@
 # Verification
 
+## Limine foundation, full-command triage and language direction — 2026-10-04
+
+The owner asked to continue the full Omarchy command port and Limine work,
+then clarified that Shell and QML should be Titan's primary languages. The
+new runtime boot operation is original Bash (`lib/titan/boot.sh` and
+`scripts/titan-boot`), reached through `titan boot`. The existing guarded Python
+installer only adds the fresh-target choice; it has not been bulk-rewritten.
+`AGENTS.md` and [implementation languages](implementation-languages.md) record
+that boundary and a focused migration sequence. A local byte measurement found
+about 133 KB of runtime Python in `lib/` and 86 KB in tests/developer tools;
+it is not accurate to attribute the language share only to tests. No language
+statistics exclusions or artificial source padding were added.
+
+- **Port audit:** source summaries, option/function names and lexical command
+  references from all 299 originally pending commands were triaged against
+  pinned revision `5c4da021469517449770579793b37ce26d0a0d48`. This is not a
+  line-by-line behavioral review. `tools/audit-omarchy --plan --write` produces
+  [13 implementation batches](research/omarchy-port-plan.md) with owners,
+  language direction, prerequisites and acceptance criteria, including partial
+  equivalents and power-policy differences. Regeneration is reproducible.
+  Counts now are 66 adapted, 109 partial, 6 policy and 298 pending out of 479;
+  the Limine refresh mapping alone moved from pending to partial. Full parity
+  remains unfinished.
+- **Fresh VM:** `run.OWNZaL` built a current test ISO inside QEMU. In
+  `install.cQXPpv`, the ISO's embedded installer/entrypoint hashes match the
+  checkout, and installed Bash boot helper, templates and CLI hashes match
+  the final runtime sources (`boot-source-check.json`). Limine 12.9.1 was
+  installed from Arch's official package. The ISO retains Archiso's
+  systemd-boot path; the new installed disk uses the opt-in Limine choice.
+- **Visible boot/login:** a 1280×800 boot frame (`boot-frames/005.png`) was
+  inspected: graphite menu, Titan branding, readable kernel selection and
+  countdown. The ISO-detached installed disk booted Linux 7.2.8-arch1-2;
+  `bootctl status` reports Limine 12.9.1. Both before and after a real LTS
+  package transaction, all eight existing graphical checks passed, including
+  ReGreet authentication, first-login setup, shell/keybinding, rendered lock,
+  VT redraw, rescue, lockout explanation and unlock. No Quickshell styling or
+  keyboard chords changed.
+- **Boot operations:** real VM checks pass for repeatable refresh and preserved
+  appearance settings; physical-machine detection refusal; competing refresh
+  locking; unmanaged-menu refusal; an incomplete kernel update refusing before
+  either output changes; changed-menu backups and restore. These checks pass
+  again after the package transaction and while booted into LTS. Status reports
+  schema 1 and `snapshot_boot: false`. The helper retains changed generated
+  output files as `.previous`; this is not a transactional system rollback.
+- **Kernel lifecycle:** an actual full pacman transaction installed Linux LTS
+  and rebuilt its initramfs. The `99-titan-limine.hook` generated the additional
+  menu entry. The upgraded disk passed desktop acceptance on the default
+  kernel. A subsequent explicit one-shot selection booted `6.18.55-1-lts`, with
+  greetd active and all six boot-operation checks passing. The final harness
+  now selects LTS for its post-transaction boot; this last selection step was
+  exercised separately on the same kept disk, after the original harness
+  completed. The user's default appearance/entry was restored and the one-shot
+  request was consumed. The LTS Plymouth frame was also inspected.
+- **Corrections/failed evidence:** an old cloud guest `run.yFc9LX` refused a
+  package-file conflict left by an earlier fixture; the latest kept workflow
+  guest was used instead. The first fresh Limine attempt `install.I88YNu`
+  stopped before EFI deployment because the generic virtualization query
+  detected the install chroot. Querying `systemd-detect-virt --vm` correctly
+  identifies KVM there; a diagnostic mount confirmed target Btrfs `@`/UUID and
+  FAT ESP checks before the successful fresh retry. Failure artifacts are
+  retained. No physical-machine guard was removed.
+- **Final packaging:** the Titan package now declares `jq` for Shell JSON
+  operations, including managed systemd-boot status. A final `--full --reuse`
+  run against `run.OWNZaL` rebuilt and installed that package and passed all
+  19 package/configuration checks (`limine-final-packages.log`). All task-owned
+  VMs are stopped; their disks, build outputs and failure logs are retained.
+- **Static/host:** 61 unit/integration tests, Python compile, changed Bash
+  syntax and `git diff --check` pass. `scripts/doctor` passes with the actual
+  current Hyprland instance (the agent's inherited instance is stale).
+  Host `titan boot status --json` is read-only and refresh refuses nonroot.
+  No host packages, services, power policy, bootloader or firmware were changed.
+
+Artifacts remain under `~/.cache/titan/vm/runs/install.cQXPpv`, including
+`install.log`, `iso-source-check.json`, `boot-source-check.json`,
+`bootloader-{checks,status,upgrade,after-upgrade,select-lts,lts-boot}` logs and
+boot/graphical frames. `run.OWNZaL/iso` holds the test ISO and build record.
+The test ISO contains a throwaway SSH public key and must not be distributed.
+
+Still open: Limine snapshot entry synchronization with matching historical
+kernel/module assets, read-only snapshot overlay boot and explicit restore;
+a real Limine version upgrade, physical firmware, Secure Boot, additional
+kernel flavors and existing-machine bootloader migration. The laptop keeps
+systemd-boot. Next boot milestone is the snapshot path in the
+[boot batch](research/omarchy-port-plan.md#boot); next language migration is a
+focused package/service command family with its VM lifecycle checks.
+
 ## Workflow VM acceptance and provisioning corrections — 2026-10-04
 
 The modular workflow foundation now has repeatable real-package acceptance:

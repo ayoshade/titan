@@ -1,0 +1,23 @@
+[Trigger]
+Operation = Install
+Operation = Upgrade
+Type = Package
+Target = linux
+Target = linux-lts
+Target = linux-zen
+Target = linux-hardened
+Target = limine
+Target = titan
+
+[Trigger]
+Operation = Remove
+Type = Package
+Target = linux
+Target = linux-lts
+Target = linux-zen
+Target = linux-hardened
+
+[Action]
+Description = Refreshing Titan Limine kernel entries and EFI binary...
+When = PostTransaction
+Exec = /usr/share/titan/scripts/titan-boot refresh

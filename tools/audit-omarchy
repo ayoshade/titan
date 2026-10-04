@@ -4,12 +4,14 @@ import argparse
 from collections import Counter
 import hashlib
 import json
+import re
 from pathlib import Path
 import subprocess
 
 root = Path(__file__).resolve().parents[1]
 parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument('reference', type=Path)
+parser.add_argument('--plan', action='store_true', help='Generate the grouped source-triage report (use --write to save it)')
 parser.add_argument('--write', action='store_true', help='Update the tracked inventory for the pinned coverage revision')
 args = parser.parse_args()
 reference = args.reference.expanduser().resolve()
@@ -33,6 +35,53 @@ for directory in ('config', 'default', 'install', 'shell', 'manual', 'themes'):
             files.append({'path': str(file.relative_to(reference)), 'sha256': hashlib.sha256(file.read_bytes()).hexdigest()})
 inventory = {'schema': 1, 'source': 'https://github.com/omacom/omarchy', 'revision': revision,
              'counts': dict(Counter(item['status'] for item in commands)), 'commands': commands, 'files': files}
+if args.plan:
+    plan = json.loads((root / 'docs/research/omarchy-port-batches.json').read_text())
+    if plan['revision'] != revision:
+        parser.error('Port plan revision differs from the reference')
+    known = {item['command'] for item in commands}
+    groups = {batch['id']: [] for batch in plan['batches']}
+    for item in commands:
+        if item['status'] == 'adapted':
+            continue
+        name = item['command'].removeprefix('omarchy-')
+        batch = next((batch for batch in plan['batches']
+                      if any(name.startswith(prefix) for prefix in batch['prefixes'])), None)
+        if batch is None:
+            parser.error(f"No implementation batch for {item['command']}")
+        source = (reference / 'bin' / item['command']).read_text(errors='replace')
+        refs = sorted(set(re.findall(r'\bomarchy-[a-z0-9-]+\b', source)) & known - {item['command']})
+        groups[batch['id']].append((item, refs, len(source.splitlines())))
+    lines = ['# Omarchy command port plan', '', f'Source revision: `{revision}`.', '',
+             plan['review_level'], '',
+             'All 299 originally pending commands were triaged; partial equivalents and power-policy differences are included too. '
+             'The report reads the full source files to extract lexical references and line counts. '
+             'References can occur in comments, embedded programs or data; they are leads for behavioral review, not a verified call graph. '
+             'A batch assignment never upgrades implementation or acceptance status.', '',
+             'Regenerate with `tools/audit-omarchy ~/.cache/titan/references/omarchy --plan --write`. '
+             'Do not edit this generated report; edit the batch specification and coverage mapping.', '',
+             'Shell and QML are the primary implementation languages. Existing Python APIs remain supported during focused migrations. '
+             'Developer analysis and tests may use Python. No language-statistics exclusions are introduced.', '',
+             '| Batch | Pending | Partial | Policy |', '| --- | ---: | ---: | ---: |']
+    for batch in plan['batches']:
+        counts = Counter(item['status'] for item, _, _ in groups[batch['id']])
+        lines.append(f"| [{batch['title']}](#{batch['id']}) | {counts['pending']} | {counts['partial']} | {counts['titan-policy']} |")
+    for batch in plan['batches']:
+        lines += ['', f"<a id=\"{batch['id']}\"></a>", '', f"## {batch['title']}", '',
+                  f"Owner/language: {batch['language']}", '',
+                  'Prerequisites: ' + (', '.join(batch['depends_on']) or 'existing Titan foundation') + '.', '',
+                  batch['scope'], '', 'Acceptance: ' + batch['acceptance'], '',
+                  '| Reference command | Status | Source lines | Behavior to review | Lexical references |',
+                  '| --- | --- | ---: | --- | --- |']
+        for item, refs, count in groups[batch['id']]:
+            summary = (item['summary'] or 'No source summary; inspect implementation.').replace('|', '\\|').replace('\n', ' ')
+            reftext = ', '.join('`' + name.removeprefix('omarchy-') + '`' for name in refs) or '—'
+            lines.append(f"| `{item['command']}` | {item['status']} | {count} | {summary} | {reftext} |")
+    report = '\n'.join(lines) + '\n'
+    if args.write:
+        (root / 'docs/research/omarchy-port-plan.md').write_text(report)
+    else:
+        print(report)
 if args.write:
     (root / 'docs/research/omarchy-inventory.json').write_text(json.dumps(inventory, indent=2) + '\n')
 print(json.dumps({'revision': revision, 'commands': len(commands), 'files': len(files), 'counts': inventory['counts']}, indent=2))

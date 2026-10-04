@@ -18,16 +18,23 @@ Titan's older shortcut reference. Preserve Titan's researched appearance and
   commands, source hash, summary and coverage, plus hashes for 878 reference
   files under config/default/install/shell/manual/themes.
 - [omarchy-equivalents.json](omarchy-equivalents.json): maintained explicit
-  mappings for 180 commands. **299 remain unmapped/pending review.** That isn't
-  a count of 299 distinct missing user features; many are internal helpers.
-- 66 commands have adapted Titan operations, 108 have partial equivalents and
+  mappings for 181 commands. **298 remain pending implementation or detailed
+  behavioral review.** That isn't a count of 298 distinct missing user features;
+  many are internal helpers.
+- 66 commands have adapted Titan operations, 109 have partial equivalents and
   6 relate to the laptop's differing idle/power policy. Adapted means a Titan
   implementation exists, not that every hardware path was acceptance-tested.
+- [omarchy-port-plan.md](omarchy-port-plan.md): all originally pending commands,
+  partial equivalents and policy differences grouped into 13 implementation
+  batches with language boundaries, prerequisites and acceptance criteria.
+  This is source triage, not complete line-by-line behavioral review. Regenerate
+  it from [omarchy-port-batches.json](omarchy-port-batches.json) with `--plan --write`.
 - Refresh the inventory against the pinned clone:
 
   ```sh
   tools/audit-omarchy ~/.cache/titan/references/omarchy
   tools/audit-omarchy ~/.cache/titan/references/omarchy --write
+  tools/audit-omarchy ~/.cache/titan/references/omarchy --plan --write
   ```
 
   The tool refuses a revision differing from the mapping. For a new upstream
@@ -35,7 +42,22 @@ Titan's older shortcut reference. Preserve Titan's researched appearance and
   claims to changed source. It inventories files without copying source into
   Titan. This source inventory is complete; the behavioral review is not.
 
-## Implemented in this batch
+## Limine and language direction follow-up
+
+Fresh QEMU installs now have an opt-in Limine path with original Bash
+`lib/titan/boot.sh` and `titan boot status|refresh`. Kernel entries, user
+appearance preservation, output backups and a pacman refresh hook are the
+initial foundation. `omarchy-refresh-limine` is partial because snapshot
+synchronization/boot/restore and live migration are still missing. See
+[installation](../installation.md) and [verification](../verification.md).
+
+Shell and QML are the owner's primary-language direction. The
+[language plan](../implementation-languages.md) records where runtime Python
+is concentrated and how to migrate command families without dropping their
+safety or CLI contracts. Existing implementations remain supported; source
+triage does not count as a completed port.
+
+## Implemented in the initial foundation batch
 
 See [operations](../operations.md) for commands, state, recovery and module
 ownership. The original implementation adds:

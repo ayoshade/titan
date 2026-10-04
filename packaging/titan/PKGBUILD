@@ -8,7 +8,7 @@ pkgdesc="Titan desktop: Hyprland + Quickshell defaults, shell, tools and migrati
 arch=('any')
 url="https://github.com/ayoshade/titan"
 license=('Apache-2.0' 'MIT')
-depends=('bash' 'python' 'hyprland' 'quickshell' 'kitty' 'hyprlock' 'wl-clipboard' 'libnotify')
+depends=('bash' 'python' 'jq' 'hyprland' 'quickshell' 'kitty' 'hyprlock' 'wl-clipboard' 'libnotify')
 optdepends=('titan-desktop: the complete Titan desktop package set'
             'snapper: snapshots before updates (scripts/install-snapshots)')
 source=()
