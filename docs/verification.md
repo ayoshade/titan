@@ -873,3 +873,37 @@ change.
   and ran it (2.102.0). Processes Hyprland had already spawned (`vt-redraw`,
   Xwayland) carry the same `PATH`. No Titan binding launches a mise tool
   today; the check used a temporary dispatched command, not a key.
+
+## saneAspect batch: toggles, game mode, scale chips, screen corners — 2026-10-03
+
+Research: captions of nKomstQedmE and OeT5VgeLSIQ read in full, with native
+frames sampled (see `docs/research/shell-panels.md`). rLFFjT6kAkA and
+wcm95W876OU were not reviewed in this batch.
+
+- **Island toggle announcement:** on umbra (1366×768, scale 1, theme industrial,
+  accent theme), `bin/workflow nightlight` on, then off, was captured with grim:
+  the pill kept its 230 px width and showed the ring, moon and "Night Light", then
+  the slashed icon, then returned to the workspace marks, clock and status. No
+  desktop notification was sent while the shell ran. Night light was restored
+  to off.
+- **Game mode:** toggled on and off live. Hyprland reported animations, blur and
+  shadows off, rounding 0 and border 0, then 16 and 1 again with everything back
+  on. The full-width bar showed the gamepad announcement, and the saved state file
+  was removed afterwards.
+- **Screen corners:** grim captures of the top-left and bottom-right corners show
+  the black rounded corners at 14 px; the layer is `umbra-corners` with an empty
+  input region. Clicks through a corner were not tested by hand.
+- **Display scale chips:** the Display page was opened by temporarily making it
+  the default control-center page (reverted). It shows eDP-1 with 1.0× selected
+  and 2.0×; 2.0× was not clicked, so applying a scale from a chip is untested
+  live. `scale set` validation (unclean value, unknown monitor, missing argument)
+  and game-mode restore, including a state file saved by the previous version,
+  are covered by `tests/test_workflow_display.py`.
+- **Settings:** Bar & Island shows the Screen corners switch and radius.
+- **Checks:** 42 unit tests pass, `scripts/doctor` passes, qmllint reports no
+  errors (only the usual uncreatable PanelWindow warning), the live shell
+  reloaded without errors, and `git diff --check` is clean.
+- **Still open:** clicking a scale chip on a monitor with more clean scales,
+  pointer pass-through at a corner, and the reference's game-bar contents,
+  game-mode notification tab, notifications inside the island, two-phase notch
+  morph, spring motion and screenshot-blur lock screen.

@@ -5,7 +5,7 @@ Channel: https://www.youtube.com/@saneAspect/videos. On 2026-10-03, 80 public up
 Review levels: *measured* = native frames analysed numerically; *sampled* = frame
 samples viewed; *captions* = caption text only; blank = not reviewed yet.
 
-Next to review: nKomstQedmE captions, OeT5VgeLSIQ, rLFFjT6kAkA, wcm95W876OU, and full
+Next to review: rLFFjT6kAkA (video downloaded, captions still needed), wcm95W876OU, and full
 frame passes of Ob98KFByTec and ZS6syCYFKPE. YouTube returned HTTP 429 for caption downloads when they were requested in parallel, so fetch them one at a time.
 
 | ID | Title | Length | Date | Topic | Review |
@@ -49,7 +49,7 @@ frame passes of Ob98KFByTec and ZS6syCYFKPE. YouTube returned HTTP 429 for capti
 | [4_fp-aQ0nX0](https://www.youtube.com/watch?v=4_fp-aQ0nX0) | Caelestia Dots in 2026: Should You Use Them? | 21:49 |  |  |  |
 | [nczPmyQx9Ks](https://www.youtube.com/watch?v=nczPmyQx9Ks) | Stop using HyprPanel, its creator already did | 20:37 |  |  |  |
 | [k5-U_xBA3Mg](https://www.youtube.com/watch?v=k5-U_xBA3Mg) | Learn Quickshell in 2026: The Complete Roadmap | 30:42 |  |  |  |
-| [nKomstQedmE](https://www.youtube.com/watch?v=nKomstQedmE) | I Replaced My Whole Hyprland Bar With One Notch | 26:55 | 2026-08-01 | Notch mode, settings app | Sampled: 25 s contact sheet and 17 s settings crops (Bar & Island, Appearance, Motion). English captions downloaded but not yet read. |
+| [nKomstQedmE](https://www.youtube.com/watch?v=nKomstQedmE) | I Replaced My Whole Hyprland Bar With One Notch | 26:55 | 2026-08-01 | Notch mode, settings app, screen corners, lock screen, motion | Captions read in full (2026-10-03; the auto-captions are a rough machine translation). Sampled: 25 s contact sheet, 17 s settings crops, native frames of the hover media card (9:16), screen corners (14:30–16:15, radius measured) and the lock screen (16:30–18:40). Notes in [shell-panels.md](shell-panels.md#toggles-game-mode-corners-and-lock-screen). |
 | [VqXPtJt8okc](https://www.youtube.com/watch?v=VqXPtJt8okc) | How to Get Niri’s Overview on Hyprland | 19:42 |  |  |  |
 | [2ZNGlPW6DM8](https://www.youtube.com/watch?v=2ZNGlPW6DM8) | How to Get Liquid Glass on Hyprland | 22:50 |  |  |  |
 | [7ErM-TF6K2c](https://www.youtube.com/watch?v=7ErM-TF6K2c) | Don't Learn Quickshell (Until This Happens) | 13:09 |  |  |  |
@@ -58,7 +58,7 @@ frame passes of Ob98KFByTec and ZS6syCYFKPE. YouTube returned HTTP 429 for capti
 | [7JLfiy-fli4](https://www.youtube.com/watch?v=7JLfiy-fli4) | Beginner’s Roadmap To Ricing Hyprland in 2026 | 15:21 |  |  |  |
 | [aKoG9rFnTOk](https://www.youtube.com/watch?v=aKoG9rFnTOk) | The New Way of Ricing Hyprland in The Age of Quickshell | 13:54 |  |  |  |
 | [TfZ676_41H8](https://www.youtube.com/watch?v=TfZ676_41H8) | How to Make a Game Mode for Hyprland | 9:16 |  |  |  |
-| [OeT5VgeLSIQ](https://www.youtube.com/watch?v=OeT5VgeLSIQ) | So I’ve been working on this new Quickshell feature… | 13:03 | 2026-06-25 | Quickshell feature preview | Downloaded with captions 2026-10-03; not reviewed. |
+| [OeT5VgeLSIQ](https://www.youtube.com/watch?v=OeT5VgeLSIQ) | So I’ve been working on this new Quickshell feature… | 13:03 | 2026-06-25 | Night light, game mode, scale switcher, game-mode notifications | Captions read in full; native 1080p frames of the island toggle (0:54–1:26), the game bar and its notification tab (10:25–11:50), the control center and the Display scale page (8:30). Notes in [shell-panels.md](shell-panels.md#toggles-game-mode-corners-and-lock-screen). |
 | [Vlpyz4c4Xdw](https://www.youtube.com/watch?v=Vlpyz4c4Xdw) | How to Rice Quickshell (Part 2) / Battery, Network and Volume | 57:20 |  |  |  |
 | [k0fyXP6YaRk](https://www.youtube.com/watch?v=k0fyXP6YaRk) | How to Rice Quickshell (Part 1) | 22:56 |  |  |  |
 | [-rD5tVnaepc](https://www.youtube.com/watch?v=-rD5tVnaepc) | What Makes The Perfect Hyprland Rice (3 Things) | 13:41 |  |  |  |

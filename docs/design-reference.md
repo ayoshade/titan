@@ -43,6 +43,14 @@ Ob98KFByTec, nKomstQedmE and ipEGXS5WcSg. Launcher and menu styling, the power m
 game-mode bar and the night-light temperature slider followed later the same
 day. See [research/shell-panels.md](research/shell-panels.md).
 
+## Toggles, game mode, corners and lock (2026-10-03)
+
+Captions and native frames of OeT5VgeLSIQ and nKomstQedmE added the island's
+toggle announcement, game mode's full effect list, Display scale chips and
+rounded screen corners; their lock screen, game-bar notifications and motion
+system are recorded as open gaps. See
+[research/shell-panels.md](research/shell-panels.md#toggles-game-mode-corners-and-lock-screen).
+
 ## Current implementation
 
 This summarizes the shell as it is now. The research notes linked above give
@@ -54,6 +62,8 @@ the measurements and per-feature checklists.
   - Hover widens it slightly; volume and brightness expand it into an OSD.
   - A click opens the dashboard (`IslandDashboard.qml`). The dashboard clock
     morphs it into a month calendar (`IslandCalendar.qml`).
+  - Night light and game mode announce themselves inside the pill for ~2 s
+    (`components/ToggleIndicator.qml`).
   - Notch mode attaches it to the top edge with flares. Game mode makes it a
     full-width bar. The side circles of the older reference layout were
     removed to match the October 2 video.
@@ -62,6 +72,8 @@ the measurements and per-feature checklists.
     drill-in pages, media, tray, notifications and an inline power menu.
   - Panels use a black frame and graphite inner surface; search menus use the
     reference's flat black launcher style (`components/SearchMenu.qml`).
+- **Screen corners** (`ScreenCorners.qml`): black rounded display corners on the
+  overlay layer that take no input; hidden in game mode.
 - **Settings** (`SettingsApp.qml`): a floating window whose rows come from
   `theme/settings-schema.json`.
 - **Theme and wallpaper carousels:** top center, centred selection. Each

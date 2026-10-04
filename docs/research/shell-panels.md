@@ -122,6 +122,55 @@ Sources: 5cp6DkClAuM 0:48–0:53, J8s7O2IGogE 5:00.
   opens a media card with large art on an art-tinted background, plus title,
   artist, album, player, progress and transport.
 
+## Toggles, game mode, corners and lock screen
+
+Sources: OeT5VgeLSIQ (2026-06-25) and nKomstQedmE (2026-08-01), captions read in
+full and native frames sampled on 2026-10-03. Both predate the October 2
+workspace island, so they show a smaller clock-only pill; behaviour carries
+over, sizes do not. He records at 1.25× scale, so frame pixels ÷ 1.25 ≈ logical.
+
+- **Toggle announcement** (OeT5VgeLSIQ 0:54–1:26): pressing the night-light or
+  game-mode key keeps the pill the same size and swaps its contents for about
+  2 s: an icon in a thin ring plus "Night Light" / "Game Mode". On: accent ring
+  and accent icon. Off: grey ring, and a slash draws itself through the icon.
+  Captions: "the island itself becomes the indicator", and the bar and control
+  center tile read one switch, so they cannot disagree. His game-mode glyph is a
+  hand-drawn gamepad.
+- **Game mode** (OeT5VgeLSIQ 3:00–5:30; nKomstQedmE 15:45): a full-width bar
+  ≈37 logical px tall with media (art, title, artist) on the left of centre, the
+  clock centred and Wi-Fi plus a battery-percentage chip on the right. It also
+  turns off animations, shadows, blur, rounded corners and borders; the screen
+  corners fade away.
+- **Game-mode notifications** (10:25–11:50): the bar's contents are replaced by
+  the notification and a ~358×55 tab with rounded bottom corners protrudes below
+  the bar, about 2 s, longer on hover. In normal mode the island itself becomes
+  a ~358 px notification pill. nKomstQedmE 7:30 confirms that media and
+  notifications replace the island's content rather than opening other surfaces.
+- **Scale switcher** (8:30): Control center → Display lists each monitor
+  ("eDP-1 · 1920×1200", "· focused") with 1.0, 1.25, 1.5, 1.75 and 2.0× chips;
+  the current one is accent-filled. The Display tile's subtitle shows the scale.
+- **Screen corners** (nKomstQedmE 14:30–16:15): black rounded display corners on
+  an overlay layer above full-screen windows, with an empty input region, faded
+  out in game mode. Measured ≈12–14 px radius in the 1080p frames.
+- **Notch details** (nKomstQedmE 4:00–7:30): pure `#000000` in both forms; a
+  14 px flare; floating ↔ notch is one shape morphing in two phases (flatten the
+  top corners, then grow the flare); in notch mode the shape extends 4 px above
+  the screen edge so the shadow's padding leaves no gap.
+- **Hover card** (nKomstQedmE 9:16): 88 px album art, bold title, album, artist in
+  muted capitals and transport on the left; the clock slides from centre to the
+  right and sits above a day strip (Notchnook-inspired). The October dashboard
+  supersedes this layout.
+- **Motion** (nKomstQedmE 10:15–11:15): a generated damped-spring curve (400 ms,
+  damping 0.8) for movement; fades use a separate critically damped curve so
+  opacity never overshoots. The "Bounce" setting is the damping coefficient.
+- **Fonts** (nKomstQedmE 12:15–13:15): SF Pro Text/Display, or Inter (Medium for
+  body) with Inter Display, and reduced hinting to avoid colour halos.
+- **Lock screen** (nKomstQedmE 16:30–23:15): a frozen screenshot of the desktop,
+  blurred and darkened ~20% with a gradient; the date above a large clock;
+  avatar, user name and "Press Any Key to Enter Password", the field appearing
+  only once typing starts; battery and Wi-Fi top right. He captures JPEG (q85)
+  for speed and locks anyway after 700 ms if the capture fails.
+
 ## Titan implementation checklist
 
 | Item | State |
@@ -148,6 +197,14 @@ Sources: 5cp6DkClAuM 0:48–0:53, J8s7O2IGogE 5:00.
 | Notifications | Adaptation: avatar cards grouped by app with "+N more"; toast drops below the island |
 | Media panel | Implemented after the Ob98KFByTec album-art card, with a blurred art backdrop |
 | Lock screen restyle | Not done: Hyprlock reliability is still unverified (see AGENTS.md), and it cannot be tested without locking the session |
+| Island toggle announcement | Implemented (`components/ToggleIndicator.qml`): same pill size, ring and icon, slash on off, ~2 s. Triggered by any change of the shared toggle state. Accent follows Titan's accent choice |
+| Game mode effects | Extended: also rounding 0 and borders 0, besides animations, blur and shadows. Screen corners fade out |
+| Game bar contents (media, battery chip) and notification tab | Not implemented. Titan's game bar keeps the compact island's contents |
+| Notifications inside the island | Not implemented: Titan's toast drops below the island |
+| Display scale chips | Implemented per monitor through `workflow scale list/set`. Adaptation: only scales that divide the panel cleanly are offered, so 1366×768 shows 1.0× and 2.0× |
+| Screen corners | Implemented (`modules/ScreenCorners.qml`, Settings → Bar & Island, on by default, 14 px) |
+| Two-phase notch morph, 4 px overhang, spring-curve motion | Not implemented; Titan switches notch mode without the morph and uses OutBack easing |
+| Screenshot-blur lock screen with press-any-key | Not implemented. Hyprlock reliability work comes first, and lock changes need hands-on testing |
 
 ## Phase 2 login and boot — 2026-10-03
 
