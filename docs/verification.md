@@ -1,5 +1,81 @@
 # Verification
 
+## System status/control-family Bash migration — 2026-10-04
+
+Original Bash `lib/titan/system_status.sh` now owns battery, network, Bluetooth,
+power profiles and audio through the existing `scripts/titan-system` route.
+Direct `desktop_cli.py` callers delegate there; top-level help still lists the
+families and the old Python runtime module is retired. No QML, compositor,
+keybinding, native Quickshell service or host power-policy changes occur.
+
+- **Contracts:** schema-1 battery/external-power and network device JSON remain;
+  nmcli escaped separators are decoded and malformed responses fail without
+  success JSON. Routine status omits SSIDs/connection names/credentials.
+  Explicit network QR output uses inherited stdio; pairing/network editing
+  remain interactive. Noninteractive calls now use a 30-second timeout with a
+  further 5-second termination bound. Audio default IDs must be positive,
+  volume stays 0–100 percent and input selection/decimal leading zeros/signs
+  work without octal interpretation or Bash integer overflow. The Performance
+  marker guard, native profile availability and Polkit authorization remain.
+  Syntax errors return 2; operation/refusal/tool/timeout failures 1; interruption
+  130. No new Titan state, polling, sudo escalation or credentials logging exists.
+- **Local:** 116 tests pass, including nine focused system-command checks for
+  native-PATH/direct caller compatibility, all help levels, invalid/injected
+  arguments, JSON escaped fields/malformed responses, audio bounds/argv, policy
+  markers, optional/disappearing battery fields, unavailable tools and failure/
+  interruption/timeout handling. Test-owned recorded stubs never control host
+  devices. Bash/Python syntax and `git diff --check` pass.
+- **Host:** read-only battery/network JSON and audio volume inspection pass.
+  `power set balanced` is refused by the existing Performance-policy guard
+  before invoking a control tool. `scripts/doctor` passed before adding the
+  missing dependency to the manifest; the final run correctly stops at missing
+  pacman-managed `python-gobject`. Arch declares it optional for
+  `power-profiles-daemon` but requires it for `powerprofilesctl`; the host utility
+  currently fails importing `gi.repository`. Titan now declares it in
+  `packages/services.txt` and as a base-package optional dependency. D-Bus shows
+  the laptop's Performance policy active. `sudo -n true` requires local
+  authentication. The owner's terminal remedy is
+  `sudo pacman -Syu --needed python-gobject`, then `titan doctor` and
+  `titan power current`. No host upgrade, radio/audio/profile change or shell
+  restart was performed. The upstream power utility still uses Python;
+  migrating Titan's wrappers does not remove that external dependency.
+- **Packages:** `tools/vm-test --full --stay --reuse run.OWNZaL` rebuilt current
+  packages and passed all 19 standard package/config checks, including packaged
+  doctor and the newly declared dependency. Final help/QR option refinements
+  were rebuilt and installed in the same owned 2 GiB VM; focused acceptance
+  checks final runtime hashes without overlays and confirms the retired module
+  is absent. There is no ISO build, signing or publication.
+- **Focused real acceptance:** `tools/vm-system-checks run.OWNZaL` passes seven
+  checks: installed source hashes/retired module; battery/network inspection
+  without Python on PATH and direct Python compatibility with no Titan state;
+  real Wi-Fi radio toggle/restoration; real PipeWire null-sink default/volume/
+  mute changes and invalid-input preservation; real power-saver switch,
+  Performance-marker refusal, unavailable-Performance refusal and restoration;
+  bounded Bluetooth daemon absence; and byte-identical normal user choice JSON.
+  The sink and policy marker are removed; test-started services are stopped.
+  Network/power controls use guest-only sudo because SSH lacks an active
+  graphical Polkit session. The runtime commands never add sudo themselves.
+- **Fixture corrections/limits:** initial runs used bare Python on a restricted
+  PATH, attempted Polkit controls from SSH and waited on native Bluetooth
+  without a daemon. A retry also assumed QEMU supported Performance. These
+  failures are retained. Final checks use the explicit system Python for direct
+  compatibility, locally authenticated guest controls, the runtime Bluetooth
+  timeout and actual available profiles. No physical Bluetooth pairing, Wi-Fi
+  connection/QR credentials, interactive nmtui or input microphone hardware
+  was exercised. Local stubs verify those argv/interactive contracts; hardware
+  and graphical authentication remain separate acceptance work.
+
+Artifacts: `run.OWNZaL/{system-source.json,system-results.json,
+system-commands.log,system-initial-results.json,system-initial-commands.log,
+system-profile-fixture-results.json,system-profile-fixture-commands.log,
+system-package-refresh.log,system-final-inspection.log}` and host
+`~/.cache/titan/system-{final-local-tests,final-host-doctor,final-package-checks,
+final-rebuild,final-acceptance}.log`. The task-owned VM is stopped after final
+inspection. Coverage remains 75 adapted, 107 partial, 6 policy and 291 pending
+of 479; this is a language migration with preserved desktop ownership.
+Next: reconcile the host dependency through the owner's authenticated terminal,
+then developer recipe/job provisioning with existing real workflow acceptance.
+
 ## Package transaction-family Bash migration — 2026-10-04
 
 Original Bash `lib/titan/packages.sh` now owns the whole `titan pkg` CLI:

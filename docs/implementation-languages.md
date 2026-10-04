@@ -35,8 +35,12 @@ approval.
 2. Service lifecycles now use `lib/titan/services.sh`; the Python service module
    has been retired after real Docker/CUPS/Tailscale VM checks. The entire package
    CLI now uses `packages.sh`, including catalogs, bundles, search/info/listing,
-   full-upgrade installation, strict removal and AUR orchestration. Continue with
-   simple wrappers from `system_status.py` one family at a time. Keep the public
+   full-upgrade installation, strict removal and AUR orchestration. Battery,
+   network, Bluetooth, power and audio wrappers now use `system_status.sh`, with
+   compatibility dispatch from the Python CLI. Noninteractive calls are bounded;
+   pairing/editing stay interactive and Quickshell owns native reactive services.
+   `tools/vm-system-checks RUN` checks real controls/refusals and restoration.
+   Continue with developer provisioning/jobs one family at a time. Keep the public
    CLI, structured status, confirmation boundaries and exit codes; use `jq`
    for JSON and argv arrays for subprocess arguments.
    Dependency predicates (`commands.sh`), package predicates/drop/history/cache

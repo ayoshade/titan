@@ -255,6 +255,14 @@ log decoded contents. Network status omits SSIDs and passwords; `network qr`
 is explicitly for viewing credentials locally, never a routine agent check.
 Bluetooth pairing stays interactive. Power changes respect the laptop's
 always-awake/Performance policy. None of these commands adds an idle daemon.
+These five command families now use `lib/titan/system_status.sh`, including
+compatibility dispatch from the Python CLI. Status reads create no Titan state.
+Noninteractive calls stop after 30 seconds (with a further 5-second termination
+bound); network editing and pairing remain interactive. Failed native calls,
+timeouts, invalid node IDs/volume ranges and the power-policy guard return 1;
+invalid CLI syntax returns 2 and interruption 130. Available profiles and local
+Polkit authorization still come from the native tools. `python-gobject` is
+required by the upstream `powerprofilesctl` and included in `packages/services.txt`.
 
 ## Hooks and extensions
 
@@ -307,10 +315,13 @@ remain supported while their operations migrate.
 
 Currently, `bin/titan` routes to distinct scripts and Python modules: `apps`,
 `configuration`, `development`, `utilities`, `media_tools`,
-`system_status`, `plugins`, with shared primitives in `ops`. Services live in
+`plugins`, with shared primitives in `ops`. Services live in
 `lib/titan/services.sh`, reached through the existing `scripts/titan-system`.
 Dependency predicates use `commands.sh`; the entire package CLI uses
 `packages.sh`; mise list/upgrade wrappers use `development.sh`.
+Battery, network, Bluetooth, power and audio CLI operations use `system_status.sh`;
+the retired Python module is no longer packaged. `tools/vm-system-checks RUN`
+checks real controls, native refusals and restoration in an owned build VM.
 `packages.py` contains only read-only catalog/argv helpers still used by Python
 developer recipes and menu generation; it no longer owns CLI execution or parsing.
 Other operations continue using the Python parser. New functionality

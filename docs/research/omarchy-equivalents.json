@@ -30,37 +30,37 @@
     "omarchy-audio-input-mute": {
       "status": "adapted",
       "equivalent": "titan audio / bin/workflow audio / Quickshell Audio",
-      "notes": "Original Titan operation; CLI and desktop implementation follow Titan interfaces."
+      "notes": "Original Titan operation; CLI and desktop implementation follow Titan interfaces. CLI wrappers now use original Bash system_status.sh; native Quickshell services remain unchanged."
     },
     "omarchy-audio-input-set-default": {
       "status": "adapted",
       "equivalent": "titan audio / bin/workflow audio / Quickshell Audio",
-      "notes": "Original Titan operation; CLI and desktop implementation follow Titan interfaces."
+      "notes": "Original Titan operation; CLI and desktop implementation follow Titan interfaces. CLI wrappers now use original Bash system_status.sh; native Quickshell services remain unchanged."
     },
     "omarchy-audio-output-set-default": {
       "status": "adapted",
       "equivalent": "titan audio / bin/workflow audio / Quickshell Audio",
-      "notes": "Original Titan operation; CLI and desktop implementation follow Titan interfaces."
+      "notes": "Original Titan operation; CLI and desktop implementation follow Titan interfaces. CLI wrappers now use original Bash system_status.sh; native Quickshell services remain unchanged."
     },
     "omarchy-audio-output-sink": {
       "status": "adapted",
       "equivalent": "titan audio / bin/workflow audio / Quickshell Audio",
-      "notes": "Original Titan operation; CLI and desktop implementation follow Titan interfaces."
+      "notes": "Original Titan operation; CLI and desktop implementation follow Titan interfaces. CLI wrappers now use original Bash system_status.sh; native Quickshell services remain unchanged."
     },
     "omarchy-audio-output-switch": {
       "status": "adapted",
       "equivalent": "titan audio / bin/workflow audio / Quickshell Audio",
-      "notes": "Original Titan operation; CLI and desktop implementation follow Titan interfaces."
+      "notes": "Original Titan operation; CLI and desktop implementation follow Titan interfaces. CLI wrappers now use original Bash system_status.sh; native Quickshell services remain unchanged."
     },
     "omarchy-audio-output-volume": {
       "status": "adapted",
       "equivalent": "titan audio / bin/workflow audio / Quickshell Audio",
-      "notes": "Original Titan operation; CLI and desktop implementation follow Titan interfaces."
+      "notes": "Original Titan operation; CLI and desktop implementation follow Titan interfaces. CLI wrappers now use original Bash system_status.sh; native Quickshell services remain unchanged."
     },
     "omarchy-audio-source-switch": {
       "status": "adapted",
       "equivalent": "titan audio / bin/workflow audio / Quickshell Audio",
-      "notes": "Original Titan operation; CLI and desktop implementation follow Titan interfaces."
+      "notes": "Original Titan operation; CLI and desktop implementation follow Titan interfaces. CLI wrappers now use original Bash system_status.sh; native Quickshell services remain unchanged."
     },
     "omarchy-bar": {
       "status": "adapted",
@@ -70,22 +70,22 @@
     "omarchy-battery-present": {
       "status": "adapted",
       "equivalent": "titan battery / Quickshell UPower",
-      "notes": "Original Titan operation; CLI and desktop implementation follow Titan interfaces."
+      "notes": "Original Titan operation; CLI and desktop implementation follow Titan interfaces. CLI wrappers now use original Bash system_status.sh; native Quickshell services remain unchanged."
     },
     "omarchy-battery-status": {
       "status": "adapted",
       "equivalent": "titan battery / Quickshell UPower",
-      "notes": "Original Titan operation; CLI and desktop implementation follow Titan interfaces."
+      "notes": "Original Titan operation; CLI and desktop implementation follow Titan interfaces. CLI wrappers now use original Bash system_status.sh; native Quickshell services remain unchanged."
     },
     "omarchy-bluetooth-device": {
       "status": "adapted",
       "equivalent": "titan bluetooth / Quickshell NetState",
-      "notes": "Original Titan operation; CLI and desktop implementation follow Titan interfaces."
+      "notes": "Original Titan operation; CLI and desktop implementation follow Titan interfaces. CLI wrappers now use original Bash system_status.sh; native Quickshell services remain unchanged."
     },
     "omarchy-bluetooth-power": {
       "status": "adapted",
       "equivalent": "titan bluetooth / Quickshell NetState",
-      "notes": "Original Titan operation; CLI and desktop implementation follow Titan interfaces."
+      "notes": "Original Titan operation; CLI and desktop implementation follow Titan interfaces. CLI wrappers now use original Bash system_status.sh; native Quickshell services remain unchanged."
     },
     "omarchy-brightness-display": {
       "status": "partial",
@@ -580,17 +580,17 @@
     "omarchy-network-password": {
       "status": "partial",
       "equivalent": "titan network",
-      "notes": "Status omits SSIDs/secrets; explicit nmcli QR/password view is local and interactive."
+      "notes": "Status omits SSIDs/secrets; explicit nmcli QR/password view is local and interactive. CLI wrappers now use original Bash system_status.sh; native Quickshell services remain unchanged."
     },
     "omarchy-network-qr": {
       "status": "partial",
       "equivalent": "titan network",
-      "notes": "Status omits SSIDs/secrets; explicit nmcli QR/password view is local and interactive."
+      "notes": "Status omits SSIDs/secrets; explicit nmcli QR/password view is local and interactive. CLI wrappers now use original Bash system_status.sh; native Quickshell services remain unchanged."
     },
     "omarchy-network-status": {
       "status": "partial",
       "equivalent": "titan network",
-      "notes": "Status omits SSIDs/secrets; explicit nmcli QR/password view is local and interactive."
+      "notes": "Status omits SSIDs/secrets; explicit nmcli QR/password view is local and interactive. CLI wrappers now use original Bash system_status.sh; native Quickshell services remain unchanged."
     },
     "omarchy-notification-dismiss": {
       "status": "partial",
@@ -715,22 +715,22 @@
     "omarchy-power-present": {
       "status": "adapted",
       "equivalent": "titan battery / Quickshell UPower",
-      "notes": "Original Titan operation; CLI and desktop implementation follow Titan interfaces."
+      "notes": "Original Titan operation; CLI and desktop implementation follow Titan interfaces. CLI wrappers now use original Bash system_status.sh; native Quickshell services remain unchanged."
     },
     "omarchy-powerprofiles-init": {
       "status": "partial",
       "equivalent": "titan power",
-      "notes": "Profile CLI/native shell state; always-awake policy has priority and init is machine-specific."
+      "notes": "Profile CLI/native shell state; always-awake policy has priority and init is machine-specific. CLI wrappers now use original Bash system_status.sh; native Quickshell services remain unchanged."
     },
     "omarchy-powerprofiles-list": {
       "status": "partial",
       "equivalent": "titan power",
-      "notes": "Profile CLI/native shell state; always-awake policy has priority and init is machine-specific."
+      "notes": "Profile CLI/native shell state; always-awake policy has priority and init is machine-specific. CLI wrappers now use original Bash system_status.sh; native Quickshell services remain unchanged."
     },
     "omarchy-powerprofiles-set": {
       "status": "partial",
       "equivalent": "titan power",
-      "notes": "Profile CLI/native shell state; always-awake policy has priority and init is machine-specific."
+      "notes": "Profile CLI/native shell state; always-awake policy has priority and init is machine-specific. CLI wrappers now use original Bash system_status.sh; native Quickshell services remain unchanged."
     },
     "omarchy-refresh-applications": {
       "status": "partial",

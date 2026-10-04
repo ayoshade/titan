@@ -124,10 +124,29 @@ Real AUR builds were not performed; ordering and failure contracts have local
 stub coverage, with missing-helper refusal tested against unchanged guest packages.
 The host's pacman-managed jq is now installed and `titan doctor` passes.
 
-Next portable migration: the simple audio/battery/power/network/Bluetooth status
-and control wrappers in `system_status.py`, preserving bounded commands and native
-Quickshell service ownership. Developer recipe/job provisioning follows separately
-with existing workflow acceptance; hardware/security/authentication remain separate.
+## System status/control Bash migration — 2026-10-04
+
+Battery, network, Bluetooth, power profiles and audio now use original Bash
+`lib/titan/system_status.sh` through `scripts/titan-system`. Direct Python CLI
+callers delegate to Bash; the old runtime module is retired. JSON schemas,
+explicit credential display, interactive pairing/editing, audio bounds and the
+always-awake/Performance policy guard are preserved. nmcli escaped separators
+are decoded and malformed responses fail without success JSON. Noninteractive
+calls now have a 30-second timeout and a further 5-second termination bound.
+Native Quickshell state and reactive services are unchanged.
+
+`tools/vm-system-checks RUN` verifies installed hashes, no-state/native-PATH
+inspection, actual network/audio/power controls, refusal and restoration.
+The guest has no physical Bluetooth adapter or Performance-capable driver;
+see [verification](../verification.md) for exact coverage and limits. Arch's
+optional `python-gobject`, required by `powerprofilesctl`, is declared in the
+service manifest and as a base-package optional dependency. The laptop needs
+local sudo authentication for a normal full Arch transaction to add it; no
+host package or power-policy changes were performed in this task.
+
+Coverage remains 75 adapted, 107 partial, 6 policy and 291 pending of 479.
+Next: developer recipe/job provisioning with existing workflow acceptance;
+hardware/security/authentication remain separate batches.
 
 ## Implemented in the initial foundation batch
 

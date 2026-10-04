@@ -1,10 +1,23 @@
 #!/usr/bin/env bash
 set -euo pipefail
 root=$(cd -- "$(dirname -- "$(readlink -f "${BASH_SOURCE[0]}")")/.." && pwd)
+if [[ $# == 1 && ( $1 == --help || $1 == -h ) ]]; then
+ source "$root/lib/titan/services.sh"
+ source "$root/lib/titan/system_status.sh"
+ titan_service_usage
+ for family in battery network bluetooth power audio; do titan_system_usage "$family"; done
+ exit
+fi
 if [[ ${1:-} == service ]]; then
  shift
  source "$root/lib/titan/services.sh"
  titan_service "$@"
  exit
 fi
-exec python3 "$root/lib/titan/desktop_cli.py" "$@"
+source "$root/lib/titan/system_status.sh"
+result=0
+titan_system "$@" || result=$?
+if [[ $result == 2 ]]; then
+ echo 'titan: Invalid system command arguments; use --help' >&2
+fi
+exit "$result"

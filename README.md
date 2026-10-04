@@ -158,6 +158,7 @@ titan pkg add --plan fzf zoxide     # read-only package transaction plan
 titan boot status --json             # experimental installer bootloader status
 titan snapshot list --json           # experimental Limine recovery preview inventory
 titan hardware --json                # read-only hardware inventory and installer packages
+titan battery                        # read-only battery/external-power JSON (Bash)
 titan skills [--dry-run]             # link the three end-user skills for Codex and Claude
 titan update                        # snapshot, full upgrade, migrations (asks for sudo)
 ```

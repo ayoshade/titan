@@ -10,25 +10,27 @@ from pathlib import Path
 def main(argv=None):
     argv = sys.argv[1:] if argv is None else argv
     # Preserve direct internal callers while this family moves to Shell.
-    if argv and (argv[0] == 'service' or
+    system_families = ('service', 'battery', 'network', 'bluetooth', 'power', 'audio')
+    if argv and (argv[0] in system_families or
                  argv[0] == 'pkg' or
                  (argv[0] == 'dev' and len(argv) > 1 and argv[1] in ('tools', 'upgrade'))):
-        script = {'service': 'titan-system', 'pkg': 'titan-packages', 'dev': 'titan-dev'}[argv[0]]
+        script = 'titan-system' if argv[0] in system_families else {'pkg': 'titan-packages', 'dev': 'titan-dev'}[argv[0]]
         return subprocess.call([str(Path(__file__).resolve().parents[2] / 'scripts' / script), *argv])
     import apps
     import configuration
     import development
     import utilities
     import media_tools
-    import system_status
     import plugins
     from ops import register_hooks
     parser = argparse.ArgumentParser(prog='titan')
     sub = parser.add_subparsers(required=True)
-    for module in (apps, configuration, development, utilities, media_tools, system_status, plugins):
+    for module in (apps, configuration, development, utilities, media_tools, plugins):
         module.register(sub)
     # Keep the family discoverable in the shared parser's top-level help.
     sub.add_parser('pkg', help='Package search, full upgrades and reviewed optional bundles (Bash)')
+    for name in system_families[1:]:
+        sub.add_parser(name, help='System status and explicit controls (Bash)')
     register_hooks(sub)
     args = parser.parse_args(argv)
     try:

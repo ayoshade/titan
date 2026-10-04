@@ -63,6 +63,21 @@ work is tracked in [the Omarchy ledger](research/omarchy.md).
   boundary are described in [installation.md](installation.md).
 - `titan cmd present|missing COMMAND…`: silent literal dependency predicates;
   exit 0 means true, 1 false, 2 invalid arguments. No commands are executed.
+- `titan battery`, `network`, `bluetooth`, `power` and `audio` use original Bash
+  in `lib/titan/system_status.sh` through `scripts/titan-system`; direct Python
+  CLI callers delegate to the same routes. Battery returns schema-1 `batteries`
+  and `power` arrays; network status returns schema-1 `devices` containing only
+  `device`, `type` and `state`, decoding nmcli's escaped separators. Inspection
+  creates no Titan state. Noninteractive tool calls have a 30-second timeout
+  with a further 5-second termination bound; `network edit` and `bluetooth pair`
+  inherit the terminal and remain interactive. `network qr` displays credentials
+  only when explicitly invoked, through nmcli's inherited terminal output.
+  Audio volume remains capped at 100 percent; default node IDs must be positive.
+  Power changes respect the always-awake/Performance marker and native available
+  profiles/Polkit authorization. `powerprofilesctl` requires Arch's optional
+  `python-gobject`, now included in Titan's service manifest. Invalid syntax
+  returns 2, operation/validation/tool/timeout failures 1, and interruption 130.
+  Quickshell continues to own reactive desktop services; no polling is added.
 - The whole `titan pkg` family uses original Bash through `scripts/titan-packages`
   and `lib/titan/packages.sh`; direct `desktop_cli.py pkg …` callers delegate there.
   `list` prints the schema-1 bundle catalog; `search QUERY`, `installed` and

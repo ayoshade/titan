@@ -1,0 +1,50 @@
+#!/usr/bin/env python3
+"""Run focused system control acceptance in an owned, running Titan VM."""
+import argparse
+import hashlib
+import json
+import os
+from pathlib import Path
+import shlex
+import subprocess
+
+root = Path(__file__).resolve().parents[1]
+parser = argparse.ArgumentParser(description=__doc__)
+parser.add_argument('run', type=Path, help='Running vm-test --full --stay run directory')
+args = parser.parse_args()
+run = args.run.resolve()
+cache = Path(os.environ.get('XDG_CACHE_HOME', Path.home() / '.cache')) / 'titan/vm/runs'
+if run.parent != cache.resolve() or not run.name.startswith('run.'):
+    parser.error('Select an owned Titan build VM under the disk-backed cache')
+try:
+    pid = int((run / 'qemu.pid').read_text())
+    argv = Path(f'/proc/{pid}/cmdline').read_bytes().split(b'\0')
+    if (not argv[0].endswith(b'qemu-system-x86_64') or
+            b'file=' + os.fsencode(run / 'disk.qcow2') + b',if=virtio' not in argv or
+            os.fsencode(run / 'qemu.pid') not in argv):
+        raise ValueError('Recorded PID does not own this VM')
+    port = int((run / 'ssh-port').read_text())
+    if not 1024 <= port <= 65535: raise ValueError('Invalid SSH port')
+except (OSError, ValueError) as error:
+    parser.error(str(error))
+options = ['-i', str(run / 'key'), '-o', 'StrictHostKeyChecking=no',
+           '-o', 'UserKnownHostsFile=/dev/null', '-o', 'ConnectTimeout=5']
+ssh = ['ssh', '-q', *options, '-p', str(port), 'tester@127.0.0.1']
+scp = ['scp', '-q', *options, '-P', str(port)]
+paths = ['bin/titan', 'scripts/titan-system', 'lib/titan/system_status.sh',
+         'lib/titan/services.sh', 'lib/titan/desktop_cli.py']
+manifest = {name: hashlib.sha256((root / name).read_bytes()).hexdigest() for name in paths}
+(run / 'system-source.json').write_text(json.dumps(manifest) + '\n')
+remote = '/home/tester/titan-system-acceptance'
+subprocess.run(ssh + [shlex.join(['mkdir', '-p', remote])], check=True, timeout=20)
+subprocess.run(scp + [str(root / 'tests/vm_system_commands.py'), str(run / 'system-source.json'),
+                     f'tester@127.0.0.1:{remote}/'], check=True, timeout=30)
+status = 1
+try:
+    status = subprocess.run(ssh + [shlex.join(['python3', '-u', remote + '/vm_system_commands.py',
+        '--manifest', remote + '/system-source.json', '--output', remote])], timeout=900).returncode
+finally:
+    for name in ('results.json', 'commands.log'):
+        subprocess.run(scp + [f'tester@127.0.0.1:{remote}/{name}', str(run / ('system-' + name))], timeout=30)
+print(f'System-control artifacts: {run}', flush=True)
+raise SystemExit(status)

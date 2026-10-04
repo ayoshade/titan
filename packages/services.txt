@@ -2,6 +2,7 @@ networkmanager
 bluez
 bluez-utils
 power-profiles-daemon
+python-gobject
 upower
 pipewire
 pipewire-pulse

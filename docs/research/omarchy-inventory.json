@@ -183,7 +183,7 @@
       "summary": "Toggle microphone mute. Drives the hardware mic-mute LED on laptops that expose one.",
       "status": "adapted",
       "equivalent": "titan audio / bin/workflow audio / Quickshell Audio",
-      "notes": "Original Titan operation; CLI and desktop implementation follow Titan interfaces."
+      "notes": "Original Titan operation; CLI and desktop implementation follow Titan interfaces. CLI wrappers now use original Bash system_status.sh; native Quickshell services remain unchanged."
     },
     {
       "command": "omarchy-audio-input-set-default",
@@ -191,7 +191,7 @@
       "summary": "Set the default audio input and move active streams",
       "status": "adapted",
       "equivalent": "titan audio / bin/workflow audio / Quickshell Audio",
-      "notes": "Original Titan operation; CLI and desktop implementation follow Titan interfaces."
+      "notes": "Original Titan operation; CLI and desktop implementation follow Titan interfaces. CLI wrappers now use original Bash system_status.sh; native Quickshell services remain unchanged."
     },
     {
       "command": "omarchy-audio-output-set-default",
@@ -199,7 +199,7 @@
       "summary": "Set the default audio output and move active streams",
       "status": "adapted",
       "equivalent": "titan audio / bin/workflow audio / Quickshell Audio",
-      "notes": "Original Titan operation; CLI and desktop implementation follow Titan interfaces."
+      "notes": "Original Titan operation; CLI and desktop implementation follow Titan interfaces. CLI wrappers now use original Bash system_status.sh; native Quickshell services remain unchanged."
     },
     {
       "command": "omarchy-audio-output-sink",
@@ -207,7 +207,7 @@
       "summary": "Print the sink whose volume and mute a given output really uses",
       "status": "adapted",
       "equivalent": "titan audio / bin/workflow audio / Quickshell Audio",
-      "notes": "Original Titan operation; CLI and desktop implementation follow Titan interfaces."
+      "notes": "Original Titan operation; CLI and desktop implementation follow Titan interfaces. CLI wrappers now use original Bash system_status.sh; native Quickshell services remain unchanged."
     },
     {
       "command": "omarchy-audio-output-switch",
@@ -215,7 +215,7 @@
       "summary": "Switch between audio outputs while preserving the mute status",
       "status": "adapted",
       "equivalent": "titan audio / bin/workflow audio / Quickshell Audio",
-      "notes": "Original Titan operation; CLI and desktop implementation follow Titan interfaces."
+      "notes": "Original Titan operation; CLI and desktop implementation follow Titan interfaces. CLI wrappers now use original Bash system_status.sh; native Quickshell services remain unchanged."
     },
     {
       "command": "omarchy-audio-output-volume",
@@ -223,7 +223,7 @@
       "summary": "Adjust output volume and show the Omarchy OSD",
       "status": "adapted",
       "equivalent": "titan audio / bin/workflow audio / Quickshell Audio",
-      "notes": "Original Titan operation; CLI and desktop implementation follow Titan interfaces."
+      "notes": "Original Titan operation; CLI and desktop implementation follow Titan interfaces. CLI wrappers now use original Bash system_status.sh; native Quickshell services remain unchanged."
     },
     {
       "command": "omarchy-audio-sink-availability",
@@ -239,7 +239,7 @@
       "summary": "Cycle to the next media source and transfer playback when the current source is playing",
       "status": "adapted",
       "equivalent": "titan audio / bin/workflow audio / Quickshell Audio",
-      "notes": "Original Titan operation; CLI and desktop implementation follow Titan interfaces."
+      "notes": "Original Titan operation; CLI and desktop implementation follow Titan interfaces. CLI wrappers now use original Bash system_status.sh; native Quickshell services remain unchanged."
     },
     {
       "command": "omarchy-audio-tuning",
@@ -279,7 +279,7 @@
       "summary": "Returns true if a battery is present on the system.",
       "status": "adapted",
       "equivalent": "titan battery / Quickshell UPower",
-      "notes": "Original Titan operation; CLI and desktop implementation follow Titan interfaces."
+      "notes": "Original Titan operation; CLI and desktop implementation follow Titan interfaces. CLI wrappers now use original Bash system_status.sh; native Quickshell services remain unchanged."
     },
     {
       "command": "omarchy-battery-status",
@@ -287,7 +287,7 @@
       "summary": "Returns a formatted battery status string with percentage and power draw/charge.",
       "status": "adapted",
       "equivalent": "titan battery / Quickshell UPower",
-      "notes": "Original Titan operation; CLI and desktop implementation follow Titan interfaces."
+      "notes": "Original Titan operation; CLI and desktop implementation follow Titan interfaces. CLI wrappers now use original Bash system_status.sh; native Quickshell services remain unchanged."
     },
     {
       "command": "omarchy-bluetooth-device",
@@ -295,7 +295,7 @@
       "summary": "Control a Bluetooth device",
       "status": "adapted",
       "equivalent": "titan bluetooth / Quickshell NetState",
-      "notes": "Original Titan operation; CLI and desktop implementation follow Titan interfaces."
+      "notes": "Original Titan operation; CLI and desktop implementation follow Titan interfaces. CLI wrappers now use original Bash system_status.sh; native Quickshell services remain unchanged."
     },
     {
       "command": "omarchy-bluetooth-power",
@@ -303,7 +303,7 @@
       "summary": "Turn Bluetooth on or off, remembered across reboots",
       "status": "adapted",
       "equivalent": "titan bluetooth / Quickshell NetState",
-      "notes": "Original Titan operation; CLI and desktop implementation follow Titan interfaces."
+      "notes": "Original Titan operation; CLI and desktop implementation follow Titan interfaces. CLI wrappers now use original Bash system_status.sh; native Quickshell services remain unchanged."
     },
     {
       "command": "omarchy-branding-about",
@@ -1951,7 +1951,7 @@
       "summary": "Print the active Wi-Fi connection's password",
       "status": "partial",
       "equivalent": "titan network",
-      "notes": "Status omits SSIDs/secrets; explicit nmcli QR/password view is local and interactive."
+      "notes": "Status omits SSIDs/secrets; explicit nmcli QR/password view is local and interactive. CLI wrappers now use original Bash system_status.sh; native Quickshell services remain unchanged."
     },
     {
       "command": "omarchy-network-qr",
@@ -1959,7 +1959,7 @@
       "summary": "Generate a Wi-Fi QR matrix for the shell",
       "status": "partial",
       "equivalent": "titan network",
-      "notes": "Status omits SSIDs/secrets; explicit nmcli QR/password view is local and interactive."
+      "notes": "Status omits SSIDs/secrets; explicit nmcli QR/password view is local and interactive. CLI wrappers now use original Bash system_status.sh; native Quickshell services remain unchanged."
     },
     {
       "command": "omarchy-network-speedtest",
@@ -1975,7 +1975,7 @@
       "summary": "Print active network status for the shell",
       "status": "partial",
       "equivalent": "titan network",
-      "notes": "Status omits SSIDs/secrets; explicit nmcli QR/password view is local and interactive."
+      "notes": "Status omits SSIDs/secrets; explicit nmcli QR/password view is local and interactive. CLI wrappers now use original Bash system_status.sh; native Quickshell services remain unchanged."
     },
     {
       "command": "omarchy-notification-battery",
@@ -2247,7 +2247,7 @@
       "summary": "Returns true if external power is connected.",
       "status": "adapted",
       "equivalent": "titan battery / Quickshell UPower",
-      "notes": "Original Titan operation; CLI and desktop implementation follow Titan interfaces."
+      "notes": "Original Titan operation; CLI and desktop implementation follow Titan interfaces. CLI wrappers now use original Bash system_status.sh; native Quickshell services remain unchanged."
     },
     {
       "command": "omarchy-powerprofiles-init",
@@ -2255,7 +2255,7 @@
       "summary": "Set the correct power profile on boot based on current AC/battery state.",
       "status": "partial",
       "equivalent": "titan power",
-      "notes": "Profile CLI/native shell state; always-awake policy has priority and init is machine-specific."
+      "notes": "Profile CLI/native shell state; always-awake policy has priority and init is machine-specific. CLI wrappers now use original Bash system_status.sh; native Quickshell services remain unchanged."
     },
     {
       "command": "omarchy-powerprofiles-list",
@@ -2263,7 +2263,7 @@
       "summary": "Returns a list of all the available power profiles on the system.",
       "status": "partial",
       "equivalent": "titan power",
-      "notes": "Profile CLI/native shell state; always-awake policy has priority and init is machine-specific."
+      "notes": "Profile CLI/native shell state; always-awake policy has priority and init is machine-specific. CLI wrappers now use original Bash system_status.sh; native Quickshell services remain unchanged."
     },
     {
       "command": "omarchy-powerprofiles-set",
@@ -2271,7 +2271,7 @@
       "summary": "Set and remember the power profile for AC or battery use",
       "status": "partial",
       "equivalent": "titan power",
-      "notes": "Profile CLI/native shell state; always-awake policy has priority and init is machine-specific."
+      "notes": "Profile CLI/native shell state; always-awake policy has priority and init is machine-specific. CLI wrappers now use original Bash system_status.sh; native Quickshell services remain unchanged."
     },
     {
       "command": "omarchy-provision-first-run",
