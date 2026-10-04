@@ -39,6 +39,11 @@ instead of maintaining two competing instruction sets.
   User state lives outside Git. Clipboard labels contain private content; never
   dump clipboard-list into logs. Optional Omarchy apps are not bundled. Do not
   mistake an assigned shortcut for an installed app or complete feature parity.
+- **mise** is Titan's default tool and runtime manager (`packages/workflow.txt`).
+  `titan setup` appends a marked line to `~/.bashrc` sourcing `default/bash/rc`,
+  and `hyprland.lua` puts mise shims on the session `PATH`. Install developer
+  CLIs/runtimes (e.g. `gh`) with `mise use -g`, not by copying binaries into
+  `~/.local/bin`; desktop packages stay in pacman manifests.
 - The development laptop runs Arch, systemd-boot, Btrfs, NetworkManager,
   PipeWire/WirePlumber, Bluetooth, power-profiles-daemon and UFW. It has Intel
   graphics and a 1366×768 internal display. Inspect actual hardware before

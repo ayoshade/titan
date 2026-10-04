@@ -666,3 +666,20 @@ following handoff section. The current inventory is `docs/agent-skills.md`.
   VM/hardware coverage, signed 0.3.0 upgrade/install validation and public-image
   source/license review remain open. The laptop's visible lock rendering and
   other hands-on hardware checks remain separate outstanding tasks.
+
+## mise as the default tool manager — 2026-10-03
+
+- Added `mise` to `packages/workflow.txt` (so `titan-desktop` depends on it),
+  `default/bash/rc` (activates mise only when installed), and
+  `scripts/install-bash-defaults` (appends one marked line to `~/.bashrc`),
+  called by `titan setup` and migration `1791072383-bash-defaults-mise`.
+  `hyprland.lua` prepends the mise shims directory to the session `PATH`, guarded
+  against duplicates on config reload.
+- Verified in throwaway homes: a missing `~/.bashrc` is created, an existing one
+  is only appended to, a second run changes nothing, the migration applies the
+  same hook, and a shell without mise still loads cleanly.
+  `Hyprland --verify-config` passes and the Bash syntax checks pass.
+- Not yet verified: mise is not installed on the development laptop, so the
+  dev-mode `scripts/doctor` package check fails until the owner runs
+  `scripts/install-packages`. Shim PATH in a live session needs a Hyprland
+  restart (or a new login) and a `mise use -g` tool launched from a keybinding.

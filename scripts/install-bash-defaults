@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+# install-bash-defaults: make ~/.bashrc source Titan's default/bash/rc (mise
+# activation). Appends one marked line; never rewrites or replaces the file.
+set -euo pipefail
+root=$(cd -- "$(dirname -- "$(readlink -f "${BASH_SOURCE[0]}")")/.." && pwd)
+rc=$HOME/.bashrc
+marker='# titan: bash defaults'
+if [[ -f $rc ]] && grep -qF "$marker" "$rc"; then exit 0; fi
+[[ -e $rc && ! -f $rc ]] && { echo "install-bash-defaults: $rc is not a regular file; add: source $root/default/bash/rc" >&2; exit 1; }
+file=$root/default/bash/rc
+printf '\n%s\n[[ -r %q ]] && . %q\n' "$marker" "$file" "$file" >>"$rc"
+echo "  ~/.bashrc now sources $file"

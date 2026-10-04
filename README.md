@@ -127,6 +127,18 @@ Titan keeps three layers apart, so updates never overwrite your choices:
 `~/.config/mimeapps.list`, the GTK settings and (packaged installs)
 `~/.config/kitty/kitty.conf` are copied once and then belong to you.
 
+**Developer tools come from [mise](https://mise.jdx.dev).** Titan installs it,
+activates it for interactive Bash (setup appends one line to `~/.bashrc`
+that sources `default/bash/rc`) and puts its shims on the Hyprland session
+`PATH`, so tools also work from the launcher and keybindings. Use it for CLIs
+and language runtimes that are not part of the desktop:
+
+```sh
+mise use -g gh node@lts python@3.13   # global tools, in ~/.config/mise/config.toml
+mise use go@1.23                      # per project, in ./mise.toml
+mise upgrade                          # update installed tools
+```
+
 ```sh
 titan version                       # version and install location
 titan theme list | current | nord   # themes
@@ -209,7 +221,7 @@ The experimental ISO builder and installation tests run inside QEMU; see
 │   │   └── assets/          Icons, menu definitions, emoji data
 │   ├── kitty/  gtk-3.0/  gtk-4.0/  xdg-desktop-portal/
 ├── agents/skills/           Development guides for repository agents
-├── default/                 Defaults copied once and the three end-user agent skills
+├── default/                 Defaults copied once, Bash defaults (mise) and the three end-user agent skills
 ├── lib/titan/               Python behind scripts/workflow (desktop operations, paths)
 ├── scripts/                 titan, titan-shell, titan-session, workflow, bootstrap, install-*,
 │                            apply-theme, fetch-wallpapers, build-repo, publish-repo, vm-test, doctor

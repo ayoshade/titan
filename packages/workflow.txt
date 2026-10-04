@@ -10,3 +10,4 @@ tesseract-data-eng
 ffmpeg
 mpv
 cliphist
+mise

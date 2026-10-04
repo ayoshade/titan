@@ -14,6 +14,10 @@ hl.env("XCURSOR_SIZE", "24")
 hl.env("HYPRCURSOR_SIZE", "24")
 hl.env("MOZ_ENABLE_WAYLAND", "1")
 hl.env("QT_QPA_PLATFORM", "wayland")
+-- mise shims: tools installed with `mise use -g` also work from the launcher and keybindings.
+local mise=os.getenv("MISE_DATA_DIR") or ((os.getenv("XDG_DATA_HOME") or os.getenv("HOME").."/.local/share").."/mise")
+local path=os.getenv("PATH") or "/usr/local/bin:/usr/bin"
+if not (":"..path..":"):find(":"..mise.."/shims:",1,true) then hl.env("PATH", mise.."/shims:"..path) end
 hl.on("hyprland.start", function()
     hl.exec_cmd(TITAN_ROOT .. "/scripts/session-start")
 end)

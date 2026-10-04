@@ -1,0 +1,7 @@
+# Titan's interactive Bash defaults, sourced from ~/.bashrc (titan setup adds
+# the line). Put your own changes in ~/.bashrc after it; updates replace this file.
+
+# mise is Titan's tool and runtime manager: `mise use -g gh`, `mise use node@22`.
+if command -v mise >/dev/null; then
+ eval "$(mise activate bash)"
+fi
