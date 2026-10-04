@@ -1,5 +1,12 @@
 # Titan
 
+> [!WARNING]
+> **Titan is in active development and beta testing.** If you clone this
+> repository, download a release or install Titan packages, expect bugs,
+> incomplete features and breaking changes. Published packages are also part of
+> the beta; Titan is not yet a stable distribution. Back up your data and test in
+> a virtual machine or on a spare system before using it on your main machine.
+
 Titan is an Arch-based, agent-friendly Linux desktop by **Cristian Adrian
 Paredez** (`ayoshade`): Hyprland plus its own Quickshell shell. The shell is a
 centered dynamic island, a control center, a launcher and a Settings app, in a
