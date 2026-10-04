@@ -166,20 +166,42 @@ def touchpad(action):
     for device in devices: evaluate(f'hl.device({{name={lua(device)},enabled={str(enabled).lower()}}})')
     data['touchpadEnabled']=enabled; save_state(data)
 
-def scale(direction):
-    data=load_state(); monitor=next(m for m in hypr('monitors') if m['focused']); current=monitor['scale']
+# Super+/ steps through Omarchy's scales; the Display page offers the reference's
+# 1.0–2.0× chips (OeT5VgeLSIQ 8:30). Both are snapped to clean scales.
+STEP_SCALES=(1,1.25,1.6,2,3,4)
+CHIP_SCALES=(1,1.25,1.5,1.75,2)
+def scale_candidates(monitor,values=STEP_SCALES):
     # A clean fractional scale divides both physical dimensions in 1/120 units.
     divisor=math.gcd(monitor['width']*120,monitor['height']*120)
     candidates=[]
-    for value in (1,1.25,1.6,2,3,4):
+    for value in values:
         units=min(divisor,round(value*120))
         while divisor%units: units+=1
         cleaned=units/120
         if cleaned not in candidates: candidates.append(cleaned)
-    candidates.sort(); index=min(range(len(candidates)),key=lambda i:abs(candidates[i]-current))
-    value=candidates[max(0,min(len(candidates)-1,index+(1 if direction=='up' else -1)))]
-    name=monitor['name']; evaluate(f'hl.monitor({{output={lua(name)},mode="preferred",position={lua(str(monitor["x"])+"x"+str(monitor["y"]))},scale={value}}})')
-    data.setdefault('scales',{})[name]=value; save_state(data); notify('Monitor scale: '+str(value))
+    return sorted(candidates)
+def set_scale(monitor,value):
+    data=load_state(); name=monitor['name']
+    evaluate(f'hl.monitor({{output={lua(name)},mode="preferred",position={lua(str(monitor["x"])+"x"+str(monitor["y"]))},scale={value}}})')
+    data.setdefault('scales',{})[name]=value; save_state(data)
+def scale(action,args=()):
+    monitors=hypr('monitors')
+    if action=='list':
+        print(json.dumps([{'name':m['name'],'width':m['width'],'height':m['height'],'scale':m['scale'],'focused':m['focused'],
+            'scales':scale_candidates(m,CHIP_SCALES)} for m in monitors])); return
+    if action=='set':
+        if len(args)!=2: raise ValueError('usage: workflow scale set MONITOR VALUE')
+        monitor=next((m for m in monitors if m['name']==args[0]),None)
+        if not monitor: raise ValueError('unknown monitor: '+args[0])
+        value=float(args[1])
+        allowed=sorted(set(scale_candidates(monitor))|set(scale_candidates(monitor,CHIP_SCALES)))
+        if value not in allowed: raise ValueError(f'{value} is not a clean scale for {monitor["name"]}; choose from '+', '.join(map(str,allowed)))
+        set_scale(monitor,value); return
+    if action not in ('up','down'): raise ValueError('usage: workflow scale up|down|list|set MONITOR VALUE')
+    monitor=next(m for m in monitors if m['focused']); current=monitor['scale']; candidates=scale_candidates(monitor)
+    index=min(range(len(candidates)),key=lambda i:abs(candidates[i]-current))
+    value=candidates[max(0,min(len(candidates)-1,index+(1 if action=='up' else -1)))]
+    set_scale(monitor,value); notify('Monitor scale: '+str(value))
 
 def mirror():
     data=load_state(); monitors=hypr('monitors'); internal=next((m for m in monitors if re.match(r'^(eDP|LVDS|DSI)-',m['name'])),None)
@@ -198,29 +220,43 @@ def nightlight(action='toggle'):
     temp=max(2500,min(6000,temp))
     if action=='apply' and not active: return
     if active: run('systemctl','--user','stop','titan-nightlight.service')
-    if action=='toggle' and active: notify('Nightlight disabled'); return
+    if action=='toggle' and active:
+        if not shell_running(): notify('Nightlight disabled')
+        return
     if action=='off': return
     run('systemd-run','--user','--collect','--unit=titan-nightlight','--setenv=WAYLAND_DISPLAY='+os.environ.get('WAYLAND_DISPLAY','wayland-1'),
         'wlsunset','-T',str(temp+1),'-t',str(temp),'-S','00:00','-s','23:59',stdout=subprocess.DEVNULL)
-    if action=='toggle': notify('Nightlight enabled',f'{temp} K')
+    if action=='toggle' and not shell_running(): notify('Nightlight enabled',f'{temp} K')
 
 OPS={ast.Add:operator.add,ast.Sub:operator.sub,ast.Mult:operator.mul,ast.Div:operator.truediv,ast.Mod:operator.mod,ast.Pow:operator.pow,ast.FloorDiv:operator.floordiv}
-GAME_OPTIONS=('animations:enabled','decoration:blur:enabled','decoration:shadow:enabled')
-def option(name): return bool(json.loads(output('hyprctl','getoption',name,'-j')).get('bool',True))
+# Game mode drops every finishing effect, as in the reference (OeT5VgeLSIQ 3:30):
+# animations, blur, shadows, rounded corners and borders.
+GAME_OPTIONS={'animations:enabled':False,'decoration:blur:enabled':False,'decoration:shadow:enabled':False,
+              'decoration:rounding':0,'general:border_size':0}
+def option(name):
+    value=json.loads(output('hyprctl','getoption',name,'-j'))
+    return int(value['int']) if 'int' in value else bool(value.get('bool',True))
+def game_config(values):
+    a,b,s,r,w=(lua(values[name]) for name in GAME_OPTIONS)
+    return f'hl.config({{animations={{enabled={a}}},decoration={{blur={{enabled={b}}},shadow={{enabled={s}}},rounding={r}}},general={{border_size={w}}}}})'
 def game_mode_active():
     # A Hyprland reload restores configured effects, which leaves a stale saved state.
     return (RUNTIME/'game-mode.json').exists() and not option('animations:enabled')
+def shell_running():
+    # The shell shows night light and game mode in the island; notify only without it.
+    return subprocess.run(['pgrep','-u',str(os.getuid()),'-f','(^|/)(qs|quickshell) .*-c umbra'],stdout=subprocess.DEVNULL).returncode==0
 def game_mode():
     path=RUNTIME/'game-mode.json'
     if game_mode_active():
         saved=json.loads(path.read_text())
-        values=[lua(bool(saved.get(name,True))) for name in GAME_OPTIONS]
-        evaluate('hl.config({animations={enabled=%s},decoration={blur={enabled=%s},shadow={enabled=%s}}})' % tuple(values))
-        path.unlink(); notify('Game mode disabled')
+        # A state saved before rounding/borders were included restores only what it saved.
+        evaluate(game_config({name:saved[name] if name in saved else option(name) for name in GAME_OPTIONS}))
+        path.unlink()
+        if not shell_running(): notify('Game mode disabled')
     else:
         atomic(path,json.dumps({name:option(name) for name in GAME_OPTIONS})+'\n')
-        evaluate('hl.config({animations={enabled=false},decoration={blur={enabled=false},shadow={enabled=false}}})')
-        notify('Game mode enabled','Animations, blur and shadows are off until toggled again or Hyprland reloads.')
+        evaluate(game_config(GAME_OPTIONS))
+        if not shell_running(): notify('Game mode enabled','Animations, blur, shadows, rounding and borders are off until toggled again or Hyprland reloads.')
 def toggle_state():
     nightlight=subprocess.run(['systemctl','--user','is-active','--quiet','titan-nightlight.service']).returncode==0
     return {'nightlight':nightlight,'gameMode':game_mode_active()}
@@ -456,7 +492,7 @@ def main(argv):
     elif name=='media':
         if args[0]=='switch': ipc('cycleMedia')
         else: run('playerctl',args[0])
-    elif name=='scale': scale(args[0])
+    elif name=='scale': scale(args[0],args[1:])
     elif name=='mirror': mirror()
     elif name=='nightlight': nightlight(args[0] if args else 'toggle'); publish_toggles()
     elif name=='game-mode': game_mode(); publish_toggles()

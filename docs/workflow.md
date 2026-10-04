@@ -69,9 +69,13 @@ interpolation of user text, filenames or calculator expressions.
   shell watches. `bin/workflow nightlight [toggle|on|off|apply]` and
   `game-mode` change the desktop. Night light uses the `nightlightTemp` setting
   (kelvin); `apply` restarts it at the new temperature only if it is on.
-  Game mode turns Hyprland animations, blur and shadows off at runtime. It saves
-  the previous values in `$XDG_RUNTIME_DIR/titan/game-mode.json` and restores them
-  on the next toggle; a Hyprland reload also restores the configured values.
+  Game mode turns Hyprland animations, blur, shadows, window rounding and
+  borders off at runtime. It saves the previous values in
+  `$XDG_RUNTIME_DIR/titan/game-mode.json` and restores them on the next toggle; a
+  Hyprland reload also restores the configured values. While the shell runs,
+  the island announces either toggle for about 2 s (from keys, panels or agents
+  alike), so these commands send no desktop notification; without the shell they
+  still do.
 - `bin/workflow keybindings`, `clipboard-list`, `reminder-list` and
   `worldclock` return JSON arrays for Quickshell. Never dump clipboard-list
   into agent logs: its labels contain user clipboard content.
@@ -82,6 +86,11 @@ interpolation of user text, filenames or calculator expressions.
 - `bin/workflow layout`, `width save|restore`, `pop`, `tiled-fullscreen`,
   `transparency`, `gaps`, `square`, `desktop` and `scale up|down` implement
   compositor operations. These change the desktop; do not run them as diagnostics.
+- `bin/workflow scale list` is read-only JSON: each monitor's name, size, current
+  scale and the 1.0–2.0× scales offered by the Display page, snapped to values
+  that divide the panel cleanly (a 1366×768 panel offers only 1.0 and 2.0).
+  `scale set MONITOR VALUE` applies one of those (or a Super+/ step) and saves it
+  in `hypr-runtime.lua`; other values are refused with the allowed list.
 - `bin/workflow capture screenshot|full|record|color|text`: Wayland capture.
   `scripts/screenshot region|full` delegates to this shared implementation.
 - `bin/workflow pick`: select geometry without taking a screenshot.
