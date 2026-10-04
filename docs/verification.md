@@ -758,7 +758,7 @@ All runs used the local 0.3.0 build of `6dd8bd2`, one 2 GiB VM at a time.
   passes with the legacy-path warning, and the packaged Hyprland config
   verifies. mise was installed as a new dependency and is active in
   interactive Bash.
-- Still open: a hands-on keypress through a `workflow` binding, the version
+- Still open: the version
   bump/release, and removing the compatibility links one release later.
 
 ## Lock screen diagnosis and QEMU lock test — 2026-10-03
@@ -855,3 +855,21 @@ All runs used the local 0.3.0 build of `6dd8bd2`, one 2 GiB VM at a time.
   Hyprlock's configure arrived at 21:18:30.899, 0.23 s later; it was ~28 s
   before the fix. Dots appeared immediately, and the password unlocked at
   21:18:33. Confirmed.
+
+## Hands-on workflow binding and mise PATH on umbra — 2026-10-03
+
+Closes the two hands-on items left open by the bin/ layout split and the mise
+change.
+
+- **workflow keypress:** the owner pressed Super+Shift+Backspace twice. The
+  `bin/workflow gaps` binding toggled `workflow.json` and the live layout
+  (21:24:17: `gaps=false`, `gaps_in` 5; 21:24:20: `gaps=true`, `gaps_in` 0),
+  returning to the owner's no-gaps choice. The binding path through `bin/`
+  works from a real key, not only in QEMU.
+- **mise shims in the session:** the running Hyprland session started at 20:29,
+  after the mise change. A command started through `hl.dsp.exec_cmd`, the
+  dispatcher every exec binding uses, received
+  `~/.local/share/mise/shims` first on `PATH`, resolved `gh` to the mise shim
+  and ran it (2.102.0). Processes Hyprland had already spawned (`vt-redraw`,
+  Xwayland) carry the same `PATH`. No Titan binding launches a mise tool
+  today; the check used a temporary dispatched command, not a key.
