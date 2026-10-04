@@ -24,11 +24,19 @@ for script in "$root"/bin/* "$root"/scripts/* "$root"/tools/*; do
  [[ -f $script ]] || continue
  if head -n1 "$script" | grep -q python; then python -c 'import ast,sys; ast.parse(open(sys.argv[1]).read(),sys.argv[1])' "$script"; else bash -n "$script"; fi
 done
+# bin/ is the public interface; scripts/NAME links keep pre-0.3 callers working.
+for name in titan titan-shell titan-session titan-install workflow; do
+ [[ -x $root/bin/$name && $(readlink -f "$root/scripts/$name") == "$root/bin/$name" ]] || { printf 'Missing command or compatibility link: %s\n' "$name" >&2; exit 1; }
+done
+"$root/scripts/legacy-paths" >/dev/null || warn "your files still call scripts/NAME; run $root/scripts/legacy-paths and use bin/NAME"
 TITAN_ROOT=$root Hyprland --verify-config -c "$root/config/hypr/hyprland.lua" >/dev/null
 if ((dev)); then
  for source in "$root"/config/*; do
   target="${XDG_CONFIG_HOME:-$HOME/.config}/${source##*/}"
   [[ $(readlink -f "$target") == "$source" ]] || { printf 'Missing config link: %s\n' "$target" >&2; exit 1; }
+ done
+ for name in titan titan-shell; do
+  [[ ! -L $HOME/.local/bin/$name || $(readlink "$HOME/.local/bin/$name") == "$root/bin/$name" ]] || warn "~/.local/bin/$name does not point at $root/bin/$name (run titan migrate)"
  done
 else
  [[ -e ${XDG_STATE_HOME:-$HOME/.local/state}/titan/setup-version ]] || warn "this account has not run 'titan setup' yet"

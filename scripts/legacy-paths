@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+# legacy-paths: list user-owned files that still call Titan's public commands
+# through their pre-0.3 location scripts/NAME (now bin/NAME). Those paths keep
+# working through compatibility links for one release. Prints FILE:LINE: TEXT
+# and exits 1 when anything is found; it never edits the files.
+set -euo pipefail
+config=${XDG_CONFIG_HOME:-$HOME/.config}
+pattern='/scripts/(titan|titan-shell|titan-session|titan-install|workflow)([^-[:alnum:]_]|$)'
+candidates=("$config/titan" "$config/systemd/user" "$config/hypr" "$HOME/.bashrc" "$HOME/.bash_profile")
+found=0
+for path in "${candidates[@]}"; do
+ # ~/.config/hypr is Titan's own tree in a checkout; only user files there count.
+ [[ -e $path && ! ( -L $path && $path == "$config/hypr" ) ]] || continue
+ if grep -rHnEI --exclude-dir=.git "$pattern" "$path" 2>/dev/null; then found=1; fi
+done
+exit $((found))
