@@ -1,5 +1,78 @@
 # Verification
 
+## Small portable dependency/package/mise ports — 2026-10-04
+
+Added original Bash `commands.sh`, `packages.sh` and `development.sh` with
+stable routes for `titan cmd present|missing`, `titan pkg
+present|missing|drop|last-upgrade|cache-prune` and existing `titan dev
+tools|upgrade`. Plans were added for drop, cache cleanup and mise upgrades.
+Existing package installation/catalogs and developer recipes remain Python;
+compatibility dispatch also covers direct `desktop_cli.py` callers. There are
+no QML, compositor, keybinding or power-policy changes in this batch.
+
+- **Contracts:** command predicates never execute their inputs. Package
+  predicates use a successful full installed-name query and distinguish an
+  unavailable/failed database (exit 3) from absence. Drop deduplicates and ignores
+  absent names, retains dependencies and pacman's modified configuration backups,
+  and preserves confirmation. All-absent removal needs no sudo. Plans print
+  requested removal names; execution filters against installed packages.
+  History reads only ALPM upgrade records and returns null for an empty readable
+  log, failing for missing/unreadable logs. Cache cleanup retains at least two
+  versions and requires optional pacman-contrib. These helpers aren't added
+  automatically to `titan update`; mise keeps the caller's release-age policy.
+- **Local checks:** all 83 tests passed, including 14 new meaningful command
+  checks for literal executable paths/search text, malformed package names,
+  predicate/database errors, idempotent removal, plans without process/state
+  side effects, catalog compatibility, failed-upgrade ordering, required
+  repositories, cache retention limits, history parsing and direct callers.
+  The transaction clients are recorded stubs in these local tests, never host
+  package operations. Bash/Python syntax and `git diff --check` pass.
+- **Host dependency:** `scripts/doctor` stops at missing pacman-managed jq.
+  jq already exists as a mise-managed tool, but isn't on this agent process's
+  default PATH and doesn't satisfy the package manifest. The checkout workflow
+  manifest now declares the dependency already present in the Titan PKGBUILD;
+  cache cleanup lists pacman-contrib as optional. Local tests used extracted
+  official Arch jq/oniguruma packages under `.cache/titan/portable-tools`,
+  without installing or upgrading any host packages. Existing Python package
+  catalog/install routes were retained to keep current menus usable.
+  Native host dependency predicates, upgrade-history text and mise listing
+  passed; JSON plans also work with the existing mise shims on PATH.
+- **Packaged acceptance:** `tools/vm-test --full --stay --reuse run.OWNZaL`
+  rebuilt/installed the current packages through a full guest upgrade and passed
+  all 19 package/configuration checks, including packaged doctor. No new ISO,
+  signing or publishing operation was performed.
+- **Real portable acceptance:** `tools/vm-portable-commands run.OWNZaL`
+  passed all five checks. Installed hashes match the checkout. Real pacman
+  predicates and JSON plans work. A valid disposable package was built in three
+  versions; paccache rejected retention of one, then removed the oldest and
+  kept two. Installing version three, modifying its backup-marked config and
+  dropping an absent/duplicate/mixed selection removed only the owned package,
+  retained custom content as `.pacsave` and kept its Bash dependency. A repeat
+  drop succeeded. Real mise listing/upgrade used a separately verified isolated
+  global config pinned to the installed Node 24.21.0, kept that pin and left the
+  guest's normal config byte-identical. This checks pin preservation, not a new
+  floating runtime download.
+- **Fixture correction:** the first mise assertion checked only installed
+  version presence and overlooked an inherited guest config. A stricter retry
+  caught that. The final fixture sets the documented
+  [mise config directory/file overrides](https://mise.jdx.dev/configuration.html)
+  and runs from `/` to avoid inherited project files; it verifies the exact
+  active config source and requested version before and after upgrade. Initial
+  and failed-isolation logs remain alongside the successful final artifacts.
+
+Artifacts: `run.OWNZaL/{portable-package-checks.log,portable-source.json,
+portable-results.json,portable-commands.log,portable-initial-commands.log,
+portable-config-isolation-failed.log}`. The task-owned VM is stopped; host
+packages, applications, services, bootloader and desktop choices were unchanged.
+Coverage now reports 74 adapted, 106 partial, 6 policy and 293 pending of 479:
+five pending helpers and three partial helpers gained command-level adaptations.
+This does not imply complete updater, hardware or distribution parity.
+
+Next: package/update preflight and diagnostics, then a focused transaction-family
+Bash migration with preserved recipe, full-upgrade and confirmation behavior.
+Host dependency reconciliation still needs a normal reviewed Arch transaction;
+the agent did not run a system upgrade merely to satisfy its health check.
+
 ## Confirmed offline snapshot restore and cross-boot resume — 2026-10-04
 
 Added original Bash recovery in `lib/titan/snapshot_restore.sh`, reached through

@@ -1,4 +1,5 @@
 python
+jq
 tmux
 neovim
 btop

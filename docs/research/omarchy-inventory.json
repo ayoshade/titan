@@ -3,9 +3,9 @@
   "source": "https://github.com/omacom/omarchy",
   "revision": "5c4da021469517449770579793b37ce26d0a0d48",
   "counts": {
-    "adapted": 66,
-    "pending": 298,
-    "partial": 109,
+    "adapted": 74,
+    "pending": 293,
+    "partial": 106,
     "titan-policy": 6
   },
   "commands": [
@@ -509,17 +509,17 @@
       "command": "omarchy-cmd-missing",
       "sha256": "791f70dda4f3b27da47cdfb5d684dadaa1b79b374ec4523ec1316119a6d71814",
       "summary": "Check whether any required commands are missing",
-      "status": "pending",
-      "equivalent": "",
-      "notes": "Behavioral review and implementation remain; no parity claimed."
+      "status": "adapted",
+      "equivalent": "titan cmd missing",
+      "notes": "Literal command/path predicate; silent exit 0 for any missing, 1 otherwise; invalid input exits 2; never executes inputs."
     },
     {
       "command": "omarchy-cmd-present",
       "sha256": "cb9ba1b2bc9c72902be150dad21b16823c8ea9356968c8444681ef545c306684",
       "summary": "Check whether all required commands are available",
-      "status": "pending",
-      "equivalent": "",
-      "notes": "Behavioral review and implementation remain; no parity claimed."
+      "status": "adapted",
+      "equivalent": "titan cmd present",
+      "notes": "Literal command/path predicate; silent exit 0 for all present, 1 otherwise; invalid input exits 2; never executes inputs."
     },
     {
       "command": "omarchy-cmd-terminal-cwd",
@@ -2077,9 +2077,9 @@
       "command": "omarchy-pkg-drop",
       "sha256": "38b07ae1385d37779c66c444040c7ae4c579ccb7e9532017a8c79c342a334d48",
       "summary": "Remove all the named packages from the system if they're installed (otherwise ignore).",
-      "status": "partial",
-      "equivalent": "titan pkg",
-      "notes": "Package operations exist; chooser, multi-provider resolution, auto-launch and missing-list semantics differ."
+      "status": "adapted",
+      "equivalent": "titan pkg drop [--plan]",
+      "notes": "Idempotent deduplicated removal; Titan intentionally retains dependencies/configuration and pacman confirmation; plans do not query packages."
     },
     {
       "command": "omarchy-pkg-install",
@@ -2093,17 +2093,17 @@
       "command": "omarchy-pkg-missing",
       "sha256": "2cfa64af694cc58dddd2b7e0d8ecb3f900b52dc95dc317eac5a82e0d83990d93",
       "summary": "Returns true if any of the named packages are missing from the system (or false if they're all there).",
-      "status": "partial",
-      "equivalent": "titan pkg",
-      "notes": "Package operations exist; chooser, multi-provider resolution, auto-launch and missing-list semantics differ."
+      "status": "adapted",
+      "equivalent": "titan pkg missing",
+      "notes": "Bash predicate returns true for any absent requested package; database failure exits 3 rather than being treated as missing."
     },
     {
       "command": "omarchy-pkg-present",
       "sha256": "3d6b2d498a3ebdf7b9784c7e464bb30af99bce1ce60ab74a269e67efb88fb82b",
       "summary": "Returns true if all of the named packages are installed on the system (or false if any of them are missing).",
-      "status": "partial",
-      "equivalent": "titan pkg",
-      "notes": "Package operations exist; chooser, multi-provider resolution, auto-launch and missing-list semantics differ."
+      "status": "adapted",
+      "equivalent": "titan pkg present",
+      "notes": "Bash installed-name predicate; preserves successful name output; separates missing packages from a failed database query (exit 3)."
     },
     {
       "command": "omarchy-pkg-remove",
@@ -3573,9 +3573,9 @@
       "command": "omarchy-update-mise",
       "sha256": "edc8148e37bf0b43957f59f8aba7d3c6bfaf8b40d43f0199ba7bf05ae5c908a5",
       "summary": "Update mise-managed tools",
-      "status": "pending",
-      "equivalent": "",
-      "notes": "Behavioral review and implementation remain; no parity claimed."
+      "status": "adapted",
+      "equivalent": "titan dev upgrade [--plan]",
+      "notes": "Bash wrapper for existing mise upgrade; preserves caller configuration/release-age policy rather than overriding cooldown; explicit route, not an automatic update step."
     },
     {
       "command": "omarchy-update-orphan-pkgs",
@@ -3605,9 +3605,9 @@
       "command": "omarchy-update-pkg-prune",
       "sha256": "22a4b71541270a7d7c6ed85d480f9f2888df059e030d30860caf4c1f9a601dda",
       "summary": "Prune superseded versions from the pacman package cache",
-      "status": "pending",
-      "equivalent": "",
-      "notes": "Behavioral review and implementation remain; no parity claimed."
+      "status": "adapted",
+      "equivalent": "titan pkg cache-prune [--keep N] [--plan]",
+      "notes": "Explicit optional paccache cleanup retains at least two cached versions; not automatically integrated into the broader Titan update flow."
     },
     {
       "command": "omarchy-update-requires-free-space",
@@ -3717,9 +3717,9 @@
       "command": "omarchy-version-pkgs",
       "sha256": "20d6be64912541f99aa414b82e1469a7025ce10b54849bedf160c421fd683847",
       "summary": "Print when system packages were last upgraded",
-      "status": "pending",
-      "equivalent": "",
-      "notes": "Behavioral review and implementation remain; no parity claimed."
+      "status": "adapted",
+      "equivalent": "titan pkg last-upgrade [--json]",
+      "notes": "Latest ALPM upgrade timestamp with schema-1 JSON and honest empty/missing-log handling; rotated logs not scanned."
     },
     {
       "command": "omarchy-voxtype-config",

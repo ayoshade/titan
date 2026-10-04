@@ -55,9 +55,6 @@ def handle(args):
         run('pacman', '-Q'); return
     names = package_names(args.names)
     if args.action == 'info': run('pacman', '-Si', '--', *names)
-    elif args.action == 'present':
-        result = run('pacman', '-Qq', '--', *names, capture_output=True, text=True)
-        print(result.stdout, end='')
     elif args.action == 'add':
         command = plan_install(names)
         if args.plan: emit({'schema': 1, 'commands': [command]})
@@ -83,7 +80,9 @@ def register(sub):
     for action in ('list', 'installed'): actions.add_parser(action)
     item = actions.add_parser('bundle'); item.add_argument('name'); item.add_argument('--apply', action='store_true')
     item = actions.add_parser('search'); item.add_argument('query')
-    for action in ('info', 'present', 'add', 'remove', 'aur'):
+    for action in ('info', 'present', 'missing', 'add', 'remove', 'drop', 'aur'):
         item = actions.add_parser(action); item.add_argument('names', nargs='+')
-        if action in ('add', 'remove', 'aur'): item.add_argument('--plan', action='store_true')
+        if action in ('add', 'remove', 'drop', 'aur'): item.add_argument('--plan', action='store_true')
+    actions.add_parser('last-upgrade').add_argument('--json', action='store_true')
+    item = actions.add_parser('cache-prune'); item.add_argument('--keep', type=int, default=2); item.add_argument('--plan', action='store_true')
     parser.set_defaults(handler=handle)

@@ -53,10 +53,6 @@ def handle(args):
         require('mise')
         for command in commands: run(*command)
         return
-    if args.action == 'tools':
-        require('mise'); run('mise', 'ls'); return
-    if args.action == 'upgrade':
-        require('mise'); run('mise', 'upgrade'); return
     if args.db_action == 'list':
         emit({'schema': 1, 'databases': databases(), 'configured': sorted(p.stem for p in (CONFIG / 'development/databases').glob('*.json'))})
         return
@@ -82,7 +78,8 @@ def handle(args):
 def register(sub):
     parser = command_parser(sub, 'dev', 'Install repeatable mise environments and manage local Docker databases')
     actions = parser.add_subparsers(dest='action', required=True)
-    for action in ('list', 'tools', 'upgrade'): actions.add_parser(action)
+    for action in ('list', 'tools'): actions.add_parser(action)
+    actions.add_parser('upgrade').add_argument('--plan', action='store_true')
     for action in ('plan', 'install'):
         item = actions.add_parser(action); item.add_argument('name')
     db = actions.add_parser('db')

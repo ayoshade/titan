@@ -36,6 +36,21 @@ work is tracked in [the Omarchy ledger](research/omarchy.md).
   and exits nonzero for unsupported GPU profiles. It never installs packages
   or changes configuration. Installer/ISO commands and their QEMU-only apply
   boundary are described in [installation.md](installation.md).
+- `titan cmd present|missing COMMAND…`: silent literal dependency predicates;
+  exit 0 means true, 1 false, 2 invalid arguments. No commands are executed.
+- `titan pkg present|missing PACKAGE…`: installed-package predicates; 0 true,
+  1 false, 2 invalid arguments, 3 unavailable/failed pacman query. Present prints
+  requested names on success; missing is silent.
+- `titan pkg drop [--plan] PACKAGE…`: idempotent removal of installed requested
+  names, preserving dependencies/configuration backups and pacman's confirmation.
+  Plans print requested argv without querying packages. No-op removal needs no sudo.
+- `titan pkg last-upgrade [--json]`: latest ALPM upgrade timestamp; schema 1,
+  `last_upgrade` is null for an empty readable history. Missing/unreadable log fails.
+- `titan pkg cache-prune [--keep N] [--plan]`: explicit paccache cleanup with
+  at least two retained versions (2–999); execution requires pacman-contrib/sudo.
+- `titan dev tools` and `upgrade [--plan]` use Bash mise wrappers, preserving
+  the caller's configuration and release-age policy. Plans need jq and create
+  no state. Cleanup/upgrades aren't automatically added to `titan update`.
 - `titan-shell ipc welcome` opens the first-login Welcome screen.
 - `bin/titan-install --status [--json]`: schema-1 read-only JSON with the
   last installation checkpoint, operation lock state and target mounts.

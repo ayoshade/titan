@@ -49,12 +49,51 @@ titan pkg add --plan fzf zoxide
 titan pkg add fzf zoxide
 titan pkg remove PACKAGE                 # pacman reviews the transaction
 titan pkg aur --plan PACKAGE             # existing paru/yay helper
+titan cmd present bash pacman            # exit-status dependency checks
+titan cmd missing OPTIONAL_COMMAND
+titan pkg present bash jq
+titan pkg missing OPTIONAL_PACKAGE
+titan pkg drop --plan PACKAGE            # inspect requested removal
+titan pkg drop PACKAGE                   # ignore absent packages; retain pacman's prompt
+titan pkg last-upgrade --json            # timestamp from ALPM upgrade records
+titan pkg cache-prune --plan             # inspect cleanup; retain two cached versions
+titan pkg cache-prune --keep 3           # optional pacman-contrib dependency
 titan dev list
 titan dev plan rails
 titan dev install node
 titan dev tools
 titan dev upgrade
+titan dev upgrade --plan
 ```
+
+The small dependency/package helpers and mise list/upgrade wrappers use Bash.
+`cmd present` exits 0 when every literal command name or executable path can be
+resolved, otherwise 1; `cmd missing` reverses that predicate. They never run
+commands. Empty argument lists/names and option-like names exit 2.
+`pkg present` likewise returns 0 for all installed packages and prints the
+requested names; `pkg missing` returns 0 if any are absent and prints nothing.
+Both return 3 if pacman is unavailable or its installed-package query fails,
+so an unreadable database isn't mistaken for an absent dependency.
+
+`pkg drop` queries the database first, removes only installed requested packages
+and deduplicates them. It retains dependencies and modified configuration backups
+and uses pacman's normal confirmation. An entirely absent selection succeeds without
+sudo. `--plan` prints the requested names without a database query; execution
+filters that selection against installed packages. Existing `pkg remove`
+continues to pass every requested name to pacman.
+
+`pkg last-upgrade --json` returns schema 1 with `last_upgrade`, an ISO timestamp
+from the last ALPM `upgraded` record, or null when the readable log has none.
+Missing/unreadable logs fail; human output never invents today's date for an
+empty history. It reads `/var/log/pacman.log`, not rotated history.
+`pkg cache-prune` requires separately installed `pacman-contrib`, invokes sudo
+and retains 2–999 cached versions per package (two by default, ordered by
+version rather than installed status). Plans need jq, run no package tools
+and create no user state. Cleanup and mise upgrades are explicit operations;
+this batch doesn't add them to `titan update` automatically.
+`dev upgrade` preserves the caller's project/global mise configuration and
+release-age policy; it does not override cooldowns or force upgrades of pinned
+versions. Existing tools/upgrade routes remain compatible.
 
 `default/catalog/packages.json` and `development.json` are the maintained
 recipes. Desktop packages use full pacman upgrades. Developer tools and
@@ -262,10 +301,13 @@ remain supported while their operations migrate.
 Currently, `bin/titan` routes to distinct scripts and Python modules: `apps`,
 `configuration`, `packages`, `development`, `utilities`, `media_tools`,
 `system_status`, `plugins`, with shared primitives in `ops`. Services live in
-`lib/titan/services.sh`, reached through the existing `scripts/titan-system`;
-other families continue using the Python parser. New functionality
+`lib/titan/services.sh`, reached through the existing `scripts/titan-system`.
+Dependency predicates use `commands.sh`; package predicates/drop/history/cache
+helpers use `packages.sh`; mise list/upgrade wrappers use `development.sh`.
+Other operations continue using the Python parser. New functionality
 does not accumulate in the legacy `workflow.py`; it only adapts shortcuts and
 menus to shared operations. Help is available at every level. Exit 0 means
 success, 1 means an operation failed/refused, 2 means invalid CLI syntax, and
-130 means interruption. Read-only plans don't create user state. New structured
+130 means interruption. Package predicates additionally return 3 for a database/tool
+failure. Read-only plans don't create user state. New structured
 status objects include `schema: 1`; UI/catalog arrays are documented arrays.

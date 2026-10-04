@@ -10,6 +10,7 @@ url="https://github.com/ayoshade/titan"
 license=('Apache-2.0' 'MIT')
 depends=('bash' 'python' 'jq' 'hyprland' 'quickshell' 'kitty' 'hyprlock' 'wl-clipboard' 'libnotify')
 optdepends=('titan-desktop: the complete Titan desktop package set'
+            'pacman-contrib: package-cache cleanup (titan pkg cache-prune)'
             'snapper: snapshots before updates (scripts/install-snapshots)')
 source=()
 _root="$startdir/../.."

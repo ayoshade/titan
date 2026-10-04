@@ -162,6 +162,16 @@
       "equivalent": "titan launch / lib/titan/apps.py",
       "notes": "Original Titan operation; CLI and desktop implementation follow Titan interfaces."
     },
+    "omarchy-cmd-missing": {
+      "status": "adapted",
+      "equivalent": "titan cmd missing",
+      "notes": "Literal command/path predicate; silent exit 0 for any missing, 1 otherwise; invalid input exits 2; never executes inputs."
+    },
+    "omarchy-cmd-present": {
+      "status": "adapted",
+      "equivalent": "titan cmd present",
+      "notes": "Literal command/path predicate; silent exit 0 for all present, 1 otherwise; invalid input exits 2; never executes inputs."
+    },
     "omarchy-cmd-terminal-cwd": {
       "status": "adapted",
       "equivalent": "titan launch / lib/titan/apps.py",
@@ -628,9 +638,9 @@
       "notes": "Uses an already installed paru/yay helper; no automatic AUR-helper bootstrap."
     },
     "omarchy-pkg-drop": {
-      "status": "partial",
-      "equivalent": "titan pkg",
-      "notes": "Package operations exist; chooser, multi-provider resolution, auto-launch and missing-list semantics differ."
+      "status": "adapted",
+      "equivalent": "titan pkg drop [--plan]",
+      "notes": "Idempotent deduplicated removal; Titan intentionally retains dependencies/configuration and pacman confirmation; plans do not query packages."
     },
     "omarchy-pkg-install": {
       "status": "partial",
@@ -638,14 +648,14 @@
       "notes": "Package operations exist; chooser, multi-provider resolution, auto-launch and missing-list semantics differ."
     },
     "omarchy-pkg-missing": {
-      "status": "partial",
-      "equivalent": "titan pkg",
-      "notes": "Package operations exist; chooser, multi-provider resolution, auto-launch and missing-list semantics differ."
+      "status": "adapted",
+      "equivalent": "titan pkg missing",
+      "notes": "Bash predicate returns true for any absent requested package; database failure exits 3 rather than being treated as missing."
     },
     "omarchy-pkg-present": {
-      "status": "partial",
-      "equivalent": "titan pkg",
-      "notes": "Package operations exist; chooser, multi-provider resolution, auto-launch and missing-list semantics differ."
+      "status": "adapted",
+      "equivalent": "titan pkg present",
+      "notes": "Bash installed-name predicate; preserves successful name output; separates missing packages from a failed database query (exit 3)."
     },
     "omarchy-pkg-remove": {
       "status": "partial",
@@ -882,6 +892,16 @@
       "equivalent": "titan version|migrate|update",
       "notes": "Titan package/Git updates and migrations exist; release-channel selection and reference notices differ."
     },
+    "omarchy-update-mise": {
+      "status": "adapted",
+      "equivalent": "titan dev upgrade [--plan]",
+      "notes": "Bash wrapper for existing mise upgrade; preserves caller configuration/release-age policy rather than overriding cooldown; explicit route, not an automatic update step."
+    },
+    "omarchy-update-pkg-prune": {
+      "status": "adapted",
+      "equivalent": "titan pkg cache-prune [--keep N] [--plan]",
+      "notes": "Explicit optional paccache cleanup retains at least two cached versions; not automatically integrated into the broader Titan update flow."
+    },
     "omarchy-update-system-pkgs": {
       "status": "partial",
       "equivalent": "titan version|migrate|update",
@@ -896,6 +916,11 @@
       "status": "partial",
       "equivalent": "titan version|migrate|update",
       "notes": "Titan package/Git updates and migrations exist; release-channel selection and reference notices differ."
+    },
+    "omarchy-version-pkgs": {
+      "status": "adapted",
+      "equivalent": "titan pkg last-upgrade [--json]",
+      "notes": "Latest ALPM upgrade timestamp with schema-1 JSON and honest empty/missing-log handling; rotated logs not scanned."
     },
     "omarchy-webapp-install": {
       "status": "partial",

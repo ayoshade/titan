@@ -13,18 +13,18 @@ Shell and QML are the primary implementation languages. Existing Python APIs rem
 | Batch | Pending | Partial | Policy |
 | --- | ---: | ---: | ---: |
 | [Boot, snapshots and installed-system recovery](#boot) | 13 | 8 | 0 |
-| [Packages, channels, upgrades and migrations](#updates) | 27 | 6 | 0 |
+| [Packages, channels, upgrades and migrations](#updates) | 24 | 6 | 0 |
 | [Agent launch, accounts, usage and optional runtimes](#agents) | 33 | 1 | 0 |
 | [Theme lifecycle, palettes, applications and branding](#themes) | 36 | 9 | 0 |
 | [Authentication, privilege and SSH service lifecycle](#security) | 14 | 0 | 0 |
 | [Detection, monitors, input, audio tuning and power](#hardware) | 42 | 17 | 2 |
 | [Optional service lifecycle and file sharing](#services) | 19 | 2 | 0 |
 | [Developer environments, config recovery and workspace jobs](#developer) | 15 | 3 | 0 |
-| [Application bundles, browser integration, gaming and launchers](#apps) | 45 | 31 | 0 |
+| [Application bundles, browser integration, gaming and launchers](#apps) | 45 | 28 | 0 |
 | [Plugin manifest, catalog, cloning and updates](#plugins) | 4 | 6 | 0 |
 | [Capture, media, dictation and picker workflows](#capture) | 8 | 12 | 0 |
 | [Shell surfaces, notifications, toggles, state and watchers](#desktop) | 36 | 12 | 4 |
-| [Shared command primitives and distribution diagnostics](#core) | 6 | 2 | 0 |
+| [Shared command primitives and distribution diagnostics](#core) | 4 | 2 | 0 |
 
 <a id="boot"></a>
 
@@ -91,11 +91,9 @@ Acceptance: VM full upgrades, lock contention, low space, interrupted transactio
 | `omarchy-update-firmware` | pending | 18 | Update system firmware using fwupd. Ensures the fwupd EFI binary is installed | `cmd-missing`, `pkg-add` |
 | `omarchy-update-keyring` | pending | 31 | Ensure the Omarchy and Arch keyring packages are installed and populated | `pkg-add`, `pkg-missing`, `update`, `update-system-pkgs` |
 | `omarchy-update-lock` | pending | 47 | Run a command while holding the Omarchy update lock | `update` |
-| `omarchy-update-mise` | pending | 12 | Update mise-managed tools | `cmd-present` |
 | `omarchy-update-orphan-pkgs` | pending | 29 | Review and optionally remove orphaned system packages after updates | — |
 | `omarchy-update-pacman` | pending | 25 | Run a pacman transaction for the Omarchy update flow, shielded from desktop session teardown. | — |
 | `omarchy-update-pacman-guard` | pending | 64 | Prevent direct pacman system upgrades from bypassing omarchy update. | — |
-| `omarchy-update-pkg-prune` | pending | 13 | Prune superseded versions from the pacman package cache | — |
 | `omarchy-update-requires-free-space` | pending | 17 | Check free disk space required for an update | — |
 | `omarchy-update-restart` | pending | 66 | Prompt for required reboot or service restarts after updates | `restart-shell`, `state`, `system-reboot` |
 | `omarchy-update-status` | pending | 12 | Refresh the shell update status | `shell`, `update-available` |
@@ -108,7 +106,6 @@ Acceptance: VM full upgrades, lock contention, low space, interrupted transactio
 | `omarchy-version` | partial | 28 | Print the installed Omarchy version | — |
 | `omarchy-version-branch` | partial | 18 | Print the active Omarchy dev-link git branch | — |
 | `omarchy-version-channel` | pending | 29 | Print the active Omarchy mirror and package channel | — |
-| `omarchy-version-pkgs` | pending | 5 | Print when system packages were last upgraded | — |
 
 <a id="agents"></a>
 
@@ -454,10 +451,7 @@ Acceptance: Actual official/AUR package builds in guests; quoted filenames/URLs;
 | `omarchy-pkg-aur-accessible` | partial | 6 | Returns true if the AUR is up and available. | `update` |
 | `omarchy-pkg-aur-add` | partial | 18 | Add the named packages to the system from the AUR if they're missing. Returns false if it couldn't be done. | `pkg-missing` |
 | `omarchy-pkg-aur-install` | partial | 30 | Show a fuzzy-finder TUI for picking new AUR packages to install. | `show-done`, `sudo-keepalive` |
-| `omarchy-pkg-drop` | partial | 31 | Remove all the named packages from the system if they're installed (otherwise ignore). | — |
 | `omarchy-pkg-install` | partial | 26 | Show a fuzzy-finder TUI for picking new Arch and OPR packages to install. | `show-done`, `sudo-keepalive` |
-| `omarchy-pkg-missing` | partial | 12 | Returns true if any of the named packages are missing from the system (or false if they're all there). | — |
-| `omarchy-pkg-present` | partial | 10 | Returns true if all of the named packages are installed on the system (or false if any of them are missing). | — |
 | `omarchy-pkg-remove` | partial | 24 | Show a fuzzy-finder TUI for picking packages installed on the system to be removed. | `show-done` |
 | `omarchy-refresh-applications` | partial | 17 | Ensure default application launchers and mise wrappers are installed. | `cmd-present` |
 | `omarchy-remove-browser` | pending | 70 | Remove a supported browser and clean up Omarchy browser defaults | `cmd-present`, `pkg-drop`, `pkg-missing` |
@@ -625,8 +619,6 @@ Acceptance: Argument boundaries, missing-command exit codes and side-effect-free
 
 | Reference command | Status | Source lines | Behavior to review | Lexical references |
 | --- | --- | ---: | --- | --- |
-| `omarchy-cmd-missing` | pending | 11 | Check whether any required commands are missing | — |
-| `omarchy-cmd-present` | pending | 9 | Check whether all required commands are available | — |
 | `omarchy-debug` | partial | 96 | Print debugging information | — |
 | `omarchy-debug-idle` | partial | 61 | Show idle, screensaver, and lock diagnostics | `screensaver`, `shell`, `system-sleep-monitor`, `toggle-enabled` |
 | `omarchy-disk-speedtest` | pending | 232 | Measure live disk read and write speed | — |

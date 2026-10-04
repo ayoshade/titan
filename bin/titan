@@ -26,6 +26,7 @@ Usage: titan COMMAND [ARGS]
   launch …                Launch with defaults and focused working directory
   webapp …                Install/list/launch/remove web-app launchers
   pkg …                   Search packages and install reviewed optional bundles
+  cmd present|missing …   Check command dependencies without running them
   dev …                   Mise environment recipes and Docker databases
   service …               Optional Docker, printing and Tailscale lifecycles
   config …                Install/diff/backup/reset/restore developer dotfiles
@@ -160,6 +161,7 @@ case "${1:-help}" in
  config|font) exec "$root/scripts/titan-config" "$@" ;;
  plugin) exec "$root/scripts/titan-plugins" "$@" ;;
  pkg) exec "$root/scripts/titan-packages" "$@" ;;
+ cmd) shift; exec "$root/scripts/titan-commands" "$@" ;;
  dev) exec "$root/scripts/titan-dev" "$@" ;;
  service) exec "$root/scripts/titan-system" "$@" ;;
  archive|worktree|tmux|forward|watch) exec "$root/scripts/titan-utilities" "$@" ;;

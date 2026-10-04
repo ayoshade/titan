@@ -38,6 +38,11 @@ approval.
    `system_status.py` one family at a time. Keep the public
    CLI, structured status, confirmation boundaries and exit codes; use `jq`
    for JSON and argv arrays for subprocess arguments.
+   Dependency predicates (`commands.sh`), package predicates/drop/history/cache
+   helpers (`packages.sh`) and mise list/upgrade wrappers (`development.sh`) now
+   use Bash. Package installation/catalogs and developer recipes/databases remain
+   Python until their transaction/provisioning paths pass a focused migration;
+   this keeps existing menus usable on checkouts missing jq.
 3. Migrate developer environment/jobs, defaults/launchers and configuration
    operations with their existing real-VM acceptance checks. Keep user data,
    backups, locks and old paths compatible throughout.

@@ -10,8 +10,11 @@ from pathlib import Path
 def main(argv=None):
     argv = sys.argv[1:] if argv is None else argv
     # Preserve direct internal callers while this family moves to Shell.
-    if argv and argv[0] == 'service':
-        return subprocess.call([str(Path(__file__).resolve().parents[2] / 'scripts/titan-system'), *argv])
+    if argv and (argv[0] == 'service' or
+                 (argv[0] == 'pkg' and len(argv) > 1 and argv[1] in ('present', 'missing', 'drop', 'last-upgrade', 'cache-prune')) or
+                 (argv[0] == 'dev' and len(argv) > 1 and argv[1] in ('tools', 'upgrade'))):
+        script = {'service': 'titan-system', 'pkg': 'titan-packages', 'dev': 'titan-dev'}[argv[0]]
+        return subprocess.call([str(Path(__file__).resolve().parents[2] / 'scripts' / script), *argv])
     import apps
     import configuration
     import development

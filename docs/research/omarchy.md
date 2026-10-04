@@ -18,10 +18,10 @@ Titan's older shortcut reference. Preserve Titan's researched appearance and
   commands, source hash, summary and coverage, plus hashes for 878 reference
   files under config/default/install/shell/manual/themes.
 - [omarchy-equivalents.json](omarchy-equivalents.json): maintained explicit
-  mappings for 181 commands. **298 remain pending implementation or detailed
-  behavioral review.** That isn't a count of 298 distinct missing user features;
+  mappings for 186 commands. **293 remain pending implementation or detailed
+  behavioral review.** That isn't a count of 293 distinct missing user features;
   many are internal helpers.
-- 66 commands have adapted Titan operations, 109 have partial equivalents and
+- 74 commands have adapted Titan operations, 106 have partial equivalents and
   6 relate to the laptop's differing idle/power policy. Adapted means a Titan
   implementation exists, not that every hardware path was acceptance-tested.
 - [omarchy-port-plan.md](omarchy-port-plan.md): all originally pending commands,
@@ -56,6 +56,31 @@ Shell and QML are the owner's primary-language direction. The
 is concentrated and how to migrate command families without dropping their
 safety or CLI contracts. Existing implementations remain supported; source
 triage does not count as a completed port.
+
+## Small portable command batch — 2026-10-04
+
+Eight reference commands now have individually verified adaptations:
+`cmd-present`, `cmd-missing`, `pkg-present`, `pkg-missing`, `pkg-drop`,
+`version-pkgs`, `update-pkg-prune` and `update-mise`. Their Titan interfaces are
+`titan cmd present|missing`, `titan pkg present|missing|drop|last-upgrade|cache-prune`
+and `titan dev upgrade`. Mise listing/upgrade and the new package helpers use
+original Bash; existing package installation/catalogs and developer recipes
+remain supported through Python. JSON plans/status use the existing jq package
+dependency, now also declared in the checkout workflow manifest.
+
+These are command-level adaptations, not full updater parity. Cache cleanup and
+mise upgrades are explicit operations rather than new automatic update steps.
+Titan preserves pacman's confirmation/configuration backups/dependencies and
+the caller's mise release-age preferences. Failed package database queries are
+reported separately from absent dependencies. Cache cleanup requires the
+optional pacman-contrib package and retains at least two versions.
+See [operations](../operations.md) and the dated [verification](../verification.md)
+entry for exact acceptance scope and host dependency limitations.
+
+Next portable work should extend package/update preflight and diagnostics,
+then migrate existing package transactions with their full-upgrade, recipe and
+confirmation contracts. Keep hardware/security/authentication tasks in their
+separate batches; a small helper port does not establish those integrations.
 
 ## Implemented in the initial foundation batch
 
