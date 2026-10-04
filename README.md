@@ -147,6 +147,7 @@ mise upgrade                          # update installed tools
 
 ```sh
 titan version                       # version and install location
+titan logo [--plain]                 # the supplied text wordmark
 titan theme list | current | nord   # themes
 titan settings get | set KEY VALUE | reset KEY | schema
 titan wallpaper list | next | set PATH
@@ -264,6 +265,15 @@ The shell keeps logic in service singletons and presentation in modules. It
 uses native Quickshell APIs for Hyprland, NetworkManager, BlueZ, PipeWire,
 UPower, MPRIS, notifications and the system tray. Theme tokens come from one
 palette catalog and the settings schema.
+
+## Branding
+
+Root `logo.txt` and `logo.png` are Titan's supplied branding masters and ship
+under `/usr/share/titan` in packages. `titan logo` prints the text artwork;
+interactive setup and maintenance terminals show it too. Welcome and Settings
+About display the PNG, retaining its supplied colours. Fresh QEMU installs use
+the same PNG for Plymouth and ReGreet, and the live ISO shows the text logo.
+See [branding](docs/branding.md) for the integration and current limits.
 
 ## Privacy and resource notes
 

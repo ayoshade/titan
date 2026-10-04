@@ -23,6 +23,7 @@ package() {
   install -d "$share"
   # Defaults and code only: user state never ships.
   cp -a --no-preserve=ownership "$_root"/{bin,config,scripts,lib,assets,migrations,default,packages,system,keys,installation,version} "$share/"
+  install -m644 "$_root"/logo.txt "$_root"/logo.png "$share/"
   find "$share" -name __pycache__ -prune -exec rm -rf {} +
   install -d "$pkgdir/usr/bin"
   for cmd in titan titan-shell titan-session; do

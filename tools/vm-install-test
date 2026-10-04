@@ -77,18 +77,20 @@ boot_vm live
 echo 'Booting the live ISO with UEFI…'
 wait_ssh
 ssh_vm 'test -d /sys/firmware/efi && test -d /run/archiso/bootmnt'
-ssh_vm 'sha256sum /usr/share/titan-installer/lib/titan/install.py /usr/share/titan-installer/bin/titan-install' >"$run/iso-installer.sha256"
+ssh_vm 'sha256sum /usr/share/titan-installer/lib/titan/install.py /usr/share/titan-installer/bin/titan-install /usr/share/titan-installer/logo.txt /usr/share/titan-installer/logo.png /usr/share/titan-installer/lib/titan/branding.sh' >"$run/iso-installer.sha256"
 python3 - "$root" "$run" <<'SOURCE'
 import hashlib,json,sys
 from pathlib import Path
 root,run=map(Path,sys.argv[1:])
 embedded=[line.split()[0] for line in (run/'iso-installer.sha256').read_text().splitlines()]
 current=[hashlib.sha256((root/path).read_bytes()).hexdigest()
-         for path in ('lib/titan/install.py','bin/titan-install')]
+         for path in ('lib/titan/install.py','bin/titan-install','logo.txt','logo.png','lib/titan/branding.sh')]
 matches=embedded == current
 (run/'iso-source-check.json').write_text(json.dumps({'matches_checkout':matches,'embedded':embedded,'checkout':current},indent=2)+'\n')
 print('PASS  ISO contains current installer source' if matches else 'NOTE  Overlaying installer changes; this is not a final ISO source check')
 SOURCE
+ssh_vm 'titan logo --plain | cmp - /usr/share/titan-installer/logo.txt && head -n "$(wc -l </usr/share/titan-installer/logo.txt)" /etc/motd | cmp - /usr/share/titan-installer/logo.txt'
+echo 'PASS  Live ISO logo command and login banner use the supplied text artwork'
 # Overlay the current installer for development iterations; the final ISO
 # build must contain these same files before recording an ISO release check.
 scp "${sshargs[@]}" -P "$sshport" "$root/lib/titan/install.py" root@127.0.0.1:/usr/share/titan-installer/lib/titan/install.py
@@ -131,6 +133,9 @@ else
  test -e /mnt/titan-check/boot/loader/entries/titan.conf
 fi
 test -e /mnt/titan-check/etc/titan/install-plan.json
+cmp /mnt/titan-check/usr/share/titan/logo.png /mnt/titan-check/usr/share/plymouth/themes/titan/logo.png
+test ! -L /mnt/titan-check/usr/share/plymouth/themes/titan/logo.png
+lsinitcpio /mnt/titan-check/boot/initramfs-linux.img | grep -F 'usr/share/plymouth/themes/titan/logo.png' >/dev/null
 umount --recursive /mnt/titan-check
 sync
 TESTACCESS

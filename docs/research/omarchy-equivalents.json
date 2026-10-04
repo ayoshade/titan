@@ -710,7 +710,7 @@
     "omarchy-plymouth-set": {
       "status": "partial",
       "equivalent": "Titan installer / system templates",
-      "notes": "QEMU target setup and original Plymouth theme exist; portable live-machine apply/switcher API is absent."
+      "notes": "Fresh QEMU targets use owner-supplied root logo.png in Plymouth and ReGreet; boot splash/login/Welcome visually verified. Portable live-machine apply, per-theme colour/asset switching and branding editor APIs remain absent."
     },
     "omarchy-power-present": {
       "status": "adapted",
@@ -941,6 +941,11 @@
       "status": "partial",
       "equivalent": "titan update / update check|status / lib/titan/update.sh",
       "notes": "Integrated per-user exclusive lock and read-only inspection, rechecked preflight and inherited ordinary-worker lock verified in QEMU after updater SIGKILL. Privileged pacman owns its database lock; generic held/run and detached privileged transaction lifecycle remain absent."
+    },
+    "omarchy-show-logo": {
+      "status": "adapted",
+      "equivalent": "titan logo [--plain] / setup and maintenance terminal headers",
+      "notes": "Original Bash reads root logo.txt; neutral silver on interactive terminals, exact plain bytes when redirected or --plain, honours NO_COLOR and preserves existing terminal output."
     }
   }
 }

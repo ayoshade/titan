@@ -1,5 +1,12 @@
 /* Original Titan greeter palette. Keep native GTK focus and accessibility. */
-window { background-color: #08090b; color: #e0e4ea; }
+window {
+ background-color: #08090b;
+ background-image: url("logo.png");
+ background-repeat: no-repeat;
+ background-size: 200px auto;
+ background-position: center 8%;
+ color: #e0e4ea;
+}
 box { border-radius: 8px; }
 label { color: #e0e4ea; }
 entry, dropdown, button {

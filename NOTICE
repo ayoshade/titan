@@ -14,6 +14,10 @@ This product includes:
   character names from the Unicode Character Database. Copyright © Unicode,
   Inc. Used under the Unicode License v3 (https://www.unicode.org/license.txt).
 
+Brand artwork:
+- Root logo.txt and logo.png were supplied by Titan's owner, 2026-10-04,
+  and are preserved as the repository's canonical branding assets.
+
 Acknowledgements (no code or assets copied):
 - Keyboard chords follow Omarchy (https://github.com/omacom/omarchy, MIT);
   Titan's implementation is independent.

@@ -1,5 +1,73 @@
 # Verification
 
+## Owner-supplied logo integration — 2026-10-04
+
+Root `logo.txt` and the owner's 405×184 RGBA `logo.png` are the canonical
+masters. Both ship at the Titan package root and in the live installer; the
+PNG is unchanged (SHA-256 in `docs/branding.md`). Original Bash `titan logo`
+and interactive setup/maintenance use the text. Shared QML Welcome/About,
+Plymouth and ReGreet use the PNG. The Plymouth template's relative link resolves
+into a regular independent image when the installer copies the target theme.
+
+- **Reference:** pinned Omarchy `5c4da021469517449770579793b37ce26d0a0d48`
+  show-logo/presentation/About, branding manual, SDDM QML and Plymouth sources
+  were inspected. Titan uses its own Bash/QML/ReGreet/Plymouth integration; no
+  upstream code/artwork was copied. Animated ASCII About, branding conversion/
+  edit/reset and screensaver behavior remain outside this change.
+- **CLI/local:** 127 tests pass. Direct comparison confirms redirected and
+  `--plain` output is byte-identical to `logo.txt`; help/refusals work without
+  state writes. PTY checks confirm silver colour/reset and `NO_COLOR`. The
+  first PTY fixture inherited the session's `NO_COLOR`; isolating that input
+  confirmed both intended branches. Bash/Python parsing, final doctor and
+  `git diff --check` pass. qmllint reports only the existing QProcess exit-status
+  type warning/unused import in Welcome; no new logo/Settings syntax warnings.
+- **Live host visual inspection:** umbra, 1366×768, scale 1, horizon/theme accent.
+  Welcome's 180×82 logo and Settings About's 160×73 image render at the supplied
+  aspect ratio/colours inside the dark surfaces. About's metadata uses the
+  correct user settings path. Ctrl+F/About filtering exposed the existing
+  unsupported `flatMap` call; replacing it with `reduce` and restarting through
+  `scripts/shell-restart` loads the final code. Search now shows only About,
+  with the whole logo/metadata visible; the fresh shell log is clean. Test-opened
+  panels were closed, current theme/accent remained horizon/theme, and no user
+  setting was changed. Captures: `~/.cache/titan/branding/{welcome,about-final}.png`.
+- **Package/ISO:** `tools/vm-test --full --stay --reuse run.OWNZaL` passed all
+  19 package/config checks. `tools/vm-build-iso run.OWNZaL` built a current test
+  ISO and its checksum passed. The live embedded installer, both logos and Bash
+  logo helper match the checkout; live `titan logo` and MOTD text match the text
+  master. Final unsigned package inspection checks exact logo/runtime/QML/
+  template bytes and confirms the relocated logo command works. The final
+  Settings search correction was verified on the host and in the final archive;
+  the fresh-install run below used the earlier branding QML before that fix.
+- **Fresh UEFI installed-disk acceptance:** `tools/vm-install-test run.OWNZaL`
+  (`install.Zc5K0L`) passed independent Btrfs/systemd-boot installation,
+  ISO-detached boot, fresh ReGreet authentication/Welcome/shell IPC and all
+  existing workflow/lock/VT/rescue/lockout checks. The theme PNG is byte-identical
+  to packaged root `logo.png`, is a regular file, and is in the initramfs.
+  Actual framebuffer captures were viewed: `boot-frames/025.png` shows the
+  centred 320 px PNG in Plymouth with the progress dots below; `greeter.png`
+  shows the 200 px logo above the native login card; `desktop.png` shows the
+  entire Welcome panel and supplied logo on the fresh 1280×800 desktop.
+  Boot frame `040.png` captured the transient handoff black frame, not a claim
+  that the splash was missing. Greeter/login controls remained usable.
+- **Limits/state:** both owned VMs are stopped. The source login template and
+  its backup/install workflow were changed and VM-tested; the host's installed
+  greeter, bootloader and initramfs were not modified. No host package/sudo
+  transaction, power-policy change, logout, reboot or suspend occurred. The
+  test ISO has an injected SSH public key and is not distributable. This was
+  unsigned local acceptance; no signing or public release occurred. Multiple
+  monitor boot/login rendering and portable branding edit/reset remain open.
+
+Artifacts: build `run.OWNZaL/{iso,build-iso.log}`; fresh installation
+`install.Zc5K0L/{iso-source-check.json,iso-installer.sha256,install.log,
+boot-frames,greeter.png,desktop.png,shell.log}`; host
+`~/.cache/titan/branding-{package-checks,iso-build,install-acceptance,
+final-local-tests,final-package-build,final-qmllint,final-host-doctor,
+shell-restart,coverage}.log`. Coverage is now 76 adapted, 107 partial,
+6 policy and 290 pending of 479 (`show-logo` advances to adapted).
+Next: remaining developer jobs, keeping logo masters in the package/ISO paths
+as new branding consumers are added. Boot/login changes to existing systems
+continue through the documented authenticated installation workflow.
+
 ## Developer recipe/database Bash migration — 2026-10-04
 
 The whole `titan dev` family now uses original Bash `development.sh` through

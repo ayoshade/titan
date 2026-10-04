@@ -231,3 +231,16 @@ The installed QEMU system was visually inspected at 1280×800: splash, greeter,
 wallpaper and first-login Welcome. A brief libseat probe message is visible
 between splash and greeter; smoother handoff remains a deviation to fix.
 Desktop panel geometry and the existing design tokens were not changed.
+
+## Titan branding placement — 2026-10-04
+
+Owner-requested adaptation: Welcome replaces its placeholder workspace pill
+with the supplied root `logo.png`, at 180×82 within the existing panel. Settings
+About adds a 160×73 image and grows its row to 144 px; aspect ratios are preserved.
+The supplied red/magenta branding is intentionally retained, while shell tokens
+and theme choices remain unchanged. Captures were inspected on umbra at
+1366×768, scale 1, horizon/theme accent, and fresh VM Welcome at 1280×800.
+Searching About exposed an existing unsupported `flatMap` call; a compatible
+`reduce` expression now filters correctly in the actual Qt runtime. The metadata
+path now points to the existing user layer (`~/.config/titan/settings.json`).
+No new saneAspect frames or captions were reviewed for this branding task.

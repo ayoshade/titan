@@ -61,6 +61,12 @@ work is tracked in [the Omarchy ledger](research/omarchy.md).
   and exits nonzero for unsupported GPU profiles. It never installs packages
   or changes configuration. Installer/ISO commands and their QEMU-only apply
   boundary are described in [installation.md](installation.md).
+- `titan logo [--plain]`: canonical root `logo.txt`, exact plain text when
+  redirected or `--plain`; neutral silver on a TTY unless `NO_COLOR` is set or
+  `TERM=dumb`. Creates no state and preserves preceding terminal output.
+  Invalid arguments return 2, unreadable/missing artwork 1. Interactive setup
+  and `scripts/titan-task` share this presentation. Both branding masters ship
+  at the package root; [branding](branding.md) documents raster consumers.
 - `titan cmd present|missing COMMAND…`: silent literal dependency predicates;
   exit 0 means true, 1 false, 2 invalid arguments. No commands are executed.
 - `titan battery`, `network`, `bluetooth`, `power` and `audio` use original Bash

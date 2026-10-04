@@ -9,6 +9,8 @@ root = Path(__file__).resolve().parents[1]
 
 
 def main(argv):
+    if sys.stdout.isatty():
+        subprocess.run([str(root / 'bin/titan'), 'logo'], check=True)
     if argv[:1] == ['--dialog']:
         if len(argv) != 2: raise ValueError('Supply one dialog name')
         if argv[1] == 'webapp':
@@ -23,7 +25,7 @@ def main(argv):
 
 if __name__ == '__main__':
     try: code = main(sys.argv[1:])
-    except (ValueError, EOFError, OSError) as error:
+    except (ValueError, EOFError, OSError, subprocess.SubprocessError) as error:
         print(error, file=sys.stderr); code = 1
     except KeyboardInterrupt: code = 130
     if sys.stdin.isatty():

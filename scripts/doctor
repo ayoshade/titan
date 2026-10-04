@@ -5,6 +5,9 @@
 set -euo pipefail
 root=$(cd -- "$(dirname -- "$(readlink -f "${BASH_SOURCE[0]}")")/.." && pwd)
 dev=0; [[ -d $root/.git ]] && dev=1
+[[ -s $root/logo.txt && -s $root/logo.png && -r $root/system/plymouth/titan/logo.png ]] || {
+ echo 'Missing Titan branding assets or Plymouth logo link' >&2; exit 1;
+}
 warn() { printf 'warning: %s\n' "$*" >&2; }
 mapfile -t packages < <(cat "$root/packages/desktop.txt" "$root/packages/workflow.txt" "$root/packages/services.txt")
 if ((dev)); then

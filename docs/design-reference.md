@@ -108,3 +108,13 @@ the measurements and per-feature checklists.
 Preview images show the original artwork and shell without user applications:
 [desktop](previews/desktop.png), [controls](previews/controls.png). They
 predate the October redesign.
+
+## Owner-supplied branding — 2026-10-04
+
+Root `logo.txt` and `logo.png` are now the supplied Titan branding masters.
+Welcome and Settings About use the PNG; the PNG's red/magenta colours are kept
+as the owner's explicit branding choice within the existing dark surfaces.
+Terminal presentations use the text logo. Fresh VM boot/login uses the PNG.
+This is branding placement inspired by the pinned Omarchy reference, not new
+saneAspect video research or a change to the island/style measurements. See
+[branding](branding.md) and [verification](verification.md).

@@ -221,6 +221,15 @@ wl-clipboard, grim/slurp and suitable XDG portals.
   prototype uses Hyprland Lua configuration; do not introduce legacy syntax
   without checking compatibility. QML runtime checks matter alongside linting.
 
+Titan's branding masters are root `logo.txt` and `logo.png`; packages ship
+both at `/usr/share/titan/`. `titan logo` and interactive setup/maintenance use
+the text; `components/TitanLogo.qml` resolves the PNG through `Paths.root` for
+Welcome/About. `system/plymouth/titan/logo.png` links to the master and fresh
+installer copying resolves it into the target theme; ReGreet's installer keeps
+a root-owned copy beside its CSS. See `docs/branding.md`. Do not hand-edit
+installed copies or apply boot/login branding to the laptop without the
+corresponding authorized system workflow.
+
 ## Repository map and ownership
 
 | Location | Responsibility |

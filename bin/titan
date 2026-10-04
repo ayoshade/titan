@@ -13,6 +13,7 @@ usage() {
 Usage: titan COMMAND [ARGS]
 
   version                 Titan version and checkout
+  logo [--plain]          Show Titan's text logo (plain when redirected)
   migrate                 Run pending migrations (safe to repeat)
   migrate --status        List migrations and whether each has run
   setup                   Per-user first-run setup (idempotent; never overwrites)
@@ -74,6 +75,7 @@ migrate() {
 }
 
 setup() {
+ if [[ -t 1 ]]; then source "$root/lib/titan/branding.sh"; titan_logo; fi
  local config=${XDG_CONFIG_HOME:-$HOME/.config} fresh=1
  # titan-session creates the directory and setup.log before calling us.
  # Those alone are not an existing install; running legacy migrations on a
@@ -110,6 +112,7 @@ setup() {
 }
 
 case "${1:-help}" in
+ logo) shift; source "$root/lib/titan/branding.sh"; titan_logo "$@" ;;
  boot) shift; exec "$root/scripts/titan-boot" "$@" ;;
  snapshot) shift; exec "$root/scripts/titan-snapshot" "$@" ;;
  setup) setup ;;

@@ -23,7 +23,7 @@ Shell and QML are the primary implementation languages. Existing Python APIs rem
 | [Application bundles, browser integration, gaming and launchers](#apps) | 45 | 28 | 0 |
 | [Plugin manifest, catalog, cloning and updates](#plugins) | 4 | 6 | 0 |
 | [Capture, media, dictation and picker workflows](#capture) | 8 | 12 | 0 |
-| [Shell surfaces, notifications, toggles, state and watchers](#desktop) | 36 | 12 | 4 |
+| [Shell surfaces, notifications, toggles, state and watchers](#desktop) | 35 | 12 | 4 |
 | [Shared command primitives and distribution diagnostics](#core) | 4 | 2 | 0 |
 
 <a id="boot"></a>
@@ -588,7 +588,6 @@ Acceptance: Actual Wayland/QML interactions, event lifetimes and CPU cost, persi
 | `omarchy-screensaver` | pending | 48 | Run the Omarchy screensaver using random effects from TTE. | — |
 | `omarchy-shell-config` | pending | 62 | Shared helpers for editing ~/.config/omarchy/shell.json (source this, don't run it). | `shell` |
 | `omarchy-show-done` | pending | 25 | Display a "Done!" or "Failed!" message and wait for user to press any key. | — |
-| `omarchy-show-logo` | pending | 9 | Display the Omarchy logo in the terminal using green color. | — |
 | `omarchy-state` | pending | 39 | Manage persistent state files for Omarchy toggles and settings. | — |
 | `omarchy-system-lid-close` | titan-policy | 20 | Lock and reconcile displays when the laptop lid closes | `hw-external-monitors`, `hw-laptop-closed`, `hyprland-monitor-clamshell`, `system-lock`, `system-sleep-lock` |
 | `omarchy-system-stats` | pending | 59 | Print CPU and memory stats for the shell | — |

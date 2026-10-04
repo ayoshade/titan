@@ -3,8 +3,8 @@
   "source": "https://github.com/omacom/omarchy",
   "revision": "5c4da021469517449770579793b37ce26d0a0d48",
   "counts": {
-    "adapted": 75,
-    "pending": 291,
+    "adapted": 76,
+    "pending": 290,
     "partial": 107,
     "titan-policy": 6
   },
@@ -2223,7 +2223,7 @@
       "summary": "Set the Plymouth boot theme colors and logo",
       "status": "partial",
       "equivalent": "Titan installer / system templates",
-      "notes": "QEMU target setup and original Plymouth theme exist; portable live-machine apply/switcher API is absent."
+      "notes": "Fresh QEMU targets use owner-supplied root logo.png in Plymouth and ReGreet; boot splash/login/Welcome visually verified. Portable live-machine apply, per-theme colour/asset switching and branding editor APIs remain absent."
     },
     {
       "command": "omarchy-plymouth-set-by-theme",
@@ -2893,9 +2893,9 @@
       "command": "omarchy-show-logo",
       "sha256": "d29f497f7f649438aa00153123cd69f79efa4ed166cba3f35899c3de08fa4c86",
       "summary": "Display the Omarchy logo in the terminal using green color.",
-      "status": "pending",
-      "equivalent": "",
-      "notes": "Behavioral review and implementation remain; no parity claimed."
+      "status": "adapted",
+      "equivalent": "titan logo [--plain] / setup and maintenance terminal headers",
+      "notes": "Original Bash reads root logo.txt; neutral silver on interactive terminals, exact plain bytes when redirected or --plain, honours NO_COLOR and preserves existing terminal output."
     },
     {
       "command": "omarchy-snapshot",

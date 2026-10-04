@@ -20,6 +20,13 @@ selection has fixture coverage; physical GPUs and laptop behavior still need
 hardware testing. Power-policy work remains Phase 3; the development laptop's
 always-awake policy is never copied into a fresh installation.
 
+The live login banner and `titan logo` use the supplied root `logo.txt`.
+Fresh targets use root `logo.png` in the Plymouth theme/initramfs and ReGreet;
+Welcome/About use the same packaged asset. The installer resolves the template's
+relative link into a regular target image. These templates do not change this
+laptop's bootloader, initramfs or currently installed greeter. See
+[branding](branding.md) for the asset layout and verification.
+
 ## Read-only inspection
 
 ```sh

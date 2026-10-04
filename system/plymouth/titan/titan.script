@@ -2,8 +2,10 @@
 Window.SetBackgroundTopColor(0.031, 0.035, 0.043);
 Window.SetBackgroundBottomColor(0.031, 0.035, 0.043);
 
-title_image = Image.Text("T I T A N", 0.88, 0.90, 0.94);
-title_image = title_image.Scale(title_image.GetWidth() * 2, title_image.GetHeight() * 2);
+title_image = Image("logo.png");
+title_width = 320;
+if (title_width > Window.GetWidth() * 0.4) title_width = Window.GetWidth() * 0.4;
+title_image = title_image.Scale(title_width, title_image.GetHeight() * title_width / title_image.GetWidth());
 title = Sprite(title_image);
 title.SetPosition(Window.GetX() + (Window.GetWidth() - title_image.GetWidth()) / 2,
                   Window.GetY() + (Window.GetHeight() - title_image.GetHeight()) / 2, 1);
@@ -11,14 +13,14 @@ title.SetPosition(Window.GetX() + (Window.GetWidth() - title_image.GetWidth()) /
 dots_image = Image.Text(".  .  .", 0.50, 0.54, 0.60);
 dots = Sprite(dots_image);
 dots.SetPosition(Window.GetX() + (Window.GetWidth() - dots_image.GetWidth()) / 2,
-                 Window.GetY() + Window.GetHeight() / 2 + 48, 1);
+                 Window.GetY() + (Window.GetHeight() + title_image.GetHeight()) / 2 + 24, 1);
 message = Sprite();
 
 fun show_text(text) {
     image = Image.Text(text, 0.75, 0.78, 0.83);
     message.SetImage(image);
     message.SetPosition(Window.GetX() + (Window.GetWidth() - image.GetWidth()) / 2,
-                        Window.GetY() + Window.GetHeight() / 2 + 96, 2);
+                        Window.GetY() + (Window.GetHeight() + title_image.GetHeight()) / 2 + 72, 2);
     message.SetOpacity(1);
 }
 fun progress(duration, fraction) { dots.SetOpacity(0.35 + fraction * 0.65); }

@@ -48,11 +48,7 @@ Item {
   width: parent.width; spacing: 8
   Column {
    width: parent.width; spacing: 6; bottomPadding: 6
-   Rectangle { anchors.horizontalCenter: parent.horizontalCenter; width: 120; height: 30; radius: 15; color: Theme.notch
-    Row { anchors.centerIn: parent; spacing: 4
-     Repeater { model: 5; Rectangle { required property int index; width: index===0 ? 7 : 5; height: index===0 ? 13 : 9; radius: width/2; anchors.verticalCenter: parent.verticalCenter; color: index===0 ? Theme.accent : Qt.alpha(Theme.text,0.2) } }
-    }
-   }
+   TitanLogo { anchors.horizontalCenter: parent.horizontalCenter }
    ShellText { anchors.horizontalCenter: parent.horizontalCenter; text: "Welcome to Titan"; font.family: Theme.display; font.pixelSize: Theme.titleSize; font.weight: Font.DemiBold }
    ShellText { anchors.horizontalCenter: parent.horizontalCenter; text: "A few steps to make it yours. Everything here can change later."; color: Theme.muted }
   }

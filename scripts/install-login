@@ -35,12 +35,14 @@ done
 /usr/bin/regreet --help | /usr/bin/grep -q -- '--config'
 install -d -m 0755 /etc/greetd
 backup=$(mktemp -d /etc/greetd/umbra-backup.XXXXXX)
-for name in config.toml regreet.toml regreet.css; do
+for name in config.toml regreet.toml regreet.css logo.png; do
  if [[ -e /etc/greetd/$name || -L /etc/greetd/$name ]]; then
   cp -a -- "/etc/greetd/$name" "$backup/$name"
  fi
- install -o root -g root -m 0644 "$root/system/greetd/$name" "/etc/greetd/$name"
- cmp -- "$root/system/greetd/$name" "/etc/greetd/$name"
+ source=$root/system/greetd/$name
+ [[ $name != logo.png ]] || source=$root/logo.png
+ install -o root -g root -m 0644 "$source" "/etc/greetd/$name"
+ cmp -- "$source" "/etc/greetd/$name"
 done
 systemd-tmpfiles --create /usr/lib/tmpfiles.d/regreet.conf
 systemctl daemon-reload

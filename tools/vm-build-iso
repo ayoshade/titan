@@ -21,7 +21,7 @@ sshargs=(-q -i "$run/key" -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev
 ssh_vm() { ssh "${sshargs[@]}" -p "$port" tester@127.0.0.1 "$@"; }
 scp_vm() { scp "${sshargs[@]}" -P "$port" "$@"; }
 build=titan-isobuild-$(date +%s)
-tar -C "$root" -czf "$run/iso-source.tar.gz" tools/build-iso bin/titan bin/titan-install scripts/titan-snapshot lib/titan/boot.sh lib/titan/snapshots.sh lib/titan/snapshot_restore.sh lib/titan/install.py lib/titan/hardware.py system/hardware keys/titan-packager.asc installation/packages.txt LICENSE NOTICE version
+tar -C "$root" -czf "$run/iso-source.tar.gz" tools/build-iso bin/titan bin/titan-install scripts/titan-snapshot lib/titan/branding.sh lib/titan/boot.sh lib/titan/snapshots.sh lib/titan/snapshot_restore.sh lib/titan/install.py lib/titan/hardware.py system/hardware keys/titan-packager.asc installation/packages.txt LICENSE NOTICE version logo.txt logo.png
 scp_vm "$run/iso-source.tar.gz" "$run/key.pub" tester@127.0.0.1:
 cat >"$run/build-iso.sh" <<EOF
 set -euo pipefail

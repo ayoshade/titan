@@ -50,14 +50,19 @@ install -m755 "$root/bin/titan-install" "$installer/bin/"
 install -m755 "$root/bin/titan" "$installer/bin/"
 install -m755 "$root/scripts/titan-snapshot" "$installer/scripts/"
 install -m644 "$root/lib/titan/"{boot,snapshots,snapshot_restore}.sh "$installer/lib/titan/"
+install -m644 "$root/lib/titan/branding.sh" "$installer/lib/titan/"
 install -m644 "$root/lib/titan/"{install,hardware}.py "$installer/lib/titan/"
 install -m644 "$root/system/hardware/profiles.json" "$installer/system/hardware/"
 install -m644 "$root/keys/titan-packager.asc" "$installer/keys/"
 install -m644 "$root/installation/packages.txt" "$installer/installation/"
 install -m644 "$root/"{LICENSE,NOTICE,version} "$installer/"
+install -m644 "$root/"{logo.txt,logo.png} "$installer/"
 ln -s /usr/share/titan-installer/bin/titan-install "$live/usr/local/bin/titan-install"
 ln -s /usr/share/titan-installer/bin/titan "$live/usr/local/bin/titan"
-cat >"$live/etc/motd" <<'MOTD'
+{
+cat "$root/logo.txt"
+printf '\n'
+cat <<'MOTD'
 TITAN / LIVE INSTALLER
 
 Experimental UEFI + Btrfs installer, currently limited to disposable QEMU VMs.
@@ -70,6 +75,7 @@ Limine snapshot recovery: titan snapshot restore ID --disk /dev/vda.
 Inspect/resume interruption: titan snapshot restore-status|restore-resume --disk /dev/vda.
 The initial VM prototype is unencrypted. It never reboots automatically.
 MOTD
+} >"$live/etc/motd"
 find "$profile/efiboot" -type f -name '*.conf' -exec sed -i 's/Arch Linux/Titan live installer/g' {} +
 if [[ -n $key ]]; then
  install -d -m700 "$live/root/.ssh"

@@ -37,7 +37,7 @@ FloatingWindow {
   "@restartShell": {label:"Restart shell"}, "@doctor": {label:"Run health check"}, "@about": {label:"About"}
  })
  // Search flattens every section into one group of matching rows.
- readonly property var groups: query==="" ? section.groups : [{label:"Results", keys:sections.flatMap(s=>s.groups.flatMap(g=>g.keys)).filter(k=>labelFor(k).toLowerCase().includes(query) || k.toLowerCase().includes(query))}]
+ readonly property var groups: query==="" ? section.groups : [{label:"Results", keys:sections.reduce((keys,s)=>keys.concat(s.groups.reduce((keys,g)=>keys.concat(g.keys),[])),[]).filter(k=>labelFor(k).toLowerCase().includes(query) || k.toLowerCase().includes(query))}]
  FileView { id: hostname; path: "/etc/hostname" }
  Shortcut { sequence: "Escape"; onActivated: win.visible=false }
  Shortcut { sequences: [StandardKey.Back]; onActivated: win.step(-1) }
@@ -155,7 +155,7 @@ FloatingWindow {
   readonly property var spec: key.startsWith("@") ? ({type:key}) : Settings.schema.settings[key] || ({})
   readonly property var value: Settings.values[key]
   readonly property bool tall: spec.type==="int" || key==="@about" || key==="@idlePolicy"
-  implicitHeight: tall ? 64 : 46
+  implicitHeight: key==="@about" ? 144 : tall ? 64 : 46
   Rectangle { visible: !row.first; x: 14; width: parent.width-28; height: 1; color: Qt.alpha(Theme.text,0.06) }
   ShellText { id: label; x: 14; y: row.tall ? 12 : (parent.height-height)/2; text: win.labelFor(row.key); font.pixelSize: Theme.fontSize+1 }
   ShellText { visible: !!row.spec.hint && !row.tall; anchors { left: label.right; leftMargin: 8; baseline: label.baseline } text: row.spec.hint || ""; color: Theme.muted; font.pixelSize: Theme.captionSize }
@@ -262,10 +262,11 @@ FloatingWindow {
     }
    }
   }
+  TitanLogo { visible: row.key==="@about"; x: 14; y: 36; width: 160; height: 73 }
   ShellText {
    visible: row.key==="@idlePolicy" || row.key==="@about"
-   x: 14; y: 32; width: parent.width-28
-   text: row.key==="@idlePolicy" ? "Always awake: idle locking and display-off are disabled on this machine (docs/always-awake.md)." : "Titan · Umbra shell on "+(hostname.text().trim()||"this machine")+" · theme "+Theme.paletteName+" · settings in ~/.local/state/titan/settings.json"
+   x: 14; y: row.key==="@about" ? 116 : 32; width: parent.width-28
+   text: row.key==="@idlePolicy" ? "Always awake: idle locking and display-off are disabled on this machine (docs/always-awake.md)." : "Titan · Umbra shell on "+(hostname.text().trim()||"this machine")+" · theme "+Theme.paletteName+" · settings in ~/.config/titan/settings.json"
    color: Theme.muted; font.pixelSize: Theme.captionSize; wrapMode: Text.Wrap
   }
  }

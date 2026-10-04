@@ -18,10 +18,10 @@ Titan's older shortcut reference. Preserve Titan's researched appearance and
   commands, source hash, summary and coverage, plus hashes for 878 reference
   files under config/default/install/shell/manual/themes.
 - [omarchy-equivalents.json](omarchy-equivalents.json): maintained explicit
-  mappings for 188 commands. **291 remain pending implementation or detailed
-  behavioral review.** That isn't a count of 291 distinct missing user features;
+  mappings for 189 commands. **290 remain pending implementation or detailed
+  behavioral review.** That isn't a count of 290 distinct missing user features;
   many are internal helpers.
-- 75 commands have adapted Titan operations, 107 have partial equivalents and
+- 76 commands have adapted Titan operations, 107 have partial equivalents and
   6 relate to the laptop's differing idle/power policy. Adapted means a Titan
   implementation exists, not that every hardware path was acceptance-tested.
 - [omarchy-port-plan.md](omarchy-port-plan.md): all originally pending commands,
@@ -172,6 +172,29 @@ Coverage remains 75 adapted, 107 partial, 6 policy and 291 pending of 479.
 Next: remaining developer jobs (SSH-forward/rsync/tmux/worktrees), then
 configuration recovery/defaults/launchers with real acceptance. Hardware,
 security/authentication and release work remain separate batches.
+
+## Canonical Titan logo integration — 2026-10-04
+
+The owner supplied root `logo.txt` and `logo.png`. Pinned Omarchy sources
+`omarchy-show-logo`, `omarchy-launch-floating-terminal-with-presentation`,
+`omarchy-launch-about`, `manual/41-branding.md`, the Plymouth script and SDDM
+QML were reviewed for their use of text and raster branding. No upstream
+artwork or implementation was imported.
+
+`titan logo` and interactive setup/maintenance presentations now use the text
+master; the live ISO ships both masters and prepends the text to its login
+banner. Welcome and Settings About use the raster master through `Paths.root`.
+Plymouth's template links to the same PNG; installer copying resolves it into
+the independent target theme/initramfs. ReGreet installs a reviewed PNG copy
+alongside its CSS. Fresh UEFI VM boot, login and Welcome were captured and
+inspected; About/search were inspected in the owner's session. Existing user
+settings and always-awake policy remain. The host bootloader/initramfs/installed
+greeter were not changed.
+
+This adapts the branding placement to Titan's QML and ReGreet architecture.
+Omarchy's animated text About, fastfetch presentation, branding edit/image/reset
+APIs and screensaver remain separate work. `show-logo` advances to adapted;
+coverage is now 76 adapted, 107 partial, 6 policy and 290 pending of 479.
 
 ## Implemented in the initial foundation batch
 
