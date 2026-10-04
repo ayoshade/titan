@@ -1,5 +1,68 @@
 # Verification
 
+## Package transaction-family Bash migration — 2026-10-04
+
+Original Bash `lib/titan/packages.sh` now owns the whole `titan pkg` CLI:
+catalog/list, bundle plans/apply, search/installed/info, add/remove and AUR
+orchestration, alongside the existing predicates/drop/history/cache operations.
+`scripts/titan-packages` no longer invokes Python. Direct `desktop_cli.py pkg …`
+callers delegate to it, including help; the shared parser still lists pkg.
+`packages.py` retains only read-only catalog/argv helpers for the remaining
+Python developer provisioning and maintenance-menu consumers.
+
+- **Contracts:** add/bundles use full Arch upgrades with `--needed`; AUR work
+  follows a successful Arch upgrade and uses existing paru/yay (paru first).
+  All retain native transaction/review prompts. Strict remove passes every
+  requested name to pacman; drop remains idempotent. Recipe executable fields,
+  repository availability and tools are checked before bundle transactions.
+  Plans require jq but run no package tools/create no user state; add/remove/
+  bundle plans work without pacman/sudo/Python. AUR plans still require a helper;
+  bundle plans keep their descriptive paru fallback. Invalid syntax/names return
+  2, migrated transaction failures/refusals 1. Empty `titan pkg` still returns 2.
+- **Local:** 107 tests pass, including seven new portable-contract checks for
+  the whole family without Python, restricted-PATH plans, literal arguments,
+  malformed catalog/repository fields (including trailing newlines), helper
+  preference/failure ordering, repository-query errors and direct Python-call
+  compatibility. Bash/Python syntax checks and `git diff --check` pass.
+  Local transaction tests use recorded stubs, never host package operations.
+- **Host:** pacman-managed jq 1.8.2-1 is now present and `scripts/doctor` passes.
+  The previous jq blocker is resolved. No package transaction, shell restart,
+  theme change or power-policy change was performed on the laptop in this task.
+- **Packages:** `tools/vm-test --full --stay --reuse run.OWNZaL` rebuilt the
+  checkout and passed all 19 standard package/config checks. A final CLI help/
+  no-argument refinement was rebuilt and installed into that same owned 2 GiB
+  VM; the focused acceptance verifies the final runtime hashes without overlays.
+- **Focused real acceptance:** `tools/vm-package-checks run.OWNZaL` passes six
+  checks: installed runtime/catalog/menu-helper hashes; native no-state plans
+  with no Python/pacman/sudo on PATH and unchanged menu command generation;
+  invalid argument, missing multilib and missing-helper refusals without package
+  changes; real full-upgrade install cancellation/confirmation and repeat
+  `--needed` preservation; real removal cancellation/confirmation with `.pacsave`
+  and Bash dependency preservation; and a real menu-generated terminal-foot
+  bundle/full upgrade with byte-identical user choice JSON. Install/remove
+  dialogs run through the actual `scripts/titan-task` in a pseudo-terminal.
+  The guest-only fixture package/repository is removed and pacman configuration
+  restored. This tests menu command adapters, not a new graphical click-through.
+- **Fixture correction:** the first run piped multiple lines into the Python
+  dialog; its input buffering consumed the later pacman confirmation. The menu
+  check also created legacy workflow startup state in the plan-test directory.
+  The corrected fixture sends PTY responses after each prompt and keeps menu
+  startup state in separate test directories. Initial failure logs are retained.
+
+Artifacts: `run.OWNZaL/{package-source.json,package-results.json,
+package-commands.log,package-initial-results.json,package-initial-commands.log,
+package-refresh.log}` and host `~/.cache/titan/package-migration-{build,rebuild,
+local-tests,host-doctor,acceptance}.log`. The task-owned VM is stopped after
+final inspection. No ISO build, signing or publication occurs.
+
+Coverage remains 75 adapted, 107 partial, 6 policy and 291 pending of 479;
+this is a verified language migration, not new chooser/provider/postcondition
+parity. Actual AUR builds remain untested; local stubs verify helper selection,
+full-upgrade ordering and failures, and QEMU verifies missing-helper refusal.
+Next: focused `system_status.py` wrapper migration, then developer provisioning/
+jobs with existing real workflow acceptance. UI motion/notification research,
+detached update transactions and release preparation remain separate work.
+
 ## Update readiness, private stages and interruption diagnostics — 2026-10-04
 
 Original Bash `lib/titan/update.sh` now owns update execution and the new

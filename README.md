@@ -154,6 +154,7 @@ titan shell status | restart | ipc METHOD | open PANEL
 titan doctor                        # health check
 titan update check --json           # read-only local update readiness
 titan update status --json          # last update stage/result and current lock
+titan pkg add --plan fzf zoxide     # read-only package transaction plan
 titan boot status --json             # experimental installer bootloader status
 titan snapshot list --json           # experimental Limine recovery preview inventory
 titan hardware --json                # read-only hardware inventory and installer packages
@@ -241,7 +242,7 @@ The experimental ISO builder and installation tests run inside QEMU; see
 │   ├── kitty/  gtk-3.0/  gtk-4.0/  xdg-desktop-portal/
 ├── agents/skills/           Development guides for repository agents
 ├── default/                 Defaults copied once, Bash defaults (mise) and the three end-user agent skills
-├── lib/titan/               Python behind bin/workflow (desktop operations, paths)
+├── lib/titan/               Bash CLI families and remaining Python desktop operations
 ├── bin/                     Public commands: titan, titan-shell, titan-session, titan-install, workflow
 ├── scripts/                 Internal helpers: bootstrap, install-*, apply-theme, fetch-wallpapers,
 │                            doctor, lock, screenshot (plus compatibility links to bin/ for one release)

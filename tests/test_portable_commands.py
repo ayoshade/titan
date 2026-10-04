@@ -184,6 +184,105 @@ if os.environ.get('TITAN_TEST_UPGRADE_FAIL'): sys.exit(1)
         self.cli('pkg', 'unknown', '--help', code=2)
         self.cli('dev', 'upgrade', '--unexpected', code=2)
 
+    def test_entire_package_cli_runs_without_python(self):
+        self.stub('python3', 'sys.exit(91)\n')
+        self.stub('paru')
+        for argv in (('list',), ('bundle', 'sharing'), ('bundle', 'sharing', '--apply'),
+                     ('installed',), ('search', 'literal search'), ('info', 'bash'),
+                     ('add', 'bash'), ('remove', 'absent', 'bash', 'bash'),
+                     ('aur', '--plan', 'fixture'), ('aur', 'fixture'), ('--help',)):
+            self.cli('pkg', *argv)
+        self.assertFalse(any(call[0] == 'python3' for call in self.calls()))
+        self.assertIn(['sudo', 'pacman', '-R', '--', 'absent', 'bash', 'bash'], self.calls())
+        self.assertIn(['pacman', '-Q'], self.calls())
+        self.assertIn(['pacman', '-Si', '--', 'bash'], self.calls())
+
+    def test_new_routes_validate_syntax_before_running_tools(self):
+        self.cli('pkg', code=2)
+        for argv in (('list', 'extra'), ('installed', '--plan'), ('search',),
+                     ('search', 'one', 'two'), ('bundle',), ('bundle', 'pdf', 'images'),
+                     ('bundle', 'pdf', '--unexpected'), ('bundle', '--apply'),
+                     ('info', '--plan', 'bash')):
+            self.cli('pkg', *argv, code=2)
+        for action in ('add', 'remove', 'aur', 'info'):
+            for name in ('', '../file', '--root', '$(touch OWNED)', 'bash\nExec=bad'):
+                self.cli('pkg', action, name, code=2)
+        self.cli('pkg', 'bundle', 'unknown', code=1)
+        self.assertEqual(self.calls(), [])
+        self.cli('pkg', 'add', '--plan', '--', 'bash')
+        self.cli('pkg', 'search', '--', '-literal')
+        self.assertEqual(self.calls(), [['pacman', '-Ss', '--', '-literal']])
+
+    def test_all_install_plans_work_without_pacman_sudo_or_python(self):
+        # A deliberately restricted PATH checks dependency-free inspection.
+        for name in ('bash', 'dirname', 'readlink', 'jq'):
+            (self.fake / name).symlink_to('/usr/bin/' + name)
+        (self.fake / 'pacman').unlink()
+        (self.fake / 'sudo').unlink()
+        self.env['PATH'] = str(self.fake)
+        self.cli('pkg', 'list')
+        for argv in (('add', '--plan', 'bash'), ('remove', '--plan', 'bash'),
+                     ('bundle', 'gaming'), ('bundle', 'sharing')):
+            self.assertEqual(json.loads(self.cli('pkg', *argv).stdout)['schema'], 1)
+        self.cli('pkg', 'aur', '--plan', 'fixture', code=1)
+        self.cli('pkg', 'bundle', 'sharing', '--apply', code=1)
+        self.assertEqual(self.calls(), [])
+        self.assertFalse((self.home / 'state').exists())
+        self.assertFalse((self.home / 'config').exists())
+
+    def test_aur_helper_selection_and_every_stage_failure(self):
+        self.stub('yay')
+        expected = [['sudo', 'pacman', '-Syu'], ['yay', '-S', '--needed', '--', 'fixture']]
+        self.assertEqual(json.loads(self.cli('pkg', 'aur', '--plan', 'fixture').stdout)['commands'], expected)
+        self.cli('pkg', 'aur', 'fixture')
+        self.assertEqual(self.calls(), expected)
+        self.record.unlink()
+        self.stub('paru', 'sys.exit(42)\n')
+        self.cli('pkg', 'aur', 'fixture', code=1)
+        self.assertEqual(self.calls(), [expected[0], ['paru', '-S', '--needed', '--', 'fixture']])
+        self.record.unlink()
+        self.env['TITAN_TEST_UPGRADE_FAIL'] = '1'
+        self.cli('pkg', 'bundle', 'sharing', '--apply', code=1)
+        self.assertEqual(self.calls(), [expected[0]])
+
+    def test_repository_query_failure_and_enabled_repository(self):
+        self.stub('pacman-conf', 'sys.exit(42)\n')
+        self.cli('pkg', 'bundle', 'gaming', '--apply', code=1)
+        self.assertEqual(self.calls(), [['pacman-conf', '--repo-list']])
+        self.record.unlink()
+        self.stub('pacman-conf', "print('core\\nextra\\nmultilib')\n")
+        self.cli('pkg', 'bundle', '--apply', 'gaming')
+        self.assertEqual(self.calls(), [['pacman-conf', '--repo-list'],
+            ['sudo', 'pacman', '-Syu', '--needed', '--', 'steam', 'lutris', 'gamemode', 'mangohud']])
+
+    def test_malformed_catalog_refuses_before_transactions(self):
+        catalog_root = self.home / 'catalog root'
+        file = catalog_root / 'default/catalog/packages.json'
+        file.parent.mkdir(parents=True)
+        for recipe in ({'packages': ['--root']}, {'packages': ['bash\nunsafe']}, {'packages': ['bash\n']},
+                       {'packages': ['bash'], 'aur': 'unsafe'},
+                       {'packages': ['bash'], 'repositories': ['extra\nmultilib']},
+                       {'packages': ['bash'], 'after_install': [42]}):
+            file.write_text(json.dumps({'test': recipe}))
+            result = subprocess.run(['bash', '-euo', 'pipefail', '-c',
+                'root=$1; source "$2/lib/titan/packages.sh"; titan_pkg bundle test --apply',
+                'bash', str(catalog_root), str(ROOT)], env=self.env,
+                capture_output=True, text=True, timeout=10)
+            self.assertNotEqual(result.returncode, 0, recipe)
+        self.assertEqual(self.calls(), [])
+
+    def test_python_compatibility_routes_include_install_and_catalog(self):
+        help_text = subprocess.run(['/usr/bin/python3', str(ROOT / 'lib/titan/desktop_cli.py'), '--help'],
+                                   env=self.env, capture_output=True, text=True, timeout=10)
+        self.assertIn('pkg', help_text.stdout)
+        for argv in (('pkg', 'list'), ('pkg', 'add', '--plan', 'bash'),
+                     ('pkg', 'bundle', 'pdf'), ('pkg', 'remove', '--plan', 'bash')):
+            direct = subprocess.run(['/usr/bin/python3', str(ROOT / 'lib/titan/desktop_cli.py'), *argv],
+                                    env=self.env, capture_output=True, text=True, timeout=10)
+            self.assertEqual(direct.returncode, 0, direct.stderr)
+            self.assertEqual(json.loads(direct.stdout), json.loads(self.cli(*argv).stdout))
+        self.assertEqual(self.calls(), [])
+
 
 if __name__ == '__main__':
     unittest.main()

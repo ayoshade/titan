@@ -15,6 +15,7 @@ tools/vm-test --full             # packaged CLI/config checks
 tools/vm-test --graphical        # ReGreet authentication, session, Welcome, IPC
 tools/vm-test --workflows        # graphical + real runtimes/services/databases/apps
 tools/vm-test --full --reuse RUN_DIRECTORY
+tools/vm-package-checks RUN_DIRECTORY  # running --full --stay VM; real package transactions
 ```
 
 `--graphical` implies full packages and kept artifacts. `--stay` deliberately

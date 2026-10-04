@@ -63,6 +63,20 @@ work is tracked in [the Omarchy ledger](research/omarchy.md).
   boundary are described in [installation.md](installation.md).
 - `titan cmd present|missing COMMAND…`: silent literal dependency predicates;
   exit 0 means true, 1 false, 2 invalid arguments. No commands are executed.
+- The whole `titan pkg` family uses original Bash through `scripts/titan-packages`
+  and `lib/titan/packages.sh`; direct `desktop_cli.py pkg …` callers delegate there.
+  `list` prints the schema-1 bundle catalog; `search QUERY`, `installed` and
+  `info PACKAGE…` retain pacman's native output. `add [--plan] PACKAGE…` uses
+  `sudo pacman -Syu --needed -- …`. `remove [--plan] PACKAGE…` passes every name
+  to `sudo pacman -R -- …`, preserving configuration backups and confirmation.
+  `aur [--plan] PACKAGE…` requires an existing paru/yay helper (paru first),
+  upgrades Arch before invoking it, and stops if that upgrade fails.
+  `bundle NAME [--apply]` returns a schema-1 plan by default; applying validates
+  the recipe, required repositories and all executables before any transaction.
+  Plans require jq but don't execute package tools or create user state; add,
+  remove and bundle plans work without pacman/sudo. AUR plans retain their helper
+  requirement; bundle plans retain the paru fallback when no helper exists.
+  Invalid arguments exit 2; migrated transaction failures/refusals exit 1.
 - `titan pkg present|missing PACKAGE…`: installed-package predicates; 0 true,
   1 false, 2 invalid arguments, 3 unavailable/failed pacman query. Present prints
   requested names on success; missing is silent.

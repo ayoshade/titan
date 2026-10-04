@@ -2047,7 +2047,7 @@
       "summary": "Install Arch packages if they are missing",
       "status": "partial",
       "equivalent": "titan pkg",
-      "notes": "Package operations exist; chooser, multi-provider resolution, auto-launch and missing-list semantics differ."
+      "notes": "Original Bash package CLI preserves full upgrades, plans and confirmation. Fuzzy chooser, provider resolution, auto-launch and upstream install postconditions still differ."
     },
     {
       "command": "omarchy-pkg-aur-accessible",
@@ -2063,7 +2063,7 @@
       "summary": "Add the named packages to the system from the AUR if they're missing. Returns false if it couldn't be done.",
       "status": "partial",
       "equivalent": "titan pkg aur",
-      "notes": "Uses an already installed paru/yay helper; no automatic AUR-helper bootstrap."
+      "notes": "Original Bash requires existing paru/yay and a successful full Arch upgrade before helper execution; review prompts retained. Fuzzy AUR chooser and upstream install postconditions remain gaps; actual AUR builds untested."
     },
     {
       "command": "omarchy-pkg-aur-install",
@@ -2071,7 +2071,7 @@
       "summary": "Show a fuzzy-finder TUI for picking new AUR packages to install.",
       "status": "partial",
       "equivalent": "titan pkg aur",
-      "notes": "Uses an already installed paru/yay helper; no automatic AUR-helper bootstrap."
+      "notes": "Original Bash requires existing paru/yay and a successful full Arch upgrade before helper execution; review prompts retained. Fuzzy AUR chooser and upstream install postconditions remain gaps; actual AUR builds untested."
     },
     {
       "command": "omarchy-pkg-drop",
@@ -2087,7 +2087,7 @@
       "summary": "Show a fuzzy-finder TUI for picking new Arch and OPR packages to install.",
       "status": "partial",
       "equivalent": "titan pkg",
-      "notes": "Package operations exist; chooser, multi-provider resolution, auto-launch and missing-list semantics differ."
+      "notes": "Original Bash package CLI preserves full upgrades, plans and confirmation. Fuzzy chooser, provider resolution, auto-launch and upstream install postconditions still differ."
     },
     {
       "command": "omarchy-pkg-missing",
@@ -2111,7 +2111,7 @@
       "summary": "Show a fuzzy-finder TUI for picking packages installed on the system to be removed.",
       "status": "partial",
       "equivalent": "titan pkg",
-      "notes": "Package operations exist; chooser, multi-provider resolution, auto-launch and missing-list semantics differ."
+      "notes": "Original Bash package CLI preserves full upgrades, plans and confirmation. Fuzzy chooser, provider resolution, auto-launch and upstream install postconditions still differ."
     },
     {
       "command": "omarchy-plugin-add",

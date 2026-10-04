@@ -66,7 +66,14 @@ titan dev upgrade
 titan dev upgrade --plan
 ```
 
-The small dependency/package helpers and mise list/upgrade wrappers use Bash.
+The whole package CLI, dependency predicates and mise list/upgrade wrappers use Bash.
+Package list/bundle plans require jq. Install/remove plans run no pacman or sudo
+and work even when those tools are absent. AUR plans require an existing helper;
+bundle plans use paru as their descriptive fallback when none is installed.
+Applying bundles validates catalog package names, required repositories and all
+executables before the first transaction. A failed Arch upgrade stops subsequent
+AUR work. The helper runs as the caller and keeps its normal review prompts;
+Titan neither installs a helper nor adds `--noconfirm`.
 `cmd present` exits 0 when every literal command name or executable path can be
 resolved, otherwise 1; `cmd missing` reverses that predicate. They never run
 commands. Empty argument lists/names and option-like names exit 2.
@@ -299,11 +306,13 @@ command implementations now use Bash. Existing interfaces
 remain supported while their operations migrate.
 
 Currently, `bin/titan` routes to distinct scripts and Python modules: `apps`,
-`configuration`, `packages`, `development`, `utilities`, `media_tools`,
+`configuration`, `development`, `utilities`, `media_tools`,
 `system_status`, `plugins`, with shared primitives in `ops`. Services live in
 `lib/titan/services.sh`, reached through the existing `scripts/titan-system`.
-Dependency predicates use `commands.sh`; package predicates/drop/history/cache
-helpers use `packages.sh`; mise list/upgrade wrappers use `development.sh`.
+Dependency predicates use `commands.sh`; the entire package CLI uses
+`packages.sh`; mise list/upgrade wrappers use `development.sh`.
+`packages.py` contains only read-only catalog/argv helpers still used by Python
+developer recipes and menu generation; it no longer owns CLI execution or parsing.
 Other operations continue using the Python parser. New functionality
 does not accumulate in the legacy `workflow.py`; it only adapts shortcuts and
 menus to shared operations. Help is available at every level. Exit 0 means

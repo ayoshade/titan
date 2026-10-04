@@ -27,7 +27,7 @@ Usage: titan COMMAND [ARGS]
   defaults …              Select terminal, browser, editor or agent
   launch …                Launch with defaults and focused working directory
   webapp …                Install/list/launch/remove web-app launchers
-  pkg …                   Search packages and install reviewed optional bundles
+  pkg …                   Search, inspect, install or remove packages and reviewed bundles
   cmd present|missing …   Check command dependencies without running them
   dev …                   Mise environment recipes and Docker databases
   service …               Optional Docker, printing and Tailscale lifecycles

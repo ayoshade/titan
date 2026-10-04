@@ -620,7 +620,7 @@
     "omarchy-pkg-add": {
       "status": "partial",
       "equivalent": "titan pkg",
-      "notes": "Package operations exist; chooser, multi-provider resolution, auto-launch and missing-list semantics differ."
+      "notes": "Original Bash package CLI preserves full upgrades, plans and confirmation. Fuzzy chooser, provider resolution, auto-launch and upstream install postconditions still differ."
     },
     "omarchy-pkg-aur-accessible": {
       "status": "partial",
@@ -630,12 +630,12 @@
     "omarchy-pkg-aur-add": {
       "status": "partial",
       "equivalent": "titan pkg aur",
-      "notes": "Uses an already installed paru/yay helper; no automatic AUR-helper bootstrap."
+      "notes": "Original Bash requires existing paru/yay and a successful full Arch upgrade before helper execution; review prompts retained. Fuzzy AUR chooser and upstream install postconditions remain gaps; actual AUR builds untested."
     },
     "omarchy-pkg-aur-install": {
       "status": "partial",
       "equivalent": "titan pkg aur",
-      "notes": "Uses an already installed paru/yay helper; no automatic AUR-helper bootstrap."
+      "notes": "Original Bash requires existing paru/yay and a successful full Arch upgrade before helper execution; review prompts retained. Fuzzy AUR chooser and upstream install postconditions remain gaps; actual AUR builds untested."
     },
     "omarchy-pkg-drop": {
       "status": "adapted",
@@ -645,7 +645,7 @@
     "omarchy-pkg-install": {
       "status": "partial",
       "equivalent": "titan pkg",
-      "notes": "Package operations exist; chooser, multi-provider resolution, auto-launch and missing-list semantics differ."
+      "notes": "Original Bash package CLI preserves full upgrades, plans and confirmation. Fuzzy chooser, provider resolution, auto-launch and upstream install postconditions still differ."
     },
     "omarchy-pkg-missing": {
       "status": "adapted",
@@ -660,7 +660,7 @@
     "omarchy-pkg-remove": {
       "status": "partial",
       "equivalent": "titan pkg",
-      "notes": "Package operations exist; chooser, multi-provider resolution, auto-launch and missing-list semantics differ."
+      "notes": "Original Bash package CLI preserves full upgrades, plans and confirmation. Fuzzy chooser, provider resolution, auto-launch and upstream install postconditions still differ."
     },
     "omarchy-plugin-add": {
       "status": "partial",

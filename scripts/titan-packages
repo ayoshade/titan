@@ -1,10 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 root=$(cd -- "$(dirname -- "$(readlink -f "${BASH_SOURCE[0]}")")/.." && pwd)
-case ${2:-} in
- present|missing|drop|last-upgrade|cache-prune)
-  source "$root/lib/titan/packages.sh"
-  shift
-  titan_pkg "$@" ;;
- *) exec python3 "$root/lib/titan/desktop_cli.py" "$@" ;;
-esac
+[[ ${1:-} == pkg ]] || { echo 'Usage: titan-packages pkg ACTION [ARGS…]' >&2; exit 2; }
+source "$root/lib/titan/packages.sh"
+shift
+titan_pkg "$@"

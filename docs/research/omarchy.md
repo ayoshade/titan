@@ -96,10 +96,38 @@ shell refresh command. Coverage is 75 adapted, 107 partial, 6 policy and 291
 pending; no availability/channel/keyring or automatic repair parity is claimed.
 See [workflow](../workflow.md) and the dated [verification](../verification.md).
 
-Next portable work should migrate existing package transactions with their
-full-upgrade, recipe and confirmation contracts. Detached update transactions,
-keyring/channel validation and restart advice remain separate update work.
-Keep hardware/security/authentication tasks in their own batches.
+The next package transaction-family migration is complete below. Detached update
+transactions, keyring/channel validation and restart advice remain separate update
+work. Keep hardware/security/authentication tasks in their own batches.
+
+## Package transaction-family Bash migration — 2026-10-04
+
+All `titan pkg` routes now use original Bash in `lib/titan/packages.sh`, including
+list/catalog, bundle plans/apply, search/installed/info, add/remove and AUR
+orchestration. Existing dependency/drop/history/cache interfaces are retained.
+Direct `desktop_cli.py pkg …` callers delegate to the same script. The Python
+package module retains only read-only catalog/argv helpers for developer recipes
+and maintenance-menu generation; it no longer executes package CLI transactions.
+
+Full upgrades, `--needed`, pacman's confirmation/configuration backups,
+required repository refusals, existing paru/yay selection and failure ordering
+are preserved. Plans use jq and run no package tools; add/remove/bundle inspection
+works without pacman/sudo. Bundle apply validates recipe executable fields before
+transactions. Package installation still does not imply service setup or account
+authentication. `tools/vm-package-checks RUN` verifies real transactions and the
+existing menu/task adapters; see the dated [verification](../verification.md).
+
+This changes the implementation language, not upstream feature coverage:
+75 adapted, 107 partial, 6 policy and 291 pending remain. Fuzzy package/AUR
+choosers, provider resolution and upstream install postconditions remain gaps.
+Real AUR builds were not performed; ordering and failure contracts have local
+stub coverage, with missing-helper refusal tested against unchanged guest packages.
+The host's pacman-managed jq is now installed and `titan doctor` passes.
+
+Next portable migration: the simple audio/battery/power/network/Bluetooth status
+and control wrappers in `system_status.py`, preserving bounded commands and native
+Quickshell service ownership. Developer recipe/job provisioning follows separately
+with existing workflow acceptance; hardware/security/authentication remain separate.
 
 ## Implemented in the initial foundation batch
 

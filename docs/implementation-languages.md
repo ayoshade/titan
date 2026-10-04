@@ -33,18 +33,22 @@ approval.
 1. Implement new system workflows in Shell now: the initial Limine helper is
    `scripts/titan-boot` plus `lib/titan/boot.sh`.
 2. Service lifecycles now use `lib/titan/services.sh`; the Python service module
-   has been retired after real Docker/CUPS/Tailscale VM checks. Continue with
-   package operations and simple wrappers from `packages.py` and
-   `system_status.py` one family at a time. Keep the public
+   has been retired after real Docker/CUPS/Tailscale VM checks. The entire package
+   CLI now uses `packages.sh`, including catalogs, bundles, search/info/listing,
+   full-upgrade installation, strict removal and AUR orchestration. Continue with
+   simple wrappers from `system_status.py` one family at a time. Keep the public
    CLI, structured status, confirmation boundaries and exit codes; use `jq`
    for JSON and argv arrays for subprocess arguments.
    Dependency predicates (`commands.sh`), package predicates/drop/history/cache
    helpers (`packages.sh`) and mise list/upgrade wrappers (`development.sh`) now
    use Bash. Update readiness/status and staged execution live in `update.sh`,
    preserving full upgrades and recording failures/interruption for inspection.
-   Package installation/catalogs and developer recipes/databases remain
-   Python until their transaction/provisioning paths pass a focused migration;
-   this keeps existing menus usable on checkouts missing jq.
+   `packages.py` retains only read-only catalog/argv helpers for the remaining
+   Python developer recipes and menu generation. Direct Python package CLI callers
+   delegate to Bash. Real package installation/removal and menu command adapters
+   pass `tools/vm-package-checks RUN`; package plans/catalogs now require the
+   declared jq dependency. Developer recipes/databases still use Python until
+   their provisioning paths pass their own focused migration.
 3. Migrate developer environment/jobs, defaults/launchers and configuration
    operations with their existing real-VM acceptance checks. Keep user data,
    backups, locks and old paths compatible throughout.
