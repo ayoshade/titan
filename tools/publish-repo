@@ -25,7 +25,7 @@ tag=repo-$channel
 out=${XDG_CACHE_HOME:-$HOME/.cache}/titan/publish/$channel
 rm -rf "$out"; mkdir -p "$out"
 args=(--channel "$channel"); [[ -n $sign ]] && args+=(--sign "$sign")
-"$root/scripts/build-repo" "${args[@]}" "$out" >/dev/null
+"$root/tools/build-repo" "${args[@]}" "$out" >/dev/null
 # Upload real files: the .db/.files names are symlinks made by repo-add.
 files=()
 for f in "$out"/*; do

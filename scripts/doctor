@@ -19,7 +19,7 @@ import ast,pathlib,sys
 for source in pathlib.Path(sys.argv[1]).rglob('*.py'):
  ast.parse(source.read_text(),str(source))
 PYTHON
-for script in "$root"/scripts/*; do
+for script in "$root"/scripts/* "$root"/tools/*; do
  # Check each script with the interpreter its shebang names.
  [[ -f $script ]] || continue
  if head -n1 "$script" | grep -q python; then python -c 'import ast,sys; ast.parse(open(sys.argv[1]).read(),sys.argv[1])' "$script"; else bash -n "$script"; fi

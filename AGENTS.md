@@ -193,6 +193,7 @@ wl-clipboard, grim/slurp and suitable XDG portals.
 | `assets/` | Original wallpapers and other shared assets |
 | `packages/` | Explicit package manifests |
 | `scripts/` | Installation, bootstrap, checks, session and user operations |
+| `tools/` | Developer and release tooling (package builds, publishing, QEMU tests, ISO); never packaged |
 | `system/` | Reviewed templates for privileged system configuration |
 | `installation/`, `lib/titan/install.py` | Experimental QEMU-only dedicated-disk installer and its base packages |
 | `system/hardware/profiles.json`, `lib/titan/hardware.py` | Read-only detection and conservative hardware package selection (`titan hardware`) |
@@ -218,16 +219,16 @@ dirty Git. Layout changes to existing installs ship as numbered, idempotent
 scripts in `migrations/`, run by `titan migrate` (and `titan update`).
 Packaging lives in `packaging/` (`titan`, `titan-desktop`); `titan setup` is
 shared first-run setup; `titan-session` is the login session; build a repository
-with `scripts/build-repo` and test packages only in a VM (`scripts/vm-test`).
+with `tools/build-repo` and test packages only in a VM (`tools/vm-test`).
 Titan is Apache-2.0 (`LICENSE`, `NOTICE`: record any third-party material
-there). `scripts/publish-repo` publishes GitHub releases. Publishing is public:
+there). `tools/publish-repo` publishes GitHub releases. Publishing is public:
 run it with `--yes` only when the owner asks, and never handle the signing key
 or its passphrase.
-Phase 2 tooling: `scripts/vm-test --graphical --stay` prepares a build VM;
-`scripts/vm-build-iso RUN` builds there; stop only that VM before
-`scripts/vm-install-test RUN` tests the ISO on a new virtual disk. Keep runs on
+Phase 2 tooling: `tools/vm-test --graphical --stay` prepares a build VM;
+`tools/vm-build-iso RUN` builds there; stop only that VM before
+`tools/vm-install-test RUN` tests the ISO on a new virtual disk. Keep runs on
 disk, one 2 GiB VM at a time on this laptop. Test ISOs contain a temporary SSH
-public key: never distribute them. `scripts/build-iso` full builds and
+public key: never distribute them. `tools/build-iso` full builds and
 `scripts/titan-install --apply` are guarded to QEMU; do not remove those guards
 to try the installer on this daily-use machine.
 Installer `--status` is read-only; `--recover --disk DEVICE` verifies and releases

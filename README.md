@@ -195,11 +195,11 @@ titan update                        # snapshot, full upgrade, migrations (asks f
 `packaging/titan` and `packaging/titan-desktop` hold the PKGBUILDs.
 
 ```sh
-scripts/build-repo --channel edge                         # local pacman repository
-scripts/vm-test --full                                    # install local builds on a throwaway Arch VM (needs qemu-base)
-scripts/vm-test --full --from-repo                        # install from the published repository, as a user would
-scripts/vm-test --graphical                               # real greeter authentication and first-login shell checks
-scripts/publish-repo --channel stable --sign KEYID --yes  # GitHub release repo-stable
+tools/build-repo --channel edge                         # local pacman repository
+tools/vm-test --full                                    # install local builds on a throwaway Arch VM (needs qemu-base)
+tools/vm-test --full --from-repo                        # install from the published repository, as a user would
+tools/vm-test --graphical                               # real greeter authentication and first-login shell checks
+tools/publish-repo --channel stable --sign KEYID --yes  # GitHub release repo-stable
 ```
 
 Release, signing and user setup are documented in
@@ -224,7 +224,9 @@ The experimental ISO builder and installation tests run inside QEMU; see
 ├── default/                 Defaults copied once, Bash defaults (mise) and the three end-user agent skills
 ├── lib/titan/               Python behind scripts/workflow (desktop operations, paths)
 ├── scripts/                 titan, titan-shell, titan-session, workflow, bootstrap, install-*,
-│                            apply-theme, fetch-wallpapers, build-repo, publish-repo, vm-test, doctor
+│                            apply-theme, fetch-wallpapers, doctor
+├── tools/                   Developer and release tooling, not packaged: build-repo, publish-repo,
+│                            build-iso, vm-test, vm-build-iso, vm-install-test, vm-graphical
 ├── migrations/              Numbered upgrade steps run by `titan migrate`
 ├── packaging/               PKGBUILDs for titan and titan-desktop
 ├── packages/                Package manifests (desktop, workflow, login)

@@ -23,7 +23,7 @@ cp "$source_run/key" "$source_run/key.pub" "$run/"
 cp "$firmware/OVMF_VARS.4m.fd" "$run/OVMF_VARS.fd"
 qemu-img create -q -f qcow2 "$run/disk.qcow2" 40G
 mkdir "$run/http"
-"$root/scripts/build-repo" --channel edge "$run/http/repo" >/dev/null
+"$root/tools/build-repo" --channel edge "$run/http/repo" >/dev/null
 port=$((20000 + RANDOM % 20000)); sshport=$((40000 + RANDOM % 20000))
 python3 -m http.server "$port" --bind 127.0.0.1 --directory "$run/http" >/dev/null 2>&1 &
 http=$!
@@ -131,5 +131,5 @@ wait_ssh
 wait "$capture"
 ssh_vm 'findmnt -no FSTYPE / | grep -qx btrfs && systemctl is-active --quiet greetd && titan hardware --json' >"$run/hardware.json"
 export TITAN_VM_RUN=$run TITAN_VM_SSH_PORT=$sshport TITAN_VM_SSH_USER=root
-"$root/scripts/vm-graphical"
+"$root/tools/vm-graphical"
 echo 'All installer and installed-disk graphical checks passed.'

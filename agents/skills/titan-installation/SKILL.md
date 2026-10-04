@@ -18,7 +18,7 @@ Adapted from Omarchy's install-scripts guide. Read the checkout's `AGENTS.md`,
 | Packages | `packages/*.txt`, `packaging/titan*/PKGBUILD` |
 | Read-only hardware inventory | `lib/titan/hardware.py`, `system/hardware/profiles.json` |
 | Live installer | `scripts/titan-install`, `lib/titan/install.py`, `installation/packages.txt` |
-| ISO and VM orchestration | `scripts/build-iso`, `scripts/vm-build-iso`, `scripts/vm-install-test` |
+| ISO and VM orchestration | `tools/build-iso`, `tools/vm-build-iso`, `tools/vm-install-test` |
 | Reviewed privileged templates | `system/`, installed through the relevant `scripts/install-*` |
 
 Titan's scripts are separate executable programs with their own shebangs and

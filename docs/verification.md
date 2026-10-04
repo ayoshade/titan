@@ -685,3 +685,18 @@ following handoff section. The current inventory is `docs/agent-skills.md`.
   `scripts/doctor` passes again.
 - Not yet verified: shim PATH in a live session needs a Hyprland
   restart (or a new login) and a `mise use -g` tool launched from a keybinding.
+
+## Layout split step 1: developer tools in `tools/` — 2026-10-03
+
+Following `docs/layout-plan.md`, `build-iso`, `build-repo`, `publish-repo`,
+`vm-build-iso`, `vm-graphical`, `vm-install-test` and `vm-test` moved from
+`scripts/` to `tools/`. Each still resolves the root from its own location, so
+only callers and docs changed. Historical entries above keep their old paths.
+
+- Verified: Bash/Python syntax of all tools, `scripts/doctor` (now also parses
+  `tools/*`), 33 unit tests, and `tools/build-repo --channel edge` builds both
+  packages; the `titan` package contains no `tools/` or VM/build/publish scripts.
+  `tools/vm-test` gained a check that developer tools are not packaged.
+- Not yet verified: `tools/build-iso --prepare` (needs archiso, absent on this
+  laptop) and the VM runs (`vm-test --full`, `vm-build-iso`, `vm-install-test`).
+  These are part of step 5 of the plan.

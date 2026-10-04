@@ -84,13 +84,13 @@ exit 2, refused/failed operations exit 1, and an interrupt exits 130.
 ## Build and test in QEMU
 
 ```sh
-scripts/vm-test --graphical --stay
+tools/vm-test --graphical --stay
 # Copy the printed RUN_DIRECTORY into the next commands:
-scripts/vm-build-iso RUN_DIRECTORY
+tools/vm-build-iso RUN_DIRECTORY
 # Stop just that build VM to release its 2 GiB memory, then:
-scripts/vm-install-test RUN_DIRECTORY
+tools/vm-install-test RUN_DIRECTORY
 # Include failure/interruption and safe-recovery checks before installing:
-scripts/vm-install-test RUN_DIRECTORY --recovery
+tools/vm-install-test RUN_DIRECTORY --recovery
 ```
 
 `vm-test --graphical` implies `--full --keep`. It drives real ReGreet
@@ -134,8 +134,8 @@ outside Git; do not put overlays or Archiso work trees in RAM-backed `/tmp`.
 Inside an isolated QEMU build machine with Archiso installed:
 
 ```sh
-scripts/build-iso --prepare /var/tmp/titan-profile  # stage only, no root needed
-sudo scripts/build-iso /var/tmp/titan-build        # new directory, actual build
+tools/build-iso --prepare /var/tmp/titan-profile  # stage only, no root needed
+sudo tools/build-iso /var/tmp/titan-build        # new directory, actual build
 ```
 
 The builder starts from the installed

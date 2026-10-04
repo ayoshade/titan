@@ -11,9 +11,9 @@ Adapted from Omarchy's acceptance-tests guide. Read the checkout's `AGENTS.md`,
 Titan's current entrypoints are:
 
 ```sh
-scripts/vm-test --full             # packaged CLI/config checks
-scripts/vm-test --graphical        # ReGreet authentication, session, Welcome, IPC
-scripts/vm-test --full --reuse RUN_DIRECTORY
+tools/vm-test --full             # packaged CLI/config checks
+tools/vm-test --graphical        # ReGreet authentication, session, Welcome, IPC
+tools/vm-test --full --reuse RUN_DIRECTORY
 ```
 
 `--graphical` implies full packages and kept artifacts. `--stay` deliberately
@@ -31,7 +31,7 @@ first-run changes, build a current ISO and test a fresh virtual disk. The
 installer harness overlays `install.py` for iterations; final ISO verification
 must establish that the image already contains that same source.
 
-The graphical companion `scripts/vm-graphical` uses QMP input and real PAM
+The graphical companion `tools/vm-graphical` uses QMP input and real PAM
 authentication, checks live Hyprland errors and shell IPC, and captures greeter,
 selection, login and desktop states. Extend assertions around the behavior
 changed, including keyboard/focus and restart persistence where relevant.

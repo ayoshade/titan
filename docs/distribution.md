@@ -103,7 +103,7 @@ changes); they suggest it to the user.
 | Version, migrations, `titan` command | Done (0.2.0) |
 | `titan update` | Done; first real run by the user on 2026-10-03 (hyprland and libutf8proc upgraded, no kernel change) |
 | Snapshots before updates (Snapper on Btrfs) | Enabled on this machine 2026-10-03 (`scripts/install-snapshots`; see docs/snapshots.md) |
-| Packaging Titan (`titan` package, defaults in `/usr/share/titan`, own repo) | Done: `scripts/vm-test --full` passed 14/14 on a clean Arch VM; Apache-2.0; hosted as GitHub releases (`scripts/publish-repo`). signed with key 8A648F6B462B95C6 |
+| Packaging Titan (`titan` package, defaults in `/usr/share/titan`, own repo) | Done: `tools/vm-test --full` passed 14/14 on a clean Arch VM; Apache-2.0; hosted as GitHub releases (`tools/publish-repo`). signed with key 8A648F6B462B95C6 |
 | First-run setup | `titan setup` plus the shell's Welcome screen; tested in a throwaway home |
 
 ### Packaging (0.2.0)
@@ -117,8 +117,8 @@ changes); they suggest it to the user.
 | `titan setup` | Per user, idempotent, never overwrites. Creates the user layer; copies `mimeapps.list` and GTK settings once; writes a thin `~/.config/kitty/kitty.conf` in package mode; marks migrations on fresh installs (applies them otherwise); generates the theme; sets GTK dark preferences; enables PipeWire user units; appends one marked line to `~/.bashrc` that sources `default/bash/rc` (mise activation; `scripts/install-bash-defaults`, also migration `1791072383-bash-defaults-mise`); records `setup-version` |
 | mise | Titan's default tool and runtime manager (`packages/workflow.txt`). Interactive Bash activates it through `default/bash/rc`; `hyprland.lua` prepends `$MISE_DATA_DIR/shims` (default `~/.local/share/mise/shims`) to the session `PATH` once. Titan ships no global tool list: `~/.config/mise/config.toml` belongs to the user |
 | Welcome screen | The shell opens it on startup while `~/.local/state/titan/welcome-done` is missing. It lists theme, wallpapers, Wi-Fi, keys and Settings; "Get started" writes the marker. Reopen with `titan-shell ipc welcome`. Migration `1791060868-first-run-markers` marks existing installs |
-| `scripts/build-repo [--channel stable\|edge] [--sign KEY] [OUT]` | Builds both packages and runs `repo-add` into `~/.cache/titan/repo/CHANNEL`. Stable requires a clean checkout. Unsigned repositories are for testing only |
-| `scripts/vm-test [--full] [--keep] [--memory MB] [--from-repo [stable\|edge]]` | Boots Arch's official cloud image under QEMU/KVM on a throwaway overlay (kept on disk in `~/.cache/titan/vm/runs`), injects a key through cloud-init, installs the built packages (or, with `--from-repo`, the published repository using the documented user steps) through a detached job and runs 14 checks. Needs `qemu-base`; refuses to start without enough free memory (2 GB VM plus 1 GB) |
+| `tools/build-repo [--channel stable\|edge] [--sign KEY] [OUT]` | Builds both packages and runs `repo-add` into `~/.cache/titan/repo/CHANNEL`. Stable requires a clean checkout. Unsigned repositories are for testing only |
+| `tools/vm-test [--full] [--keep] [--memory MB] [--from-repo [stable\|edge]]` | Boots Arch's official cloud image under QEMU/KVM on a throwaway overlay (kept on disk in `~/.cache/titan/vm/runs`), injects a key through cloud-init, installs the built packages (or, with `--from-repo`, the published repository using the documented user steps) through a detached job and runs its install, setup, layout and config checks. Needs `qemu-base`; refuses to start without enough free memory (2 GB VM plus 1 GB) |
 | `titan update` in package mode | No Git: pacman's full upgrade updates `titan` from the configured repo. The shell restarts when the version changes |
 
 Developer mode (this laptop) keeps the `~/.config → ~/dotfiles` symlinks
@@ -149,9 +149,9 @@ gpg --armor --export-secret-keys KEYID > /path/to/offline-backup.asc   # private
 ### 2. Publish
 
 ```sh
-scripts/publish-repo --channel edge                 # dry run: lists files and the pacman URL
-scripts/publish-repo --channel edge --yes           # publish edge (unsigned is allowed for testing)
-scripts/publish-repo --channel stable --sign KEYID --yes   # stable must be signed; needs a clean checkout
+tools/publish-repo --channel edge                 # dry run: lists files and the pacman URL
+tools/publish-repo --channel edge --yes           # publish edge (unsigned is allowed for testing)
+tools/publish-repo --channel stable --sign KEYID --yes   # stable must be signed; needs a clean checkout
 ```
 
 `publish-repo` builds through `build-repo`, creates the release if missing

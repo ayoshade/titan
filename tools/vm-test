@@ -67,7 +67,7 @@ users:
 growpart: {mode: auto, devices: ['/']}
 EOF
 # Packages to test: built from this checkout, unless testing the published repository.
-if [[ -z $from ]]; then "$root/scripts/build-repo" --channel edge "$run/repo" >/dev/null; fi
+if [[ -z $from ]]; then "$root/tools/build-repo" --channel edge "$run/repo" >/dev/null; fi
 port=$((20000 + RANDOM % 20000)) sshport=$((40000 + RANDOM % 20000))
 python3 -m http.server "$port" --bind 127.0.0.1 --directory "$run/seed" >/dev/null 2>&1 &
 http=$!
@@ -189,6 +189,7 @@ if /usr/lib/qt6/bin/qmllint -I /usr/lib/qt6/qml /usr/share/titan/config/quickshe
 titan settings set islandWidth 260 && [[ \$(titan settings get islandWidth) == 260 ]] && pass "settings round-trip" || fail "settings"
 titan theme nord >/dev/null && [[ \$(titan theme current) == nord ]] && pass "theme switch" || fail "theme switch"
 titan doctor >/dev/null 2>&1 && pass "titan doctor (package mode)" || fail "titan doctor"
+[[ ! -e /usr/share/titan/tools && ! -e /usr/share/titan/scripts/vm-test ]] && pass "developer tools are not packaged" || fail "developer tools shipped"
 [[ -e /usr/share/titan/system/greetd/config.toml && -e /usr/share/titan/packages/login.txt ]] && pass "login installer inputs shipped" || fail "login installer inputs"
 titan theme "\$theme_before" >/dev/null
 titan settings set islandWidth "\$width_before"
@@ -198,6 +199,6 @@ EOF
 if ((graphical && status == 0)); then
  # The companion test drives the greeter through QEMU and checks the live session.
  export TITAN_VM_RUN=$run TITAN_VM_SSH_PORT=$sshport
- "$root/scripts/vm-graphical" || status=$?
+ "$root/tools/vm-graphical" || status=$?
 fi
 exit $status

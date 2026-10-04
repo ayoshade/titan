@@ -1,7 +1,8 @@
 # Plan: split `scripts/` into `bin/`, `scripts/` and `tools/`
 
-Status: **proposed, not started** (2026-10-03). Owner decision pending on the
-open questions at the end.
+Status: **approved 2026-10-03; step 1 done** (tools moved). The owner accepted
+the recommended answers to the open questions: `workflow` stays off `PATH`,
+the folder is `tools/`, compatibility links last one release after `bin/` ships.
 
 ## Why
 
