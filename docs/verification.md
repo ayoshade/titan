@@ -679,7 +679,9 @@ following handoff section. The current inventory is `docs/agent-skills.md`.
   is only appended to, a second run changes nothing, the migration applies the
   same hook, and a shell without mise still loads cleanly.
   `Hyprland --verify-config` passes and the Bash syntax checks pass.
-- Not yet verified: mise is not installed on the development laptop, so the
-  dev-mode `scripts/doctor` package check fails until the owner runs
-  `scripts/install-packages`. Shim PATH in a live session needs a Hyprland
+- The owner installed mise 2026.10.0 and moved `gh` to it (`mise use -g gh`,
+  2.102.0; the copied `~/.local/bin/gh` was removed). Interactive Bash resolves
+  `gh` through mise, the shim works with the existing `gh` login, and
+  `scripts/doctor` passes again.
+- Not yet verified: shim PATH in a live session needs a Hyprland
   restart (or a new login) and a `mise use -g` tool launched from a keybinding.
