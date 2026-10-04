@@ -5,6 +5,7 @@ import Quickshell
 import Quickshell.Networking
 import Quickshell.Bluetooth
 import Quickshell.Hyprland
+import Quickshell.Io
 import Quickshell.Services.Pipewire
 import Quickshell.Services.SystemTray
 import "../components"
@@ -395,7 +396,19 @@ Item {
  Component {
   id: displayPage
   Column {
+   id: displayCol
    spacing: 8
+   // Scale chips per monitor (OeT5VgeLSIQ 8:30). `workflow scale list` offers
+   // 1.0–2.0× snapped to scales Hyprland accepts for each panel.
+   property var scales: ({})
+   function refresh() { if(!lister.running) lister.running=true }
+   Component.onCompleted: refresh()
+   Process {
+    id: lister
+    command: [Paths.workflow,"scale","list"]
+    stdout: StdioCollector { onStreamFinished: { try { const m={}; for(const x of JSON.parse(text)) m[x.name]=x; displayCol.scales=m } catch(e) {} } }
+   }
+   Process { id: setter; onExited: displayCol.refresh() }
    PageHead { title: "Display" }
    Repeater {
     model: Hyprland.monitors.values
@@ -403,15 +416,39 @@ Item {
      id: mon
      required property var modelData
      readonly property var ipc: modelData.lastIpcObject || ({})
-     width: parent.width; height: 96; radius: Theme.radius; color: Qt.alpha(Theme.text,0.05)
+     readonly property var info: displayCol.scales[modelData.name] || null
+     width: parent.width; height: card.implicitHeight+20; radius: Theme.radius; color: Qt.alpha(Theme.text,0.05)
      Column {
-      anchors { fill: parent; margins: 10 } spacing: 8
+      id: card
+      anchors { left: parent.left; right: parent.right; top: parent.top; margins: 10 } spacing: 8
       Row {
        spacing: 8
        Rectangle { width: 26; height: 26; radius: 13; color: Qt.alpha(Theme.text,0.07); ShellIcon { anchors.centerIn: parent; name: "monitor"; size: 12 } }
        Column {
         ShellText { text: mon.modelData.name+(mon.modelData.focused ? "  ·  focused" : ""); font.weight: Font.DemiBold }
-        ShellText { text: (mon.ipc.width||"?")+"×"+(mon.ipc.height||"?")+" · "+Math.round(mon.ipc.refreshRate||0)+" Hz · "+(mon.ipc.scale||1)+"×"; color: Theme.muted; font.pixelSize: Theme.captionSize }
+        ShellText { text: (mon.ipc.width||"?")+"×"+(mon.ipc.height||"?")+" · "+Math.round(mon.ipc.refreshRate||0)+" Hz"; color: Theme.muted; font.pixelSize: Theme.captionSize }
+       }
+      }
+      Row {
+       spacing: 6
+       visible: !!mon.info
+       Repeater {
+        model: mon.info ? mon.info.scales : []
+        Rectangle {
+         id: chip
+         required property real modelData
+         readonly property bool current: !!mon.info && Math.abs(mon.info.scale-modelData)<0.001
+         width: 58; height: 30; radius: 10
+         color: current ? Theme.accent : chipArea.containsMouse ? Qt.alpha(Theme.text,0.1) : Qt.alpha(Theme.text,0.06)
+         Behavior on color { ColorAnimation { duration: Theme.hover } }
+         ShellText { anchors.centerIn: parent; text: (Number.isInteger(chip.modelData) ? chip.modelData.toFixed(1) : String(+chip.modelData.toFixed(3)))+"×"; color: chip.current ? Theme.notch : Theme.text; font.weight: Font.Medium; font.features: { "tnum": 1 } }
+         MouseArea {
+          id: chipArea
+          anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor
+          onClicked: if(!chip.current && !setter.running) { setter.command=[Paths.workflow,"scale","set",mon.modelData.name,String(chip.modelData)]; setter.running=true }
+         }
+         Accessible.role: Accessible.RadioButton; Accessible.name: "Scale "+chip.modelData+"×"; Accessible.checked: current
+        }
        }
       }
       PillSlider { width: parent.width; symbol: "sun"; label: "Brightness"; visible: mon.modelData.name.startsWith("eDP"); value: Brightness.value; onMoved: Brightness.setValue(value) }
@@ -422,7 +459,7 @@ Item {
    ListRow { symbol: "moon"; title: "Night Light"; subtitle: Toggles.nightlight ? "On · "+Settings.values.nightlightTemp+" K" : "Off"; selected: Toggles.nightlight; onClicked: Toggles.toggle("nightlight") }
    // Warmer toward the right, as in the reference Display page.
    PillSlider { width: parent.width; symbol: "moon"; label: "Night light temperature"; value: (6000-Settings.values.nightlightTemp)/3500; onMoved: Settings.set("nightlightTemp",Math.round((6000-value*3500)/100)*100) }
-   Caption { text: "Scale: Super+/ and Super+Alt+/. Resolution changes stay in the Hyprland monitor profile."; width: parent.width; wrapMode: Text.Wrap }
+   Caption { text: "Super+/ and Super+Alt+/ also step the scale. Resolution stays in the Hyprland monitor profile."; width: parent.width; wrapMode: Text.Wrap }
   }
  }
 }

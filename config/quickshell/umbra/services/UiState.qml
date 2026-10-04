@@ -66,4 +66,9 @@ QtObject {
  function osd(kind) { context = kind; if (kind === "brightness") Brightness.refresh(); root.timeout.restart() }
  function inform(text) { message = text; context = "message"; root.timeout.restart() }
  property Timer timeout: Timer { interval: 2500; onTriggered: { root.context = ""; root.message = "" } }
+ // Night light and game mode replace the compact island's contents for ~2 s
+ // without resizing it (OeT5VgeLSIQ 0:55–1:30).
+ property string indicator: ""
+ function indicate(kind) { indicator = kind; root.indicatorTimeout.restart() }
+ property Timer indicatorTimeout: Timer { interval: 2000; onTriggered: root.indicator = "" }
 }

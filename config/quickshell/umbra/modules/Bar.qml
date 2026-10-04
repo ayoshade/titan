@@ -128,9 +128,13 @@ PanelWindow {
     cursorShape: Qt.PointingHandCursor
     onClicked: UiState.toggleIsland(bar.modelData.name)
    }
+   // A toggle announcement crossfades the compact contents (OeT5VgeLSIQ 0:55).
+   readonly property bool announcing: UiState.indicator!==""
    Row {
     anchors.verticalCenter: parent.verticalCenter
     spacing: 4
+    opacity: compact.announcing ? 0 : 1
+    Behavior on opacity { NumberAnimation { duration: Theme.duration*0.6 } }
     Repeater {
      model: bar.workspaceCount
      WorkspaceMark {
@@ -148,6 +152,8 @@ PanelWindow {
    SystemClock { id: clock; precision: SystemClock.Minutes }
    ShellText {
     anchors.centerIn: parent
+    opacity: compact.announcing ? 0 : 1
+    Behavior on opacity { NumberAnimation { duration: Theme.duration*0.6 } }
     text: Qt.formatDateTime(clock.date,Settings.values.clock24 ? "HH:mm" : "h:mm")
     font.pixelSize: Theme.clockSize; font.weight: Font.Medium
     font.features: { "tnum": 1 }
@@ -157,6 +163,8 @@ PanelWindow {
     id: status
     anchors { right: parent.right; verticalCenter: parent.verticalCenter }
     spacing: 7
+    opacity: compact.announcing ? 0 : 1
+    Behavior on opacity { NumberAnimation { duration: Theme.duration*0.6 } }
     SignalBars {
      strength: NetState.active ? NetState.active.signalStrength : NetState.label==="Offline" ? 0 : 1
      opacity: NetState.label==="Offline" ? 0.4 : 1
@@ -167,6 +175,13 @@ PanelWindow {
     Accessible.onPressAction: UiState.toggle("controls")
    }
    MouseArea { anchors { fill: status; margins: -6 } cursorShape: Qt.PointingHandCursor; onClicked: UiState.toggle("controls") }
+   ToggleIndicator {
+    anchors.centerIn: parent
+    kind: UiState.indicator
+    opacity: compact.announcing ? 1 : 0
+    visible: opacity>0
+    Behavior on opacity { NumberAnimation { duration: Theme.duration*0.6 } }
+   }
   }
   IslandDashboard {
    anchors { top: parent.top; horizontalCenter: parent.horizontalCenter }

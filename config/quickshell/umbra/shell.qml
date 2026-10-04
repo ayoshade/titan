@@ -45,4 +45,5 @@ ShellRoot {
  Variants { model: Quickshell.screens; Bar {} }
  Variants { model: Quickshell.screens; Overlay {} }
  Variants { model: Quickshell.screens; Toast {} }
+ Variants { model: Quickshell.screens; ScreenCorners {} }
 }

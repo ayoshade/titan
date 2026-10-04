@@ -5,7 +5,7 @@
       "id": "island",
       "label": "Bar & Island",
       "icon": "island",
-      "description": "Shape and size of the island and the notch.",
+      "description": "Shape and size of the island, the notch and the screen corners.",
       "groups": [
         {
           "label": "",
@@ -14,7 +14,9 @@
             "notchFlare",
             "islandHeight",
             "islandWidth",
-            "islandGap"
+            "islandGap",
+            "screenCorners",
+            "screenCornerRadius"
           ]
         }
       ]
@@ -225,6 +227,20 @@
       "max": 24,
       "unit": "px",
       "label": "Gap from screen edge"
+    },
+    "screenCorners": {
+      "type": "bool",
+      "default": true,
+      "label": "Screen corners",
+      "hint": "Round the display corners above every window"
+    },
+    "screenCornerRadius": {
+      "type": "int",
+      "default": 14,
+      "min": 4,
+      "max": 32,
+      "unit": "px",
+      "label": "Screen corner radius"
     },
     "dashboardMedia": {
       "type": "bool",

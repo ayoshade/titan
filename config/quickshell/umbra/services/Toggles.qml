@@ -9,12 +9,17 @@ QtObject {
  id: root
  property bool nightlight: false
  property bool gameMode: false
+ // The island announces a change from any source (key, panel or agent) once
+ // the first state has loaded, as in the reference (OeT5VgeLSIQ 0:55).
+ property bool ready: false
+ onNightlightChanged: if(ready) UiState.indicate("nightlight")
+ onGameModeChanged: if(ready) UiState.indicate("gamemode")
  readonly property string workflow: Paths.workflow
  function refresh() { if(!query.running) query.running=true }
  function toggle(op) { if(runner.running) return; runner.command=[workflow,op]; runner.running=true }
  property Process query: Process {
   command: [root.workflow,"toggles"]
-  onExited: root.published.reload()
+  onExited: { root.published.reload(); root.ready=true }
   stdout: StdioCollector { onStreamFinished: { try { const s=JSON.parse(text); root.nightlight=s.nightlight; root.gameMode=s.gameMode } catch(e) {} } }
  }
  property Process runner: Process { onExited: root.refresh() }
