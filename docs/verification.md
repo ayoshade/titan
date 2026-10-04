@@ -1,5 +1,15 @@
 # Verification
 
+## Host power-command dependency reconciled — 2026-10-04
+
+The owner reports completing `sudo pacman -Syu --needed python-gobject` and
+`titan doctor`. Read-only follow-up confirms pacman-managed `python-gobject`
+3.56.3-1, a passing `scripts/doctor`, and `bin/titan power current` returning
+`performance`. The dependency blocker recorded below is resolved; no agent-run
+host package transaction or power-policy change occurred. Follow-up log:
+`~/.cache/titan/system-post-dependency-doctor.log`.
+Next: developer recipe/job provisioning with existing real workflow acceptance.
+
 ## System status/control-family Bash migration — 2026-10-04
 
 Original Bash `lib/titan/system_status.sh` now owns battery, network, Bluetooth,

@@ -140,9 +140,10 @@ inspection, actual network/audio/power controls, refusal and restoration.
 The guest has no physical Bluetooth adapter or Performance-capable driver;
 see [verification](../verification.md) for exact coverage and limits. Arch's
 optional `python-gobject`, required by `powerprofilesctl`, is declared in the
-service manifest and as a base-package optional dependency. The laptop needs
-local sudo authentication for a normal full Arch transaction to add it; no
-host package or power-policy changes were performed in this task.
+service manifest and as a base-package optional dependency. The owner completed
+the authenticated full Arch transaction to add it; follow-up confirms packaged
+`python-gobject`, a passing host doctor and `titan power current` reporting
+`performance`. No agent-run host transaction or power-policy change occurred.
 
 Coverage remains 75 adapted, 107 partial, 6 policy and 291 pending of 479.
 Next: developer recipe/job provisioning with existing workflow acceptance;
