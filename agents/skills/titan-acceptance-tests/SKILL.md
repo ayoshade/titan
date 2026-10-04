@@ -13,6 +13,7 @@ Titan's current entrypoints are:
 ```sh
 tools/vm-test --full             # packaged CLI/config checks
 tools/vm-test --graphical        # ReGreet authentication, session, Welcome, IPC
+tools/vm-test --workflows        # graphical + real runtimes/services/databases/apps
 tools/vm-test --full --reuse RUN_DIRECTORY
 ```
 
@@ -21,6 +22,20 @@ keeps QEMU running for debugging or ISO building. See `docs/installation.md`
 for `vm-build-iso` followed by `vm-install-test`, which installs a new disk and
 boots it with the ISO detached. These are Titan's own harnesses; it has no
 Omarchy `test/acceptance.d` suite or sibling `omarchy-iso` checkout.
+
+`--workflows` tests the local checkout only and keeps command logs, JSON
+results, source hashes and terminal screenshots. It installs optional packages
+inside the guest and tests Node, PHP/Laravel, the three optional services and
+all five Docker databases sequentially. AUR/multilib checks exercise refusal
+without the required helper/repository; they do not build an AUR package or
+authenticate Tailscale. Expect PHP source compilation to take several minutes.
+For a running `--graphical --stay` guest, `tools/vm-workflows RUN` runs only
+this companion suite. Guest upgrades that replace the running kernel's modules
+require a guest reboot; `vm-test` performs that before acceptance checks.
+Use `tools/vm-workflows RUN --only apps` or `--only preservation` for focused
+regressions after rebuilding the installed package. Inspect the captures even
+when automated checks pass: a mapped terminal can still display config errors.
+Do not edit a running Bash harness file; finish its run before changing it.
 
 ## Choose meaningful coverage
 

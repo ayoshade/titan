@@ -209,6 +209,7 @@ tools/build-repo --channel edge                         # local pacman repositor
 tools/vm-test --full                                    # install local builds on a throwaway Arch VM (needs qemu-base)
 tools/vm-test --full --from-repo                        # install from the published repository, as a user would
 tools/vm-test --graphical                               # real greeter authentication and first-login shell checks
+tools/vm-test --workflows                               # graphical + runtimes, services, databases and optional apps
 tools/publish-repo --channel stable --sign KEYID --yes  # GitHub release repo-stable
 ```
 

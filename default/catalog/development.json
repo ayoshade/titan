@@ -74,13 +74,27 @@
   "php": {
     "tools": [
       "php",
-      "http:composer[bin=composer,url=https://getcomposer.org/download/latest-stable/composer.phar]"
+      "http:composer[bin=composer,url=https://getcomposer.org/download/{{version}}/composer.phar,version_list_url=https://getcomposer.org/versions,version_json_path=.stable[].version,version_order=semver]"
+    ],
+    "packages": [
+      "base-devel",
+      "re2c",
+      "libxml2",
+      "openssl",
+      "curl",
+      "icu",
+      "oniguruma",
+      "libzip",
+      "gd",
+      "sqlite",
+      "readline",
+      "gettext"
     ]
   },
   "laravel": {
     "tools": [
       "php",
-      "http:composer[bin=composer,url=https://getcomposer.org/download/latest-stable/composer.phar]",
+      "http:composer[bin=composer,url=https://getcomposer.org/download/{{version}}/composer.phar,version_list_url=https://getcomposer.org/versions,version_json_path=.stable[].version,version_order=semver]",
       "node@lts"
     ],
     "commands": [
@@ -95,13 +109,41 @@
         "require",
         "laravel/installer"
       ]
+    ],
+    "packages": [
+      "base-devel",
+      "re2c",
+      "libxml2",
+      "openssl",
+      "curl",
+      "icu",
+      "oniguruma",
+      "libzip",
+      "gd",
+      "sqlite",
+      "readline",
+      "gettext"
     ]
   },
   "symfony": {
     "tools": [
       "php",
-      "http:composer[bin=composer,url=https://getcomposer.org/download/latest-stable/composer.phar]",
+      "http:composer[bin=composer,url=https://getcomposer.org/download/{{version}}/composer.phar,version_list_url=https://getcomposer.org/versions,version_json_path=.stable[].version,version_order=semver]",
       "github:symfony-cli/symfony-cli"
+    ],
+    "packages": [
+      "base-devel",
+      "re2c",
+      "libxml2",
+      "openssl",
+      "curl",
+      "icu",
+      "oniguruma",
+      "libzip",
+      "gd",
+      "sqlite",
+      "readline",
+      "gettext"
     ]
   },
   "elixir": {

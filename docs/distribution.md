@@ -129,6 +129,13 @@ changes); they suggest it to the user.
 | `tools/vm-test [--full] [--keep] [--memory MB] [--from-repo [stable\|edge]]` | Boots Arch's official cloud image under QEMU/KVM on a throwaway overlay (kept on disk in `~/.cache/titan/vm/runs`), injects a key through cloud-init, installs the built packages (or, with `--from-repo`, the published repository using the documented user steps) through a detached job and runs its install, setup, layout and config checks. Needs `qemu-base`; refuses to start without enough free memory (2 GB VM plus 1 GB) |
 | `titan update` in package mode | No Git: pacman's full upgrade updates `titan` from the configured repo. The shell restarts when the version changes |
 
+`tools/vm-test --workflows` extends graphical/full installation with real mise
+runtimes, framework provisioning, Docker database persistence, optional
+services and terminal windows. It tests the local checkout, keeps source hashes,
+command logs, JSON results and screenshots in the run directory, and reboots
+only the guest if its upgrade replaced the running kernel's modules. It doesn't
+install packages or change services on the host.
+
 Developer mode (this laptop) keeps the `~/.config → ~/dotfiles` symlinks
 through `scripts/bootstrap`, which then runs `titan setup`. Both modes share
 the same setup code.

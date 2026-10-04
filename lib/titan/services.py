@@ -6,16 +6,21 @@ from ops import command_parser, emit, require, run
 from packages import bundle, plan_install
 
 SERVICES = {
-    'docker': {'bundle': 'docker', 'unit': 'docker.service'},
-    'printing': {'bundle': 'printing', 'unit': 'cups.service'},
+    'docker': {'bundle': 'docker', 'unit': 'docker.service', 'activation_units': ['docker.socket']},
+    'printing': {'bundle': 'printing', 'unit': 'cups.service', 'activation_units': ['cups.socket', 'cups.path']},
     'tailscale': {'bundle': 'tailscale', 'unit': 'tailscaled.service'},
 }
+
+
+def units(service):
+    # Stop activation sources too, so a disabled service stays stopped.
+    return [service['unit'], *service.get('activation_units', [])]
 
 
 def commands(name):
     service = SERVICES[name]
     return [plan_install(bundle(service['bundle'])['packages']),
-            ['sudo', 'systemctl', 'enable', '--now', '--', service['unit']]]
+            ['sudo', 'systemctl', 'enable', '--now', '--', *units(service)]]
 
 
 def handle(args):
@@ -34,8 +39,8 @@ def handle(args):
     service = SERVICES[args.name]
     if args.action in ('enable', 'disable'):
         require('systemctl')
-        run('systemctl', 'cat', service['unit'], stdout=subprocess.DEVNULL)
-        run('sudo', 'systemctl', args.action, '--now', '--', service['unit']); return
+        run('systemctl', 'cat', *units(service), stdout=subprocess.DEVNULL)
+        run('sudo', 'systemctl', args.action, '--now', '--', *units(service)); return
     if args.action == 'status':
         result = subprocess.run(['systemctl', 'status', '--no-pager', service['unit']])
         return result.returncode

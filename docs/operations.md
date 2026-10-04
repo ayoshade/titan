@@ -62,7 +62,11 @@ runtimes use mise's global config, including explicitly named HTTP/GitHub
 backends for Composer and Symfony CLI. The
 [mise HTTP backend](https://mise.jdx.dev/dev-tools/backends/http.html) manages
 the [official Composer artifact](https://getcomposer.org/download/), rather
-than depositing unmanaged executables in `~/.local/bin`.
+than depositing unmanaged executables in `~/.local/bin`. Composer versions come
+from the publisher's stable-version feed, ordered by semantic version, with a
+versioned download URL. PHP recipes first install the Arch build dependencies
+required by mise's source-building PHP plugin; compilation can take several
+minutes. These optional dependencies aren't added to the desktop package set.
 
 Optional bundles are outside `packages/*.txt`: setup never installs them all.
 Gaming requires multilib already enabled; the operation refuses to silently
@@ -88,6 +92,8 @@ titan service disable docker
 These recipes manage only Docker, CUPS and Tailscale, with explicit sudo in the
 maintenance terminal. They don't modify the existing NetworkManager, firewall,
 login or power services. Service status retains systemctl's status exit codes.
+Enable/disable also manages Docker's socket and CUPS's socket/path activation
+units, so disabled services can't immediately restart through an active listener.
 
 ```sh
 titan dev db list

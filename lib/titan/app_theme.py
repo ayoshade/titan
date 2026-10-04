@@ -16,7 +16,7 @@ def render_apps(palette):
            f'set -g pane-active-border-style "fg={p["accent"]}"\n'
            f'set -g window-status-current-style "fg={p["accent"]},bold"\n'
            f'set -g message-style "bg={p["surface"]},fg={p["text"]}"\n')
-    atomic(GENERATED / 'foot.ini', '[colors]\n' + ''.join(f'{k}={p[v][1:]}\n' for k, v in
+    atomic(GENERATED / 'foot.ini', '[colors-dark]\n' + ''.join(f'{k}={p[v][1:]}\n' for k, v in
            [('background', 'background'), ('foreground', 'text'), ('selection-background', 'raised'), ('selection-foreground', 'text')]))
     atomic(GENERATED / 'ghostty.conf', ''.join(f'{k} = {p[v]}\n' for k, v in
            [('background', 'background'), ('foreground', 'text'), ('cursor-color', 'accent'), ('selection-background', 'raised')]))

@@ -16,7 +16,7 @@ from paths import CONFIG, HOME, ROOT
 CHOICES = {
     'terminal': {'kitty': 'kitty', 'foot': 'foot', 'ghostty': 'ghostty', 'alacritty': 'alacritty'},
     'browser': {'firefox': 'firefox', 'chromium': 'chromium', 'brave': 'brave'},
-    'editor': {'nvim': 'nvim', 'vim': 'vim', 'helix': 'hx', 'code': 'code', 'zed': 'zeditor', 'emacs': 'emacs'},
+    'editor': {'nvim': 'nvim', 'vim': 'vim', 'helix': 'helix', 'code': 'code', 'zed': 'zeditor', 'emacs': 'emacs'},
     'agent': {'codex': 'codex', 'claude': 'claude', 'opencode': 'opencode'},
 }
 DEFAULTS = {'terminal': 'kitty', 'browser': 'firefox', 'editor': 'nvim', 'agent': 'codex'}

@@ -1,0 +1,63 @@
+#!/usr/bin/env python3
+"""Run real developer/service acceptance checks in an owned, running Titan VM."""
+import argparse
+import hashlib
+import json
+import os
+from pathlib import Path
+import shlex
+import subprocess
+import sys
+
+root = Path(__file__).resolve().parent.parent
+parser = argparse.ArgumentParser(description=__doc__)
+parser.add_argument('run', type=Path, help='Running --graphical --stay VM run directory')
+parser.add_argument('--only', choices=('apps', 'preservation'), help='Focused app/config regression checks')
+args = parser.parse_args()
+run = args.run.resolve()
+cache = Path(os.environ.get('XDG_CACHE_HOME', Path.home() / '.cache')) / 'titan/vm/runs'
+if run.parent != cache.resolve() or not run.name.startswith('run.'):
+    parser.error('Select a Titan VM run under the disk-backed cache')
+try:
+    pid = int((run / 'qemu.pid').read_text())
+    command = Path(f'/proc/{pid}/cmdline').read_bytes().split(b'\0')
+    drive = b'file=' + os.fsencode(run / 'disk.qcow2') + b',if=virtio'
+    if (not command[0].endswith(b'qemu-system-x86_64') or drive not in command
+            or os.fsencode(run / 'qemu.pid') not in command):
+        raise ValueError('The recorded PID does not own this VM')
+    port = int(os.environ.get('TITAN_VM_SSH_PORT') or (run / 'ssh-port').read_text())
+    if not 1024 <= port <= 65535:
+        raise ValueError('Invalid SSH port')
+    user = (run / 'graphical-user').read_text().strip()
+    if not user.startswith('titanuser') or not user[9:].isdigit():
+        raise ValueError('Missing graphical acceptance account')
+except (OSError, ValueError) as error:
+    parser.error(str(error))
+
+options = ['-i', str(run / 'key'), '-o', 'StrictHostKeyChecking=no',
+           '-o', 'UserKnownHostsFile=/dev/null', '-o', 'ConnectTimeout=5']
+ssh = ['ssh', '-q', *options, '-p', str(port), 'tester@127.0.0.1']
+scp = ['scp', '-q', *options, '-P', str(port)]
+manifest = {str(p.relative_to(root)): hashlib.sha256(p.read_bytes()).hexdigest()
+            for folder in ('lib/titan', 'default/config', 'default/catalog')
+            for p in (root / folder).rglob('*') if p.is_file() and '__pycache__' not in p.parts}
+(run / 'workflow-source.json').write_text(json.dumps(manifest) + '\n')
+remote = '/home/tester/titan-workflow-acceptance'
+subprocess.run(ssh + [shlex.join(['mkdir', '-p', remote])], check=True, timeout=20)
+subprocess.run(scp + [str(root / 'tests/vm_workflows.py'), str(run / 'workflow-source.json'),
+                     f'tester@127.0.0.1:{remote}/'], check=True, timeout=30)
+status = 1
+try:
+    argv = ['python3', '-u', remote + '/vm_workflows.py', '--graphical-user', user,
+            '--manifest', remote + '/workflow-source.json', '--output', remote]
+    if args.only:
+        argv += ['--only', args.only]
+    status = subprocess.run(ssh + [shlex.join(argv)], timeout=3600).returncode
+finally:
+    for source, target in [('results.json', 'workflow-results.json'), ('commands.log', 'workflow-commands.log')]:
+        subprocess.run(scp + [f'tester@127.0.0.1:{remote}/{source}', str(run / target)], timeout=30)
+    for terminal in ('foot', 'ghostty', 'alacritty'):
+        subprocess.run(scp + [f'tester@127.0.0.1:{remote}/{terminal}.png', str(run / ('workflow-' + terminal + '.png'))],
+                       timeout=30, stderr=subprocess.DEVNULL)
+print(f'Workflow artifacts: {run}', flush=True)
+sys.exit(status)

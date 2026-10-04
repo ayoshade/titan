@@ -70,10 +70,13 @@ retained. The large reference tree remains a scratchpad, never a shipped rice.
 
 Prioritize these against the inventory rather than repeating this foundation:
 
-1. Runtime/service acceptance in a fresh VM: framework installs, Docker
-   databases, optional terminals/editors, AUR workflows and service setup. The
-   laptop lacked the required 3 GiB free-memory headroom during this batch;
-   no host applications were stopped to create it.
+1. Extend the now-passing `tools/vm-test --workflows` acceptance baseline:
+   Node/PHP/Laravel, all five database persistence paths, optional terminals,
+   Helix selection and service lifecycles are tested in QEMU (see
+   [verification](../verification.md)). Other frameworks, actual AUR builds,
+   external account/device integrations and SSH/rsync still need acceptance.
+   The first foundation batch lacked memory headroom; the later pass ran one
+   2 GiB guest at a time without stopping host applications.
 2. Agent account lifecycle and usage dashboards, authentication integration,
    background crash/battery watchers and persistent reminders. Existing agent
    launch/skills and transient reminders are partial equivalents.

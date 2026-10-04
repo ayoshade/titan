@@ -1,5 +1,81 @@
 # Verification
 
+## Workflow VM acceptance and provisioning corrections — 2026-10-04
+
+The modular workflow foundation now has repeatable real-package acceptance:
+`tools/vm-test --workflows` implies full/graphical installation, then runs the
+guest-only `tests/vm_workflows.py` through `tools/vm-workflows`. The companion
+checks its QEMU owner PID and guest identity and compares installed library,
+configuration and catalog hashes with the checkout. Logs, JSON results and
+captures stay outside Git, under the disk-backed VM run directory.
+
+- **Corrections found through acceptance:** PHP/Laravel previously failed at
+  `buildconf` without build dependencies, and Composer's fixed HTTP URL had no
+  version source. PHP recipes now install the required Arch dependencies;
+  Composer uses its stable-version feed, semantic ordering and versioned URLs
+  ([mise HTTP documentation](https://mise.jdx.dev/dev-tools/backends/http.html)).
+  Docker disable left its socket active; enable/disable now manages Docker's
+  socket and CUPS's socket/path units too. Arch's Helix package exposes
+  `/usr/bin/helix`, so the editor selection now uses that wrapper.
+- **Visual correction:** all initial automated workflow checks passed, but
+  inspecting Foot's capture revealed an invalid generated `[colors]` section.
+  The generator now uses `[colors-dark]`, following the
+  [Foot manual](https://man.archlinux.org/man/foot.ini.5.en). The app fixture
+  now runs `foot --check-config` and `ghostty +validate-config`, waits for the
+  terminal text frame and captures all three optional terminals. Final captures
+  show readable acceptance text and graphite backgrounds in Foot, Ghostty and
+  Alacritty, with no configuration banner. Helix health and Neovim's actual
+  headless configuration load pass; this does not verify every editor feature.
+- **Guest/kernel:** `run.vs1w8a` exposed a cloud-image harness problem: a full
+  upgrade replaced the running kernel's modules, so Docker couldn't create its
+  networking rules. `vm-test` now reboots only the guest when its running kernel
+  has no installed module directory. This path passed in fresh `run.OWNZaL`
+  (7.2.7 → 7.2.8). No host reboot, application termination or service change.
+- **Package and graphical baseline:** 19 package checks and 8 graphical checks
+  pass: package setup, configuration/layers, theme/settings restoration, real
+  ReGreet authentication and Welcome, workflow binding, rendered lock, console
+  return redraw, lock rescue, lockout and unlock. Welcome and the rendered lock
+  were visually inspected in the VM at 1280×800.
+- **Real provisioning:** all 15 workflow checks passed in `run.OWNZaL` after
+  the provisioning fixes. Node 24.21.0 executes through mise and interactive
+  Bash; PHP 8.5.11, Composer 2.10.3 and Laravel Installer 5.32.0 execute after
+  the Laravel recipe (about 217 s). Docker, CUPS and Tailscale setup/status/
+  disable pass; activation units are inactive/disabled afterward, and a Docker
+  client cannot reactivate the disabled daemon. No Docker-group membership.
+- **Databases:** PostgreSQL, MySQL, MariaDB, Redis and MongoDB each bind only
+  to guest loopback, accept a local TCP connection and preserve a written test
+  record through stop/start and Compose down/recreation. Named volumes remain.
+  They run sequentially in the 2 GiB guest. Readiness probes use TCP/database
+  queries to avoid temporary initialization servers. MariaDB's io_uring
+  fallback and Redis's overcommit warning remain in the logs; load/pressure
+  behavior was not tested and no host sysctl was changed.
+- **Preservation and boundaries:** real package reinstall, repeated setup,
+  migrations and backup/reset/restore preserve custom tmux content and current
+  theme/settings. The fixture reloads the guest compositor after pacman has
+  finished replacing its watched Lua file, then verifies no config errors.
+  AUR-helper and multilib refusal checks leave pacman's package list unchanged.
+  Terminal launches execute a real command in the requested directory and
+  restore the original terminal/editor choices and open panel.
+- **Final focused checks:** after the Foot correction, the kept guest was
+  rebuilt/retested with `--graphical --stay --reuse`, then
+  `tools/vm-workflows RUN --only apps` and `--only preservation` passed with
+  hashes matching the final sources. This avoided repeating unaffected runtime
+  builds/database tests. Final evidence is `workflow-results-full.json`,
+  `workflow-results-apps.json`, `workflow-results.json` (preservation), their
+  command logs and `workflow-{foot,ghostty,alacritty}.png` in `run.OWNZaL`.
+  Initial failures are retained in `run.vs1w8a`. An edit to the running Bash
+  harness interrupted one handoff after graphical checks; the finalized
+  harness completed on resume. Both task VMs were stopped; disks/logs retained.
+- **Host/static:** all 57 unit/integration tests pass after the final production
+  change; Python/Bash syntax, `scripts/doctor` and `git diff --check` pass.
+  Doctor used the actual current Hyprland instance rather than the agent
+  process's stale inherited instance ID. No new QML or compositor styling.
+
+Still open: other framework/runtime recipes (including Symfony's CLI), actual
+AUR builds, external Tailscale login/receipt and physical printing, SSH/rsync
+acceptance, font switching, richer editor/theme behavior and hardware paths.
+The successful local package pass is not a public 0.3.0 release or ISO test.
+
 ## Modular Omarchy workflows and local agent references — 2026-10-04
 
 Reference: `omacom/omarchy` revision

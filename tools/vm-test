@@ -9,18 +9,22 @@
 #     verifies the Hyprland config, lints the shell and runs `titan doctor`-style checks
 #   - --from-repo installs instead from the published GitHub repository exactly as
 #     a user would (public key from GitHub, [titan] in pacman.conf, signatures enforced)
+#   - --workflows implies graphical/full and checks real runtimes, services,
+#     database persistence and optional terminal windows inside the guest
 # Requires: qemu-base (sudo pacman -S qemu-base) and /dev/kvm.
 set -euo pipefail
 root=$(cd -- "$(dirname -- "$(readlink -f "${BASH_SOURCE[0]}")")/.." && pwd)
-usage() { echo 'Usage: vm-test [--full] [--graphical] [--from-repo [stable|edge]] [--keep] [--stay] [--reuse RUN] [--memory MB]'; }
+usage() { echo 'Usage: vm-test [--full] [--graphical] [--workflows] [--from-repo [stable|edge]] [--keep] [--stay] [--reuse RUN] [--memory MB]'; }
 [[ -f $root/packaging/titan/PKGBUILD ]] || { echo 'vm-test: use a Titan development checkout' >&2; exit 1; }
-full=0 keep=0 stay=0 graphical=0 memory=2048 from="" reuse=""
+full=0 keep=0 stay=0 graphical=0 workflows=0 memory=2048 from="" reuse=""
 while (($#)); do case $1 in --full) full=1; shift ;; --keep) keep=1; shift ;; --memory) memory=$2; shift 2 ;;
  --graphical) graphical=1; full=1; keep=1; shift ;;
+ --workflows) workflows=1; graphical=1; full=1; keep=1; shift ;;
  --reuse) reuse=$2; keep=1; shift 2 ;;
  --stay) stay=1; keep=1; shift ;;
  --from-repo) from=stable; if [[ ${2:-} == stable || ${2:-} == edge ]]; then from=$2; shift; fi; shift ;;
  -h|--help) usage; exit 0 ;; *) usage >&2; exit 2 ;; esac; done
+[[ -z $from || $workflows == 0 ]] || { echo 'vm-test: --workflows tests the local checkout, not a published repository' >&2; exit 2; }
 command -v qemu-system-x86_64 >/dev/null || { echo "vm-test: install QEMU first: sudo pacman -S qemu-base" >&2; exit 1; }
 [[ $memory =~ ^[0-9]+$ ]] && ((memory >= 1536)) || { echo "vm-test: --memory must be at least 1536 MB" >&2; exit 2; }
 [[ -w /dev/kvm ]] || { echo "vm-test: /dev/kvm is not available" >&2; exit 1; }
@@ -69,6 +73,7 @@ EOF
 # Packages to test: built from this checkout, unless testing the published repository.
 if [[ -z $from ]]; then "$root/tools/build-repo" --channel edge "$run/repo" >/dev/null; fi
 port=$((20000 + RANDOM % 20000)) sshport=$((40000 + RANDOM % 20000))
+printf '%s\n' "$sshport" >"$run/ssh-port"
 python3 -m http.server "$port" --bind 127.0.0.1 --directory "$run/seed" >/dev/null 2>&1 &
 http=$!
 cleanup() {
@@ -147,6 +152,19 @@ if [[ $(ssh_vm systemctl show titan-vmtest-install -p Result --value) != success
  tail -40 "$run/install.log" >&2
  keep=1; exit 1
 fi
+# A cloud image's full upgrade can replace the running kernel's modules.
+# Boot the installed kernel before exercising Docker or graphical hardware APIs.
+if ! ssh_vm 'test -d /usr/lib/modules/$(uname -r)'; then
+ echo 'Rebooting only the disposable VM into its updated kernel…'
+ boot_before=$(ssh_vm cat /proc/sys/kernel/random/boot_id)
+ ssh_vm sudo systemctl reboot || true
+ for i in $(seq 1 90); do
+  sleep 3
+  boot_after=$(ssh_vm cat /proc/sys/kernel/random/boot_id 2>/dev/null || true)
+  [[ -n $boot_after && $boot_after != "$boot_before" ]] && break
+ done
+ [[ -n ${boot_after:-} && $boot_after != "$boot_before" ]] || { echo 'vm-test: guest did not return after kernel update' >&2; keep=1; exit 1; }
+fi
 # Show how pacman validated the installed packages (signature, checksum…).
 [[ -n $from ]] && ssh_vm sudo journalctl -u titan-vmtest-install --no-pager -o cat | grep -E '^(Name|Version|Validated By)' || true
 echo "Checking inside the VM…"
@@ -200,5 +218,8 @@ if ((graphical && status == 0)); then
  # The companion test drives the greeter through QEMU and checks the live session.
  export TITAN_VM_RUN=$run TITAN_VM_SSH_PORT=$sshport
  "$root/tools/vm-graphical" || status=$?
+fi
+if ((workflows && status == 0)); then
+ "$root/tools/vm-workflows" "$run" || status=$?
 fi
 exit $status
