@@ -31,9 +31,8 @@
 
 ## Hands-on checks still required
 
-1. Lock after a TTY switch on the laptop: the delayed redraw is measured (about
-   28 s). `scripts/vt-redraw` is the fix and still needs the owner's
-   hands-on confirmation. The QEMU test now covers rendering, crash restore
+1. Lock after a TTY switch on the laptop: fixed by `scripts/vt-redraw` and
+   confirmed by the owner on 2026-10-03 (see below). The QEMU test now covers rendering, crash restore
    and faillock lockouts; see "Lock screen diagnosis" below and
    `docs/lock-recovery.md`.
 2. Suspend/resume verification is deferred: the user now requires always-awake
@@ -852,5 +851,7 @@ All runs used the local 0.3.0 build of `6dd8bd2`, one 2 GiB VM at a time.
   the return to tty1, not on leaving. A new graphical stage (Ctrl+Alt+F2 → F1
   while locked: one redraw, rendered lock) passed on a fresh VM, along with
   the other stages.
-- **umbra:** vt-redraw is running in the current session (started through
-  `hyprctl dispatch`). Its effect on the Intel freeze awaits the owner's test.
+- **umbra, owner test:** returned to tty1 at 21:18:30.672. vt-redraw fired, and
+  Hyprlock's configure arrived at 21:18:30.899, 0.23 s later; it was ~28 s
+  before the fix. Dots appeared immediately, and the password unlocked at
+  21:18:33. Confirmed.

@@ -69,8 +69,8 @@ instead of maintaining two competing instruction sets.
   the lock renders and unlocks (owner, 2026-10-03), but after switching to a
   text console and back it stayed frozen for ~28 s. Hyprland deferred the
   restoring modeset until a frame was requested, so typing was blind.
-  `scripts/vt-redraw` (from `session-start`) forces a redraw on VT return; it is
-  VM-tested and awaits hands-on laptop confirmation. Recover with
+  `scripts/vt-redraw` (from `session-start`) forces a redraw on VT return;
+  VM-tested and confirmed on the laptop (redraw 0.23 s after return). Recover with
   `scripts/lock-rescue` from a TTY, not by restarting greetd.
   Suspend/resume testing is deferred while the always-awake policy is active.
   Do not confuse a successful password check with a verified visible lock screen.
