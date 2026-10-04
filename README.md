@@ -10,7 +10,9 @@ notification daemon. The shell's internal name is **umbra**.
 Released: **Titan 0.2.0**, published as signed Arch packages. The **0.3.0
 development tree** adds an experimental QEMU-only UEFI installer and live ISO,
 hardware profiles and a boot splash (see [docs/installation.md](docs/installation.md)).
-It has not been published. Licensed under
+Interrupted installer attempts can be inspected and recovered in the same live
+VM session before a separately confirmed fresh installation.
+Version 0.3.0 has not been published. Licensed under
 [Apache-2.0](LICENSE); attributions are in [NOTICE](NOTICE).
 
 ## Features

@@ -4,10 +4,11 @@ import argparse
 import json
 from pathlib import Path
 import subprocess
+import signal
 import sys
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "lib/titan"))
-from install import apply, block_devices, plan
+from install import apply, block_devices, plan, recover, status
 
 parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument("--disk", help="whole target disk; omit to list disks")
@@ -15,11 +16,27 @@ parser.add_argument("--user", default="titan", help="new account name")
 parser.add_argument("--hostname", default="titan")
 parser.add_argument("--timezone", default="UTC")
 parser.add_argument("--json", action="store_true", help="print a read-only JSON plan")
-parser.add_argument("--apply", action="store_true", help="confirm and install in a live QEMU VM")
+action = parser.add_mutually_exclusive_group()
+action.add_argument("--apply", action="store_true", help="confirm and install in a live QEMU VM")
+action.add_argument("--status", action="store_true", help="read-only recovery status as JSON")
+action.add_argument("--recover", action="store_true", help="confirm release of verified installer mounts before a fresh attempt")
 parser.add_argument("--vm-repo", help="unsigned local repository, QEMU development tests only")
 args = parser.parse_args()
+if args.json and (args.apply or args.recover):
+    parser.error("--json is read-only; use it with a plan or --status")
+
+
+def terminate(signum, frame):
+    raise KeyboardInterrupt
+
+
+signal.signal(signal.SIGTERM, terminate)
 try:
-    if not args.disk:
+    if args.status:
+        print(json.dumps(status(), indent=2))
+    elif args.recover:
+        recover(args)
+    elif not args.disk:
         if args.apply:
             parser.error("--apply requires --disk")
         print(json.dumps([{k: d[k] for k in ["name", "size", "model", "type"]}

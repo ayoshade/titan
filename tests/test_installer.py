@@ -8,6 +8,7 @@ import unittest
 import os
 import shutil
 import subprocess
+from types import SimpleNamespace
 from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "lib/titan"))
@@ -82,6 +83,196 @@ class DiskSafety(unittest.TestCase):
                 with self.assertRaises(ValueError):
                     install.plan(argparse.Namespace(**(valid | values)))
                 disks.assert_not_called()
+
+
+class InstallerRecovery(unittest.TestCase):
+    def setUp(self):
+        self.directory = tempfile.TemporaryDirectory()
+        self.addCleanup(self.directory.cleanup)
+        base = Path(self.directory.name)
+        self.target = base / "target"
+        self.target.mkdir()
+        self.state = base / "state"
+        self.state.mkdir()
+        for name, value in [("TARGET", self.target), ("STATE", self.state)]:
+            patcher = patch.object(install, name, value)
+            patcher.start()
+            self.addCleanup(patcher.stop)
+        self.disk = "/dev/titan-test-disk"
+        self.identities = {self.disk: os.makedev(252, 0), self.disk + "1": os.makedev(252, 1),
+                           self.disk + "2": os.makedev(252, 2)}
+        real_stat = os.stat
+        def device_stat(path, *args, **kwargs):
+            if str(path) in self.identities:
+                return SimpleNamespace(st_rdev=self.identities[str(path)])
+            return real_stat(path, *args, **kwargs)
+        patcher = patch.object(install.os, "stat", side_effect=device_stat)
+        patcher.start()
+        self.addCleanup(patcher.stop)
+        self.devices = [{"name": self.disk, "size": 40 * 1024**3, "type": "disk", "ro": False,
+                         "mountpoints": [None], "children": [
+                             {"name": self.disk + "2", "mountpoints": [str(self.target)]}]}]
+        patcher = patch.object(install, "block_devices", return_value=self.devices)
+        patcher.start()
+        self.addCleanup(patcher.stop)
+        self.mounts = [{"target": str(self.target), "maj:min": "0:29",
+                        "source": self.disk + "2[/@]", "uuid": "root-uuid", "fsroot": "/@"}]
+        self.uuid = "root-uuid"
+        def command(*args, **kwargs):
+            if args[0] == "findmnt":
+                return install.json.dumps({"filesystems": self.mounts})
+            if args[0] == "blkid":
+                return self.uuid + "\n"
+            if args[0] == "umount":
+                self.mounts.clear()
+                self.devices[0]["children"][0]["mountpoints"] = [None]
+                return ""
+            raise AssertionError(args)
+        patcher = patch.object(install, "run", side_effect=command)
+        self.run = patcher.start()
+        self.addCleanup(patcher.stop)
+        self.record = {"schema": 1, "target": str(self.target), "status": "failed",
+                       "boot_id": Path("/proc/sys/kernel/random/boot_id").read_text().strip(),
+                       "step": "base-packages", "disk": {"name": self.disk,
+                       "size": 40 * 1024**3, "identity": self.identities[self.disk]},
+                       "mounts": [{"target": str(self.target), "device": self.disk + "2",
+                                   "maj:min": "252:2", "uuid": self.uuid, "fsroot": "/@"}]}
+        install.checkpoint(self.record)
+
+    def test_status_is_readonly_and_reports_live_mounts(self):
+        before = (self.state / "attempt.json").read_bytes()
+        result = install.status()
+        self.assertEqual(result["attempt"]["step"], "base-packages")
+        self.assertEqual(result["live_mounts"], self.mounts)
+        self.assertEqual((self.state / "attempt.json").read_bytes(), before)
+        self.assertFalse((self.state / "lock").exists())
+
+    def test_foreign_nested_mount_is_never_unmounted(self):
+        self.mounts.append({"target": str(self.target / "boot"), "maj:min": "0:99"})
+        with self.assertRaisesRegex(ValueError, "foreign"):
+            install.release_target(self.record)
+        self.assertFalse(any(call.args[0] == "umount" for call in self.run.call_args_list))
+
+    def test_changed_filesystem_device_and_boot_are_rejected(self):
+        for change in ["uuid", "device", "boot"]:
+            with self.subTest(change=change):
+                record = copy.deepcopy(self.record)
+                self.uuid = "changed" if change == "uuid" else "root-uuid"
+                self.identities[self.disk] = os.makedev(252, 9 if change == "device" else 0)
+                if change == "boot":
+                    record["boot_id"] = "another-boot"
+                with self.assertRaises(ValueError):
+                    install.release_target(record)
+        self.assertFalse(any(call.args[0] == "umount" for call in self.run.call_args_list))
+
+    def test_same_filesystem_wrong_subvolume_is_refused(self):
+        self.mounts[0]["fsroot"] = "/@home"
+        with self.assertRaisesRegex(ValueError, "foreign"):
+            install.release_target(self.record)
+        self.assertFalse(any(call.args[0] == "umount" for call in self.run.call_args_list))
+
+    def test_disk_use_outside_target_and_swap_are_rejected(self):
+        for mount in ["/mnt/other", "[SWAP]"]:
+            with self.subTest(mount=mount):
+                self.devices[0]["children"][0]["mountpoints"] = [mount]
+                with self.assertRaisesRegex(ValueError, "outside"):
+                    install.release_target(self.record)
+        self.assertFalse(any(call.args[0] == "umount" for call in self.run.call_args_list))
+
+    def test_busy_unmount_preserves_marker_and_journal(self):
+        command = self.run.side_effect
+        def busy(*args, **kwargs):
+            if args[0] == "umount":
+                raise subprocess.CalledProcessError(32, list(args))
+            return command(*args, **kwargs)
+        self.run.side_effect = busy
+        with self.assertRaises(subprocess.CalledProcessError):
+            install.release_target(self.record)
+        self.assertTrue(self.target.exists())
+        self.assertEqual(install.read_attempt()["status"], "failed")
+
+    def test_recovery_unmounts_without_erasing_and_requires_exact_confirmation(self):
+        with patch.object(install, "require_live_vm"), patch.object(install.os, "isatty", return_value=True), \
+                patch("builtins.input", return_value="RECOVER " + self.disk):
+            install.recover(argparse.Namespace(disk=self.disk))
+        self.assertFalse(self.target.exists())
+        self.assertEqual(install.read_attempt()["status"], "recovered")
+        self.assertEqual([call.args[0] for call in self.run.call_args_list if call.args[0] != "findmnt"],
+                         ["blkid", "blkid", "umount"])
+
+    def test_cancellation_and_wrong_disk_preserve_everything(self):
+        with patch.object(install, "require_live_vm"), patch.object(install.os, "isatty", return_value=True), \
+                patch("builtins.input", return_value="yes"):
+            with self.assertRaisesRegex(ValueError, "cancelled"):
+                install.recover(argparse.Namespace(disk=self.disk))
+            with self.assertRaisesRegex(ValueError, "matching"):
+                install.recover(argparse.Namespace(disk="/dev/another-disk"))
+        self.assertTrue(self.target.exists())
+        self.assertEqual(install.read_attempt()["status"], "failed")
+
+    def test_foreign_mount_appearing_during_confirmation_is_rejected(self):
+        def confirm(prompt):
+            self.mounts.append({"target": str(self.target / "boot"), "source": "tmpfs",
+                                "maj:min": "0:99", "uuid": None, "fsroot": "/"})
+            return "RECOVER " + self.disk
+        with patch.object(install, "require_live_vm"), patch.object(install.os, "isatty", return_value=True), \
+                patch("builtins.input", side_effect=confirm):
+            with self.assertRaisesRegex(ValueError, "foreign"):
+                install.recover(argparse.Namespace(disk=self.disk))
+        self.assertFalse(any(call.args[0] == "umount" for call in self.run.call_args_list))
+
+    def test_recovery_outside_live_environment_does_not_mutate_state(self):
+        before = (self.state / "attempt.json").read_bytes()
+        with patch.object(install.os, "geteuid", return_value=1000):
+            with self.assertRaisesRegex(ValueError, "live ISO"):
+                install.recover(argparse.Namespace(disk=self.disk))
+        self.run.assert_not_called()
+        self.assertEqual((self.state / "attempt.json").read_bytes(), before)
+        self.assertFalse((self.state / "lock").exists())
+
+    def test_json_and_conflicting_mutations_are_rejected_by_cli(self):
+        cli = Path(__file__).resolve().parents[1] / "scripts/titan-install"
+        for arguments in [("--json", "--apply"), ("--json", "--recover"), ("--apply", "--recover")]:
+            with self.subTest(arguments=arguments):
+                result = subprocess.run([str(cli), *arguments], text=True, capture_output=True)
+                self.assertEqual(result.returncode, 2)
+                self.assertEqual(result.stdout, "")
+
+    def test_nonempty_retry_directory_is_never_deleted(self):
+        sentinel = self.target / "keep-me"
+        sentinel.write_text("partial data")
+        with self.assertRaises(OSError):
+            install.release_target(self.record)
+        self.assertEqual(sentinel.read_text(), "partial data")
+
+    def test_concurrent_worker_keeps_operation_locked_after_parent_closes(self):
+        # A subprocess holding the inherited fd protects recovery even if its
+        # installer parent exits. No privileged mount/device operation occurs.
+        with install.operation_lock():
+            self.assertTrue(install.status()["busy"])
+            child = subprocess.Popen([sys.executable, "-c", "import sys,time; print('ready',flush=True); time.sleep(30)"],
+                                     pass_fds=(install.LOCK_FD,), stdout=subprocess.PIPE, text=True)
+            self.assertEqual(child.stdout.readline().strip(), "ready")
+        try:
+            with self.assertRaisesRegex(ValueError, "still running"):
+                with install.operation_lock():
+                    self.fail("Lock was lost while a worker remained alive")
+        finally:
+            child.terminate()
+            child.wait(timeout=5)
+            child.stdout.close()
+        with install.operation_lock():
+            pass
+
+    def test_corrupt_journal_refuses_recovery(self):
+        (self.state / "attempt.json").write_text('{"schema":1}')
+        with self.assertRaisesRegex(ValueError, "Invalid"):
+            install.read_attempt()
+
+    def test_journal_write_failure_does_not_mask_install_failure(self):
+        with patch.object(install, "checkpoint", side_effect=OSError("state full")), \
+                patch.object(install.sys, "stderr"):
+            install.failure_checkpoint(self.record, status="failed")
 
 
 class HardwareProfiles(unittest.TestCase):

@@ -5,7 +5,8 @@
 set -euo pipefail
 root=$(cd -- "$(dirname -- "$(readlink -f "${BASH_SOURCE[0]}")")/.." && pwd)
 [[ -f $root/tests/vm_install_driver.py && -f $root/packaging/titan/PKGBUILD ]] || { echo 'vm-install-test: use a Titan development checkout' >&2; exit 1; }
-[[ $# == 1 ]] || { echo 'Usage: vm-install-test BUILD_RUN_DIRECTORY' >&2; exit 2; }
+[[ $# == 1 || ( $# == 2 && $2 == --recovery ) ]] || { echo 'Usage: vm-install-test BUILD_RUN_DIRECTORY [--recovery]' >&2; exit 2; }
+recovery=${2:-}
 source_run=$(realpath "$1")
 cache=${XDG_CACHE_HOME:-$HOME/.cache}/titan/vm
 [[ $source_run == "$(realpath "$cache/runs")/"run.* && -f $source_run/key ]] || { echo 'vm-install-test: provide a kept ISO build run' >&2; exit 2; }
@@ -57,12 +58,25 @@ boot_vm live
 echo 'Booting the live ISO with UEFI…'
 wait_ssh
 ssh_vm 'test -d /sys/firmware/efi && test -d /run/archiso/bootmnt'
+ssh_vm 'sha256sum /usr/share/titan-installer/lib/titan/install.py /usr/share/titan-installer/scripts/titan-install' >"$run/iso-installer.sha256"
+python3 - "$root" "$run" <<'SOURCE'
+import hashlib,json,sys
+from pathlib import Path
+root,run=map(Path,sys.argv[1:])
+embedded=[line.split()[0] for line in (run/'iso-installer.sha256').read_text().splitlines()]
+current=[hashlib.sha256((root/path).read_bytes()).hexdigest()
+         for path in ('lib/titan/install.py','scripts/titan-install')]
+matches=embedded == current
+(run/'iso-source-check.json').write_text(json.dumps({'matches_checkout':matches,'embedded':embedded,'checkout':current},indent=2)+'\n')
+print('PASS  ISO contains current installer source' if matches else 'NOTE  Overlaying installer changes; this is not a final ISO source check')
+SOURCE
 # Overlay the current installer for development iterations; the final ISO
 # build must contain these same files before recording an ISO release check.
 scp "${sshargs[@]}" -P "$sshport" "$root/lib/titan/install.py" root@127.0.0.1:/usr/share/titan-installer/lib/titan/install.py
+scp "${sshargs[@]}" -P "$sshport" "$root/scripts/titan-install" root@127.0.0.1:/usr/share/titan-installer/scripts/titan-install
 ssh_vm 'titan-install --disk /dev/vda --user tester --json' >"$run/install-plan.json"
-scp "${sshargs[@]}" -P "$sshport" "$root/tests/vm_install_driver.py" root@127.0.0.1:/root/
-ssh_vm "systemd-run --unit=titan-install-test --property=Type=oneshot --no-block /usr/bin/python3 /root/vm_install_driver.py http://10.0.2.2:$port/repo"
+scp "${sshargs[@]}" -P "$sshport" "$root/tests/"{vm_install_driver,vm_installer_recovery}.py root@127.0.0.1:/root/
+ssh_vm "systemd-run --unit=titan-install-test --property=Type=oneshot --no-block /usr/bin/python3 /root/vm_install_driver.py http://10.0.2.2:$port/repo $recovery"
 echo 'Installing onto the blank virtual disk…'
 state=activating
 for i in $(seq 1 360); do
@@ -73,6 +87,13 @@ for i in $(seq 1 360); do
 done
 ssh_vm journalctl -u titan-install-test --no-pager -o cat >"$run/install.log"
 [[ $(ssh_vm systemctl show titan-install-test -p Result --value) == success ]] || { tail -40 "$run/install.log" >&2; exit 1; }
+ssh_vm 'titan-install --status --json' >"$run/recovery-status.json"
+python3 - "$run/recovery-status.json" <<'STATUS'
+import json,sys
+state=json.load(open(sys.argv[1]))
+assert state['attempt']['status'] == 'installed' and state['attempt']['step'] == 'complete', state
+assert not state['busy'] and not state['target_exists'] and not state['live_mounts'], state
+STATUS
 # Add test-only SSH access for checking the installed system. The installer
 # itself never enables SSH, installs keys, or grants passwordless sudo.
 ssh_vm bash -s <<'TESTACCESS'

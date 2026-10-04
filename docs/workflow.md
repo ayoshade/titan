@@ -29,6 +29,13 @@ interpolation of user text, filenames or calculator expressions.
   or changes configuration. Installer/ISO commands and their QEMU-only apply
   boundary are described in [installation.md](installation.md).
 - `titan-shell ipc welcome` opens the first-login Welcome screen.
+- `scripts/titan-install --status [--json]`: schema-1 read-only JSON with the
+  last installation checkpoint, operation lock state and target mounts.
+  `--recover --disk DEVICE` confirms verified unmount/empty-marker cleanup in
+  the same live UEFI QEMU boot. It preserves partial disk contents; a subsequent
+  `--apply` requires a new erase confirmation. These actions are exclusive;
+  `--json` is limited to inspection. Exit 1 on refusal/failure, 2 on invalid
+  arguments, 130 on interruption. See [installation.md](installation.md).
 - `titan-shell status|restart|ipc METHOD [ARG…]|functions|log [-f]|open PANEL|close`
   (`scripts/titan-shell`, linked into `~/.local/bin` by `scripts/bootstrap`) is
   the user-facing shell command. Its IPC calls time out after 5 s, and `status`

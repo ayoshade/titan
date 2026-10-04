@@ -224,10 +224,16 @@ Phase 2 tooling: `scripts/vm-test --graphical --stay` prepares a build VM;
 disk, one 2 GiB VM at a time on this laptop. Test ISOs contain a temporary SSH
 public key: never distribute them. `scripts/build-iso` full builds and
 `scripts/titan-install --apply` are guarded to QEMU; do not remove those guards
-to try the installer on this daily-use machine. The initial prototype is
-unencrypted, UEFI/Btrfs and US/en_US.UTF-8; encryption, dual boot and physical
-NVIDIA/laptop testing remain open. The Plymouth template is applied only to a
-new target, never the laptop's bootloader or initramfs. The installed plan goes
+to try the installer on this daily-use machine.
+Installer `--status` is read-only; `--recover --disk DEVICE` verifies and releases
+owned mounts in the same live boot, preserving partial data before a separately
+confirmed fresh install. `vm-install-test RUN --recovery` checks failure,
+interruption, worker locking and mount refusals. Recovery does not resume across
+boots; its journal lives under `/run/titan-installer/`.
+The initial prototype is unencrypted, UEFI/Btrfs and US/en_US.UTF-8;
+encryption, dual boot and physical NVIDIA/laptop testing remain open.
+The Plymouth template is applied only to a new target, never the laptop's
+bootloader or initramfs. The installed plan goes
 to `/etc/titan/install-plan.json`; user overrides keep their existing paths.
 Never hard-code `~/dotfiles`: Lua uses the `TITAN_ROOT` global, shell QML uses
 `Paths.root`/`Paths.script()`, and scripts resolve their own location.

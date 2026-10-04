@@ -58,6 +58,8 @@ Experimental UEFI + Btrfs installer, currently limited to disposable QEMU VMs.
 Connect to the network (iwctl for Wi-Fi), then inspect disks: titan-install
 Preview: titan-install --disk /dev/vda --user titan --timezone UTC
 Install: repeat with --apply; the exact erase confirmation is required.
+After a failed attempt: titan-install --status, then --recover --disk /dev/vda.
+Recovery releases verified mounts; a fresh install requires another ERASE.
 The initial VM prototype is unencrypted. It never reboots automatically.
 MOTD
 find "$profile/efiboot" -type f -name '*.conf' -exec sed -i 's/Arch Linux/Titan live installer/g' {} +

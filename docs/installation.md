@@ -36,10 +36,50 @@ It rechecks the disk immediately before writes. The user must type
 `ERASE /dev/vda` (the exact selected path) and enter the new account password
 twice in that terminal. Passwords are never command arguments or log output.
 
-Failures stop the installer and unmount its target. `/mnt/titan-target` remains
-as a retry marker: inspect the log and `findmnt` before retrying. The prototype
-does not resume a half-finished installation. Starting a new throwaway VM is
-the simplest recovery.
+## Recover an interrupted attempt
+
+In the same live QEMU boot, inspect the last checkpoint and current mounts:
+
+```sh
+titan-install --status --json
+titan-install --recover --disk /dev/vda
+```
+
+`--status` is read-only and always prints JSON. Its schema-1 response contains
+`attempt`, `busy`, `target_exists` and `live_mounts`. An attempt records its
+disk identity, filesystem UUIDs, intended mounts, step, status and update time.
+Steps cover partitioning, filesystems, base packages, system configuration,
+desktop packages, services, bootloader, initramfs and unmounting. It never
+records account passwords, subprocess input or subprocess output.
+
+Ordinary failures retain their original exit error, record `failed` and try to
+unmount verified target filesystems. An interrupt leaves the mounts for explicit
+recovery. `/mnt/titan-target` and `/run/titan-installer/attempt.json` block a new
+attempt until recovery. A lock prevents competing operations; child commands
+inherit it so recovery remains blocked if a forcibly killed installer leaves
+a worker alive. Wait for that worker to finish before trying recovery.
+
+Recovery requires root, the live ISO, UEFI/QEMU, an interactive terminal and
+the exact confirmation `RECOVER /dev/vda`. It checks the live boot, recorded
+disk identity/size, filesystem UUIDs, source partitions and subvolume roots,
+and current mounts again after confirmation.
+It refuses changed devices, outside mounts/swap, storage holders, foreign or
+unrecorded mounts and busy filesystems. There is no forced/lazy unmount. If a
+killed chroot leaves unrecorded virtual filesystems, inspect and release those
+manually in the disposable VM before retrying recovery.
+
+On success it unmounts the verified target, removes only the empty retry
+directory and records `recovered`. Partial files on disk are preserved for
+inspection. A new `--apply` starts from scratch and requires its own `ERASE`
+confirmation; this does not resume a half-configured system. Completed installs
+record `installed`/`complete` and remove the empty target directory.
+
+The recovery journal is live-session state: it does not survive rebooting the
+ISO. Save its JSON and terminal log before leaving that session if needed.
+After a live reboot there are no installer mounts to release; inspect the
+partial disk and explicitly choose a fresh installation. Invalid arguments
+exit 2, refused/failed operations exit 1, and an interrupt exits 130.
+`--json` cannot be combined with the mutating `--apply` or `--recover` actions.
 
 ## Build and test in QEMU
 
@@ -49,6 +89,8 @@ scripts/vm-test --graphical --stay
 scripts/vm-build-iso RUN_DIRECTORY
 # Stop just that build VM to release its 2 GiB memory, then:
 scripts/vm-install-test RUN_DIRECTORY
+# Include failure/interruption and safe-recovery checks before installing:
+scripts/vm-install-test RUN_DIRECTORY --recovery
 ```
 
 `vm-test --graphical` implies `--full --keep`. It drives real ReGreet
@@ -76,6 +118,12 @@ graphical first-login checks. The test overlays current installer code for
 development iterations; a final ISO check must use an image containing the
 same code. Test SSH keys, SSH enablement and passwordless test access are
 never part of the normal installer. Artifacts are kept and QEMU stops on exit.
+
+`--recovery` injects a failing package step and a killed installer before any
+base-package installation. It checks checkpoints, ordinary cleanup, inherited
+worker locking, foreign/busy mount refusal, cancelled/wrong-disk recovery,
+confirmed cleanup preserving filesystem labels, and a subsequent fresh install.
+These fixtures exist only in the VM test harness, not the shipped installer.
 
 Full builds and installs use 2 GiB guest memory and require 3 GiB available on
 the host. Run one VM at a time on the development laptop. Files stay on disk,
@@ -131,7 +179,7 @@ and dual-boot installs are broader than this prototype; they were not copied
 or claimed as implemented. Archiso provides the upstream live boot plumbing;
 Titan writes its own installation, hardware and desktop integration.
 
-Before a public ISO release: add encryption and installer recovery, widen VM
+Before a public ISO release: add encryption, widen VM
 coverage, test the signed 0.3.0 repository installation, finish physical GPU
 and laptop profiles, verify boot/login visuals at multiple resolutions, and
 review distribution/source-license obligations for all ISO packages. Build a

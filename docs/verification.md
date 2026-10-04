@@ -599,3 +599,70 @@ following handoff section. The current inventory is `docs/agent-skills.md`.
   `/usr/share/titan/agents` tree. Artifacts remain in
   `~/.cache/titan/vm/runs/run.mkTYG7/`; QEMU stopped on exit. No ISO, graphical
   layout, lock or suspend retest was needed for this location correction.
+
+## Installer interruption recovery — 2026-10-03
+
+- Added an atomic, private live-session journal under `/run/titan-installer/`
+  with installer checkpoints, disk identity, intended mounts, filesystem UUIDs
+  and subvolume roots. It excludes passwords, subprocess input/output and
+  command arguments. `titan-install --status [--json]` reads the journal and
+  current mounts without creating state. `--recover --disk DEVICE` requires
+  the live root/UEFI/QEMU guards and an exact `RECOVER DEVICE` confirmation.
+- Recovery rechecks identity and mount ownership after confirmation, refuses
+  outside mounts/swap, holders, changed filesystems, unrecorded/foreign mounts
+  and busy filesystems, and uses ordinary recursive unmount (never lazy/force).
+  It removes only the empty retry directory and preserves partial disk data.
+  A fresh install still requires another ERASE and new password entry. This is
+  cleanup and restart recovery; resume across live boots is not implemented.
+- Installer commands inherit an exclusive operation lock. A surviving worker
+  retains it when its installer is killed. Ordinary failures record the failed
+  step and attempt safe unmount without hiding the original command error;
+  interrupts leave the mounts for explicit recovery. Completed installs record
+  `installed`/`complete` after cleanup and leave no target directory or mounts.
+- **Local checks passed: 33 unittest checks**, including identity/UUID/boot
+  changes, wrong Btrfs subvolume, mounts appearing during confirmation, outside
+  mounts/swap, busy cleanup, cancellation, wrong disk, corrupt journals,
+  nonempty-directory preservation, inherited child locks, journal write failure,
+  CLI read-only JSON enforcement and non-live recovery refusal. Host doctor,
+  Python/Bash syntax and `git diff --check` passed. The package baseline VM
+  regression also passed 18/18.
+- **Live failure and recovery checks passed** with
+  `scripts/vm-install-test RUN --recovery` on a new 40 GiB QEMU disk:
+  - an injected pacstrap exit 72 recorded `failed`/`base-packages`, preserved
+    that error and released all target mounts;
+  - a SIGKILL left the checkpoint and five filesystem mounts; recovery refused
+    while the surviving test worker retained the inherited lock;
+  - a foreign tmpfs stacked on `/boot` was refused and remained mounted;
+  - a process holding the target as its working directory caused a real busy
+    unmount failure, retaining the retry marker;
+  - cancelled and wrong-disk recovery changed nothing; confirmed recovery then
+    removed the target mounts/empty directory while preserving both filesystem
+    labels. A new separately confirmed installation proceeded successfully.
+  Fault injection is confined to the test harness, not shipped installer flags.
+- **Current ISO and independent boot passed.** A new ISO was built in QEMU and
+  its SHA-256 verified. Before any development overlay, both embedded installer
+  files matched the current checkout hashes (`iso-source-check.json`). The final
+  install status was `installed`/`complete`, `busy=false`, no target directory
+  and no mounts. The harness detached the ISO and booted the installed disk,
+  authenticated through ReGreet and verified first-login setup/Welcome, the
+  graphite shell on Virtual-1 and empty live compositor errors. Greeter and
+  Welcome screenshots were visually inspected at 1280×800. The VM shell still
+  reports the previously documented missing-BlueZ-adapter and Qt portal
+  registration warnings; this change does not resolve them.
+- **Build capacity:** the reused 24 GiB build guest filled during an initial
+  ISO rebuild. Its log is retained as `build-iso-recovery-disk-full.log`. Only
+  that verified VM was stopped; its qcow2 disk was expanded to 64 GiB, then its
+  third partition and Btrfs filesystem were grown inside the guest. The rebuild
+  passed. No host disk, partition, bootloader, package, power policy or desktop
+  configuration changed. All task-owned QEMU processes stopped; the owner's
+  industrial shell still responds and live `hyprctl configerrors` is empty.
+- **Artifacts:** current test ISO/build logs under
+  `~/.cache/titan/vm/runs/run.mkTYG7/`; passing recovery/install logs, source
+  hashes, status JSON and graphical captures under
+  `~/.cache/titan/vm/runs/install.VqHudD/`. The previous ISO is retained under
+  `run.mkTYG7/iso/previous/recovery-baseline/`. Test images contain temporary SSH
+  access and must not be distributed; nothing was signed or published.
+- **Next work:** encryption, interrupted-install resume across boots, wider
+  VM/hardware coverage, signed 0.3.0 upgrade/install validation and public-image
+  source/license review remain open. The laptop's visible lock rendering and
+  other hands-on hardware checks remain separate outstanding tasks.

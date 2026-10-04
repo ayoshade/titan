@@ -209,6 +209,12 @@ license/source review. The initial VM prototype uses UEFI, an unencrypted
 Btrfs root and US/en_US.UTF-8. This milestone does not complete those broader
 Phase 2 requirements.
 
+Installer recovery now records live-session checkpoints and exposes read-only
+`--status` plus confirmed `--recover --disk DEVICE`. Recovery verifies and
+releases owned mounts, preserves partial disk data and permits a separately
+confirmed fresh attempt. Resume across live boots remains open; see
+[installation.md](installation.md).
+
 ### Phase 2 onwards
 
 | Phase | Work |
