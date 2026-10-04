@@ -1,13 +1,1 @@
-#!/usr/bin/env bash
-# titan-session: the "Titan" login session. Ensures this user's Titan setup has
-# run (first login on a new account), then starts Hyprland with Titan's own
-# configuration; user overrides load from ~/.config/titan/hypr.lua.
-set -euo pipefail
-root=$(cd -- "$(dirname -- "$(readlink -f "${BASH_SOURCE[0]}")")/.." && pwd)
-export TITAN_ROOT=$root
-state=${XDG_STATE_HOME:-$HOME/.local/state}/titan
-mkdir -p "$state"
-if [[ ! -e $state/setup-version ]]; then
- "$root/scripts/titan" setup >"$state/setup.log" 2>&1 || true   # the session still starts; see the log
-fi
-exec start-hyprland -- --config "$root/config/hypr/hyprland.lua"
+../bin/titan-session

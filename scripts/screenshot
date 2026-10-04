@@ -2,7 +2,7 @@
 set -euo pipefail
 root=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)
 case "${1:-region}" in
- region) exec "$root/scripts/workflow" capture screenshot ;;
- full) exec "$root/scripts/workflow" capture full ;;
+ region) exec "$root/bin/workflow" capture screenshot ;;
+ full) exec "$root/bin/workflow" capture full ;;
  *) exit 2 ;;
 esac

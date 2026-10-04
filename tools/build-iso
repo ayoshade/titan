@@ -38,19 +38,19 @@ iso_application="Titan experimental live installer (QEMU only)"
 iso_version="$version-\$(date +%Y.%m.%d)"
 bootmodes=('uefi.systemd-boot')
 airootfs_image_tool_options=('-comp' 'zstd' '-Xcompression-level' '6' '-b' '1M')
-file_permissions["/usr/share/titan-installer/scripts/titan-install"]="0:0:755"
+file_permissions["/usr/share/titan-installer/bin/titan-install"]="0:0:755"
 EOF
 printf '\npython\n' >>"$profile/packages.x86_64"
 live=$profile/airootfs
 installer=$live/usr/share/titan-installer
-install -d "$installer"/{scripts,lib/titan,system/hardware,keys,installation} "$live/usr/local/bin"
-install -m755 "$root/scripts/titan-install" "$installer/scripts/"
+install -d "$installer"/{bin,lib/titan,system/hardware,keys,installation} "$live/usr/local/bin"
+install -m755 "$root/bin/titan-install" "$installer/bin/"
 install -m644 "$root/lib/titan/"{install,hardware}.py "$installer/lib/titan/"
 install -m644 "$root/system/hardware/profiles.json" "$installer/system/hardware/"
 install -m644 "$root/keys/titan-packager.asc" "$installer/keys/"
 install -m644 "$root/installation/packages.txt" "$installer/installation/"
 install -m644 "$root/"{LICENSE,NOTICE,version} "$installer/"
-ln -s /usr/share/titan-installer/scripts/titan-install "$live/usr/local/bin/titan-install"
+ln -s /usr/share/titan-installer/bin/titan-install "$live/usr/local/bin/titan-install"
 cat >"$live/etc/motd" <<'MOTD'
 TITAN / LIVE INSTALLER
 

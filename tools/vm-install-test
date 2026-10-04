@@ -58,14 +58,14 @@ boot_vm live
 echo 'Booting the live ISO with UEFI…'
 wait_ssh
 ssh_vm 'test -d /sys/firmware/efi && test -d /run/archiso/bootmnt'
-ssh_vm 'sha256sum /usr/share/titan-installer/lib/titan/install.py /usr/share/titan-installer/scripts/titan-install' >"$run/iso-installer.sha256"
+ssh_vm 'sha256sum /usr/share/titan-installer/lib/titan/install.py /usr/share/titan-installer/bin/titan-install' >"$run/iso-installer.sha256"
 python3 - "$root" "$run" <<'SOURCE'
 import hashlib,json,sys
 from pathlib import Path
 root,run=map(Path,sys.argv[1:])
 embedded=[line.split()[0] for line in (run/'iso-installer.sha256').read_text().splitlines()]
 current=[hashlib.sha256((root/path).read_bytes()).hexdigest()
-         for path in ('lib/titan/install.py','scripts/titan-install')]
+         for path in ('lib/titan/install.py','bin/titan-install')]
 matches=embedded == current
 (run/'iso-source-check.json').write_text(json.dumps({'matches_checkout':matches,'embedded':embedded,'checkout':current},indent=2)+'\n')
 print('PASS  ISO contains current installer source' if matches else 'NOTE  Overlaying installer changes; this is not a final ISO source check')
@@ -73,7 +73,7 @@ SOURCE
 # Overlay the current installer for development iterations; the final ISO
 # build must contain these same files before recording an ISO release check.
 scp "${sshargs[@]}" -P "$sshport" "$root/lib/titan/install.py" root@127.0.0.1:/usr/share/titan-installer/lib/titan/install.py
-scp "${sshargs[@]}" -P "$sshport" "$root/scripts/titan-install" root@127.0.0.1:/usr/share/titan-installer/scripts/titan-install
+scp "${sshargs[@]}" -P "$sshport" "$root/bin/titan-install" root@127.0.0.1:/usr/share/titan-installer/bin/titan-install
 ssh_vm 'titan-install --disk /dev/vda --user tester --json' >"$run/install-plan.json"
 scp "${sshargs[@]}" -P "$sshport" "$root/tests/"{vm_install_driver,vm_installer_recovery}.py root@127.0.0.1:/root/
 ssh_vm "systemd-run --unit=titan-install-test --property=Type=oneshot --no-block /usr/bin/python3 /root/vm_install_driver.py http://10.0.2.2:$port/repo $recovery"

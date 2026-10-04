@@ -231,7 +231,7 @@ class InstallerRecovery(unittest.TestCase):
         self.assertFalse((self.state / "lock").exists())
 
     def test_json_and_conflicting_mutations_are_rejected_by_cli(self):
-        cli = Path(__file__).resolve().parents[1] / "scripts/titan-install"
+        cli = Path(__file__).resolve().parents[1] / "bin/titan-install"
         for arguments in [("--json", "--apply"), ("--json", "--recover"), ("--apply", "--recover")]:
             with self.subTest(arguments=arguments):
                 result = subprocess.run([str(cli), *arguments], text=True, capture_output=True)
@@ -308,7 +308,8 @@ class FirstLogin(unittest.TestCase):
             root = Path(folder) / "source"
             home = Path(folder) / "home"
             (root / "scripts").mkdir(parents=True)
-            for path in ["scripts/titan", "scripts/install-agent-skills", "version"]:
+            (root / "bin").mkdir()
+            for path in ["bin/titan", "scripts/install-agent-skills", "scripts/install-bash-defaults", "version"]:
                 shutil.copy(source / path, root / path)
             for path in ["migrations", "default", "config/gtk-3.0", "config/gtk-4.0"]:
                 shutil.copytree(source / path, root / path)
@@ -329,13 +330,13 @@ class FirstLogin(unittest.TestCase):
             env = dict(os.environ, HOME=str(home), XDG_CONFIG_HOME=str(home / ".config"),
                        XDG_STATE_HOME=str(home / ".local/state"), CODEX_HOME=str(home / ".codex"),
                        PATH=str(binaries) + ":" + os.environ["PATH"])
-            subprocess.run([str(root / "scripts/titan"), "setup"], env=env, check=True, capture_output=True)
+            subprocess.run([str(root / "bin/titan"), "setup"], env=env, check=True, capture_output=True)
             self.assertTrue((state / "setup-version").is_file())
             self.assertFalse((state / "welcome-done").exists())
             self.assertEqual(len(list((state / "migrations").glob("*.sh"))), len(list((root / "migrations").glob("*.sh"))))
             override = home / ".config/titan/hypr.lua"
             override.write_text("-- user's override\n")
-            subprocess.run([str(root / "scripts/titan"), "setup"], env=env, check=True, capture_output=True)
+            subprocess.run([str(root / "bin/titan"), "setup"], env=env, check=True, capture_output=True)
             self.assertEqual(override.read_text(), "-- user's override\n")
             self.assertFalse((state / "welcome-done").exists())
 

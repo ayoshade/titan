@@ -19,9 +19,9 @@ bin="$HOME/.local/bin"; mkdir -p "$bin"
 for name in titan titan-shell titan-session; do
  target="$bin/$name"
  if [[ -e "$target" || -L "$target" ]]; then
-  [[ "$(readlink -f "$target")" == "$root/scripts/$name" ]] || { printf 'Refusing existing target: %s\n' "$target" >&2; continue; }
- else ln -s "$root/scripts/$name" "$target"; fi
+  [[ "$(readlink -f "$target")" == "$root/bin/$name" ]] || { printf 'Refusing existing target: %s\n' "$target" >&2; continue; }
+ else ln -s "$root/bin/$name" "$target"; fi
 done
 # Everything per-user beyond the links is shared with packaged installs.
-"$root/scripts/titan" setup
+"$root/bin/titan" setup
 printf 'Configuration linked. Start Hyprland from your login console.\n'

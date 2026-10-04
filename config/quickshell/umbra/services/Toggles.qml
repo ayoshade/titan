@@ -3,7 +3,7 @@ import QtQuick
 import Quickshell
 import Quickshell.Io
 import "../theme"
-// Night light and game mode state from `scripts/workflow toggles`; both are
+// Night light and game mode state from `bin/workflow toggles`; both are
 // changed through the same workflow operations agents use.
 QtObject {
  id: root

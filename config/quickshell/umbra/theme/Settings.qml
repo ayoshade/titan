@@ -4,7 +4,7 @@ import Quickshell
 import Quickshell.Io
 // User settings. Defaults and validation come from theme/settings-schema.json;
 // values live outside Git in ~/.config/titan/settings.json. The Settings
-// app and `scripts/workflow settings get|set` edit the same file.
+// app and `bin/workflow settings get|set` edit the same file.
 QtObject {
  id: root
  readonly property var schema: JSON.parse(schemaFile.text() || "{\"sections\":[],\"settings\":{}}")

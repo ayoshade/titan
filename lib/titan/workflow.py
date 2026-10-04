@@ -39,7 +39,7 @@ def atomic(path, text):
     os.replace(name,path)
 def save_state(data):
     atomic(STATE/'workflow.json',json.dumps(data,indent=2)+'\n')
-    lines=['-- Generated Titan runtime preferences. Managed by scripts/workflow.']
+    lines=['-- Generated Titan runtime preferences. Managed by bin/workflow.']
     for ws,layout in data.get('layouts',{}).items():
         if re.fullmatch(r'-?\d+',ws) and layout in ('dwindle','scrolling'):
             lines.append(f'hl.workspace_rule({{workspace={lua(ws)},layout={lua(layout)}}})')
@@ -126,7 +126,7 @@ def clipboard(action,args):
     if action=='start':
         if subprocess.run(['systemctl','--user','is-active','--quiet','titan-clipboard.service']).returncode==0: return
         run('systemd-run','--user','--collect','--unit=titan-clipboard','--setenv=WAYLAND_DISPLAY='+os.environ.get('WAYLAND_DISPLAY','wayland-1'),
-            '--setenv=CLIPHIST_DB_PATH='+os.environ['CLIPHIST_DB_PATH'],'wl-paste','--watch',ROOT/'scripts/workflow','clipboard-store',stdout=subprocess.DEVNULL)
+            '--setenv=CLIPHIST_DB_PATH='+os.environ['CLIPHIST_DB_PATH'],'wl-paste','--watch',ROOT/'bin/workflow','clipboard-store',stdout=subprocess.DEVNULL)
     elif action=='store':
         if os.environ.get('CLIPBOARD_STATE') in ('sensitive','nil','clear'): return
         content=sys.stdin.buffer.read(1048577)

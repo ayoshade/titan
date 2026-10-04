@@ -6,7 +6,7 @@ import "../components"
 import "../services"
 import "../theme"
 // Titan menus (Super+Space and friends) in the reference launcher style. Menu
-// definitions live in assets/menus.json; dynamic lists come from scripts/workflow.
+// definitions live in assets/menus.json; dynamic lists come from bin/workflow.
 SearchMenu {
  id: root
  property var entries: []

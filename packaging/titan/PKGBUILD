@@ -1,4 +1,4 @@
-# Titan: defaults, shell, scripts and migrations installed to /usr/share/titan.
+# Titan: defaults, shell, commands, scripts and migrations installed to /usr/share/titan.
 # Build from this directory: makepkg -f   (see docs/distribution.md)
 pkgname=titan
 pkgver=0.3.0
@@ -20,11 +20,11 @@ package() {
   local share="$pkgdir/usr/share/titan"
   install -d "$share"
   # Defaults and code only: user state never ships.
-  cp -a --no-preserve=ownership "$_root"/{config,scripts,lib,assets,migrations,default,packages,system,keys,installation,version} "$share/"
+  cp -a --no-preserve=ownership "$_root"/{bin,config,scripts,lib,assets,migrations,default,packages,system,keys,installation,version} "$share/"
   find "$share" -name __pycache__ -prune -exec rm -rf {} +
   install -d "$pkgdir/usr/bin"
   for cmd in titan titan-shell titan-session; do
-    ln -s "/usr/share/titan/scripts/$cmd" "$pkgdir/usr/bin/$cmd"
+    ln -s "/usr/share/titan/bin/$cmd" "$pkgdir/usr/bin/$cmd"
   done
   # Quickshell finds its configuration in every XDG config directory.
   install -d "$pkgdir/etc/xdg/quickshell" "$pkgdir/etc/xdg/xdg-desktop-portal"

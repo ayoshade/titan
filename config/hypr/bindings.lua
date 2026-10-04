@@ -10,7 +10,7 @@ function b.run(key,description,command,opts)
  return b.bind(key,description,hl.dsp.exec_cmd(command),opts)
 end
 function b.task(key,description,operation,opts)
- return b.run(key,description,root.."scripts/workflow "..operation,opts)
+ return b.run(key,description,root.."bin/workflow "..operation,opts)
 end
 function b.shell(key,description,method,opts)
  return b.run(key,description,"qs -c umbra ipc call shell "..method,opts)

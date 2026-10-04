@@ -3,5 +3,5 @@ set -euo pipefail
 root=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)
 mapfile -t packages < "$root/packages/workflow.txt"
 sudo pacman -Syu --needed "${packages[@]}"
-"$root/scripts/workflow" clipboard-start
+"$root/bin/workflow" clipboard-start
 printf '\nTitan shortcut dependencies installed. No reboot needed.\n'
