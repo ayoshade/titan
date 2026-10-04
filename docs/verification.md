@@ -726,3 +726,35 @@ and reports (never rewrites) user files found by `scripts/legacy-paths`.
   Also untested: the packaged layout in a VM, an upgrade from 0.2.0 with an
   old-path `hypr.lua`, and ISO build/install with the moved `titan-install`.
   All three belong to step 5.
+
+## Layout split step 5: VM verification — 2026-10-03
+
+All runs used the local 0.3.0 build of `6dd8bd2`, one 2 GiB VM at a time.
+
+- `tools/vm-test --graphical --stay` (`run.yFc9LX`): all 19 package checks
+  passed, including the new "developer tools are not packaged" check. Both
+  graphical checks passed (ReGreet login, first-login setup, live shell). The
+  desktop capture showed the Welcome screen over the shell. In the guest,
+  `/usr/bin/titan*` resolve into `/usr/share/titan/bin/`, the five
+  `scripts/NAME → ../bin/NAME` links exist, `tools/` is absent, and both
+  `bin/workflow` and `scripts/workflow` work. The shell log errors were only
+  the cloud VM's missing NetworkManager/BlueZ, the same as in earlier runs.
+- `tools/vm-build-iso` in that VM built `titan-0.3.0-2026.10.04-x86_64.iso`,
+  and its checksum passed. `tools/vm-install-test RUN --recovery`
+  (`install.iavM9l`): the ISO's `bin/titan-install` and `install.py` match the
+  checkout. Every recovery check passed (failed package step, killed installer
+  with a surviving worker, foreign and busy mounts, cancel/wrong disk, confirmed
+  recovery), then a fresh UEFI/Btrfs install booted to ReGreet and the shell.
+- Upgrade (`run.aWcZ55`): installed the published stable `titan-desktop` 0.2.0
+  through the documented steps. Two current checks fail there as expected
+  (0.2.0 predates the skill scope and still ships the VM tools). Added a
+  `hypr.lua` bind and a user unit that both call `/usr/share/titan/scripts/…`,
+  then ran `pacman -U` with the 0.3.0 packages. `/usr/bin/titan` moved to
+  `bin/titan`. `titan migrate` applied the mise and bin migrations, listed both
+  user files with line numbers without changing them, and a second run reported
+  none pending. The old `scripts/workflow` path still works. `titan doctor`
+  passes with the legacy-path warning, and the packaged Hyprland config
+  verifies. mise was installed as a new dependency and is active in
+  interactive Bash.
+- Still open: a hands-on keypress through a `workflow` binding, the version
+  bump/release, and removing the compatibility links one release later.
