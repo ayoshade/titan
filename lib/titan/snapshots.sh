@@ -41,7 +41,7 @@ titan_snapshot_render() {
 
 titan_snapshot_list() {
  if [[ ! -e /boot/titan/snapshots && ! -L /boot/titan/snapshots ]]; then
-  printf '%s\n' '{"schema":1,"experimental":true,"snapshots":[],"restore_supported":false}'
+  printf '%s\n' '{"schema":1,"experimental":true,"snapshots":[],"restore_supported":true,"restore_scope":"live UEFI QEMU ISO only"}'
   return
  fi
  titan_boot_path /boot/titan/snapshots/.path-check || return
@@ -51,7 +51,7 @@ titan_snapshot_list() {
   [[ -e $directory || -L $directory ]] || continue
   titan_boot_path "$directory/manifest.json" || return
   jq -e '.' "$directory/manifest.json" || return
- done | jq -s '{schema:1,experimental:true,snapshots:.,restore_supported:false}'
+ done | jq -s '{schema:1,experimental:true,snapshots:.,restore_supported:true,restore_scope:"live UEFI QEMU ISO only"}'
 }
 
 titan_snapshot_create() (

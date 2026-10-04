@@ -29,6 +29,12 @@ installation workflows as behavior references; preserve Titan's VM guards.
 Use Shell for new provisioning and boot workflow operations. Existing Python
 installer safety logic remains supported until a separately verified migration.
 Opt-in Limine is a fresh QEMU-target path, not a live-machine migration.
+Offline snapshot recovery uses `lib/titan/snapshot_restore.sh` through
+`scripts/titan-snapshot`; the live ISO embeds these helpers plus `jq`.
+It shares the installer operation lock, requires an unused dedicated disk and
+typed confirmation, retains displaced roots/boot files and journals outside @
+for resume across live boots. Preserve these boundaries and test with
+`tools/vm-install-test BUILD_RUN --bootloader limine --snapshot-restore`.
 
 Titan's scripts are separate executable programs with their own shebangs and
 strict error handling, not Omarchy's sourced setup leaves. Resolve paths from

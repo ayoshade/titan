@@ -98,7 +98,7 @@ accounts/configuration come from the captured root. It is not an isolated
 security environment: a privileged operator could deliberately mount disks.
 
 The normal boot entries remain available. Creation never reboots, restores or
-deletes snapshots; there is no restore command yet. The ESP must retain at least
+deletes snapshots. Offline restore is described below. The ESP must retain at least
 64 MiB free after the copied assets, and each snapshot adds another copy of one
 kernel/initramfs pair. Listing is a manifest inventory, not a full filesystem
 integrity check. Never manually modify the copied images or their manifests.
@@ -111,8 +111,75 @@ systemd-based hook list, rebuild with `mkinitcpio -P` and refresh the menu.
 No existing-machine migration performs this change. This was rehearsed only in
 the disposable VM; host Snapper snapshots are not automatically exported into
 the Limine menu. Automatic pre-upgrade capture, cleanup/capacity management,
-graphical preview, authenticated recovery UX and confirmed offline restore with
-matching boot files are the next milestones.
+graphical preview and authenticated recovery UX remain open.
+
+## Experimental offline Limine restore
+
+Boot the current Titan live ISO under UEFI in the dedicated-disk QEMU VM.
+The target disk must be completely unmounted. This interface refuses the
+installed desktop, snapshot preview, physical machines, multi-device Btrfs,
+extra partitions, active swap and block-device holders. It applies only to
+Titan's unencrypted Limine layout; host Snapper snapshots are a separate system.
+
+```sh
+titan snapshot list --disk /dev/vda --json
+titan snapshot restore ID --disk /dev/vda
+titan snapshot restore-status --disk /dev/vda --json
+titan snapshot restore-resume --disk /dev/vda
+```
+
+Use an ID from the live inventory or `titan snapshot list` on the installed
+system. Both restore and resume require the exact text `RESTORE ID /dev/vda`. There is no
+automatic confirmation or reboot. Status mounts the target filesystems
+read-only, with Btrfs log replay disabled, and makes no persistent writes.
+It returns either the schema-1 journal or `{"schema":1,"restore":null}`. Btrfs
+inspection uses `ro,rescue=nologreplay`; the standalone `nologreplay` spelling
+is not accepted by the tested live kernel.
+
+Restore validates the source's read-only property, installer plan, filesystem
+UUIDs, fstab, kernel/module match and saved asset hashes. The fstab must select
+the supported subvolumes by name, without stale numeric `subvolid` bindings.
+Restore stages a writable copy of the captured root, retains the displaced root as
+`@titan-before-ID-TRANSACTION`, and installs the new root at `@`. Separate
+`@home`, `@log` and `@pkg` volumes retain their latest contents. The captured
+system configuration and packages are restored; personal choices under the
+separate home volume remain current.
+
+The ESP gets the captured kernel/initramfs pair, a newly generated menu using
+the captured appearance settings, and the captured Limine EFI binary. Other
+ordinary kernel entries are removed from the active menu because their modules
+may be absent from the restored root. All displaced ordinary images, menu and
+EFI binary are retained under `/boot/titan/restores/ID-TRANSACTION/before/`;
+snapshot assets and other ESP files remain present. Run `titan boot refresh`
+normally after booting the restored system; future full package upgrades can
+regenerate additional kernels and menus through the existing hook.
+
+The durable journal is `titan-restore/journal.json` at the Btrfs top level,
+outside `@`. Its phases are `preparing`, `staged`, `root-saved`, `root-installed`,
+`boot-installed` and `complete`. Resume verifies recorded subvolume identities
+and hashes; it handles a root or boot-file rename completing before the next
+checkpoint. Previous completed journals are retained on subsequent restores.
+The live installer and restore share an operation lock, inherited by workers.
+
+If interrupted, boot the live ISO again, inspect `restore-status`, and use
+`restore-resume` with a new typed confirmation. During the two root renames
+`@` can be temporarily absent, so do not boot the installed disk until the
+journal says `complete`. A forcibly killed command may leave its recovery
+mounts in the live session; a fresh live boot releases those and resumes from
+the persistent journal. Busy mounts are never lazily or forcibly unmounted.
+An unexpected subvolume identity, backup, staged asset or destination change
+causes refusal and needs manual inspection. No snapshot, displaced root or backup is
+automatically deleted.
+
+This restores one captured root and its saved kernel pair; it is not encryption,
+dual-boot, Secure Boot, physical-machine recovery, filesystem repair or a
+Snapper integration. Available space must cover the retained boot backups,
+staging and a 64 MiB ESP reserve; Btrfs metadata exhaustion still reports a
+failure and retains the journal for inspection. Graphical preview, automatic
+Snapper menu synchronization and bounded snapshot capacity remain open.
+
+Design references: Btrfs documents [writable snapshot creation](https://btrfs.readthedocs.io/en/latest/btrfs-subvolume.html)
+and the need for [nologreplay with read-only inspection](https://btrfs.readthedocs.io/en/latest/ch-mount-options.html).
 
 Primary implementation references: Arch's [sd-volatile hook](https://github.com/archlinux/mkinitcpio/blob/master/install/sd-volatile)
 and systemd's [fstab/volatile parameters](https://github.com/systemd/systemd/blob/main/man/systemd-fstab-generator.xml).

@@ -183,6 +183,8 @@ titan update                        # snapshot, full upgrade, migrations (asks f
   Btrfs root, so every pacman transaction is snapshotted. Inspecting, undoing,
   rolling back and removing are covered in
   [docs/snapshots.md](docs/snapshots.md).
+  Experimental Limine QEMU installs also support confirmed offline snapshot
+  restore from the Titan live ISO, retaining the displaced root and boot files.
 - **If the shell misbehaves:** Super+Return still opens Kitty. Run
   `titan-shell restart` (or `scripts/shell-restart` from a TTY). It escalates
   to TERM/KILL if Quickshell hangs while exiting.

@@ -5,17 +5,19 @@
 set -euo pipefail
 root=$(cd -- "$(dirname -- "$(readlink -f "${BASH_SOURCE[0]}")")/.." && pwd)
 [[ -f $root/tests/vm_install_driver.py && -f $root/packaging/titan/PKGBUILD ]] || { echo 'vm-install-test: use a Titan development checkout' >&2; exit 1; }
-[[ $# -ge 1 ]] || { echo 'Usage: vm-install-test BUILD_RUN_DIRECTORY [--recovery] [--bootloader systemd-boot|limine]' >&2; exit 2; }
+[[ $# -ge 1 ]] || { echo 'Usage: vm-install-test BUILD_RUN_DIRECTORY [--recovery] [--bootloader systemd-boot|limine] [--snapshot-restore]' >&2; exit 2; }
 source_run=$(realpath "$1"); shift
-recovery="" bootloader=systemd-boot
+recovery="" bootloader=systemd-boot snapshot_restore=0
 while (($#)); do
  case $1 in
   --recovery) recovery=--recovery; shift ;;
+  --snapshot-restore) snapshot_restore=1; shift ;;
   --bootloader) [[ $# -ge 2 ]] || exit 2; bootloader=$2; shift 2 ;;
   *) echo 'vm-install-test: unexpected argument' >&2; exit 2 ;;
  esac
 done
 [[ $bootloader == systemd-boot || $bootloader == limine ]] || { echo 'vm-install-test: invalid bootloader' >&2; exit 2; }
+[[ $snapshot_restore == 0 || $bootloader == limine ]] || { echo 'vm-install-test: --snapshot-restore requires --bootloader limine' >&2; exit 2; }
 cache=${XDG_CACHE_HOME:-$HOME/.cache}/titan/vm
 [[ $source_run == "$(realpath "$cache/runs")/"run.* && -f $source_run/key ]] || { echo 'vm-install-test: provide a kept ISO build run' >&2; exit 2; }
 mapfile -t images < <(find "$source_run/iso" -maxdepth 1 -name '*.iso')
@@ -42,7 +44,16 @@ cleanup() {
 }
 trap cleanup EXIT
 boot_vm() {
- local media=(); [[ ${1:-} == live ]] && media=(-cdrom "$image" -boot order=d)
+ local media=() firmware_backup
+ if [[ ${1:-} == live ]]; then
+  # OVMF retains disk-first BootOrder even when -boot order=d is supplied.
+  # A fresh virtual variable store reproduces selecting the ISO explicitly;
+  # preserve the previous store as an artifact, never modify host firmware.
+  firmware_backup=$(mktemp "$run/OVMF_VARS.before-live.XXXXXX.fd")
+  cp "$run/OVMF_VARS.fd" "$firmware_backup"
+  cp "$firmware/OVMF_VARS.4m.fd" "$run/OVMF_VARS.fd"
+  media=(-cdrom "$image" -boot order=d)
+ fi
  rm -f "$run/qemu.pid" "$run/qmp.sock"
  qemu-system-x86_64 -enable-kvm -cpu host -machine q35 -m 2048 -smp 4 -display none -daemonize \
   -pidfile "$run/qemu.pid" -vga std -device qemu-xhci -device usb-tablet \
@@ -205,5 +216,53 @@ SELECT
  ssh_vm 'python3 /root/vm_snapshots.py verify' >"$run/snapshot-verify.log" 2>&1
  "$root/tools/vm-graphical"
  echo 'PASS  matched historical kernel snapshot boot, volatile writes and independent normal recovery'
+fi
+if ((snapshot_restore)); then
+ scp "${sshargs[@]}" -P "$sshport" "$root/tests/vm_snapshot_restore.py" root@127.0.0.1:/root/vm_snapshot_restore.py
+ ssh_vm 'python3 /root/vm_snapshot_restore.py prepare' >"$run/restore-prepare.log" 2>&1
+ ssh_vm 'cat /root/titan-restore-acceptance.json' >"$run/restore-snapshot.json"
+ restore_id=$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["id"])' "$run/restore-snapshot.json")
+ [[ $restore_id =~ ^[0-9]{8}T[0-9]{6}Z-[a-zA-Z0-9]{6}$ ]]
+ # Cold-boot the broken disk once: removing its only ordinary kernel must
+ # expose the missing image in Limine, rather than silently passing login.
+ disk_pid=$(cat "$run/qemu.pid"); kill "$disk_pid"
+ for i in $(seq 1 50); do kill -0 "$disk_pid" 2>/dev/null || break; sleep .1; done
+ boot_vm
+ python3 - "$root" "$run" <<'BROKEN'
+from pathlib import Path
+import sys,time
+sys.path.insert(0,str(Path(sys.argv[1])/'lib/titan'))
+from vm_qmp import Monitor
+run=Path(sys.argv[2]); monitor=Monitor(run/'qmp.sock')
+time.sleep(15)
+monitor.screenshot(run/'restore-broken-boot.png')
+BROKEN
+ # Recovery source must already be embedded in the ISO; never overlay it for
+ # this acceptance path. Verify the complete live restore implementation.
+ for phase in interrupt resume-interrupt finish; do
+  disk_pid=$(cat "$run/qemu.pid"); kill "$disk_pid"
+  for i in $(seq 1 50); do kill -0 "$disk_pid" 2>/dev/null || break; sleep .1; done
+  boot_vm live; wait_ssh
+  scp "${sshargs[@]}" -P "$sshport" "$root/tests/vm_snapshot_restore.py" root@127.0.0.1:/root/vm_snapshot_restore.py
+  ssh_vm 'sha256sum /usr/share/titan-installer/bin/titan /usr/share/titan-installer/scripts/titan-snapshot /usr/share/titan-installer/lib/titan/{boot,snapshots,snapshot_restore}.sh' >"$run/restore-iso-source.sha256"
+  python3 - "$root" "$run" <<'RESTORE_SOURCE'
+import hashlib,json,sys
+from pathlib import Path
+root,run=map(Path,sys.argv[1:])
+files=('bin/titan','scripts/titan-snapshot','lib/titan/boot.sh','lib/titan/snapshots.sh','lib/titan/snapshot_restore.sh')
+embedded=[line.split()[0] for line in (run/'restore-iso-source.sha256').read_text().splitlines()]
+current=[hashlib.sha256((root/path).read_bytes()).hexdigest() for path in files]
+(run/'restore-iso-source.json').write_text(json.dumps({'files':files,'embedded':embedded,'checkout':current,'matches_checkout':embedded==current},indent=2)+'\n')
+assert embedded == current, 'Restore acceptance requires current embedded ISO source'
+RESTORE_SOURCE
+  ssh_vm "python3 /root/vm_snapshot_restore.py $phase --id $restore_id" >"$run/restore-$phase.log" 2>&1
+ done
+ disk_pid=$(cat "$run/qemu.pid"); kill "$disk_pid"
+ for i in $(seq 1 50); do kill -0 "$disk_pid" 2>/dev/null || break; sleep .1; done
+ boot_vm; wait_ssh
+ ssh_vm 'python3 /root/vm_snapshot_restore.py verify' >"$run/restore-verify.log" 2>&1
+ ssh_vm 'cat /root/titan-restore-verified.json' >"$run/restore-verified.json"
+ "$root/tools/vm-graphical"
+ echo 'PASS  live ISO offline restore, interruptions across boots, retained data and ISO-detached restored desktop'
 fi
 echo 'All installer and installed-disk graphical checks passed.'

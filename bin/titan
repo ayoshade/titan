@@ -19,7 +19,7 @@ Usage: titan COMMAND [ARGS]
   update [--no-system]    Snapshot, update Titan and Arch packages, migrate, check
   doctor                  Health check
   boot status|refresh     Experimental Limine status and QEMU-only refresh
-  snapshot list|create    Experimental matched-kernel recovery previews in QEMU
+  snapshot               Experimental QEMU previews and offline restore (see snapshot --help)
   hardware [--json|--packages]  Read-only hardware inventory and installer profile
   skills [--dry-run]       Link end-user skills for Codex and Claude; preserve custom skills
   defaults …              Select terminal, browser, editor or agent

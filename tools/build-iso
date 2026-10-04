@@ -39,18 +39,24 @@ iso_version="$version-\$(date +%Y.%m.%d)"
 bootmodes=('uefi.systemd-boot')
 airootfs_image_tool_options=('-comp' 'zstd' '-Xcompression-level' '6' '-b' '1M')
 file_permissions["/usr/share/titan-installer/bin/titan-install"]="0:0:755"
+file_permissions["/usr/share/titan-installer/bin/titan"]="0:0:755"
+file_permissions["/usr/share/titan-installer/scripts/titan-snapshot"]="0:0:755"
 EOF
-printf '\npython\n' >>"$profile/packages.x86_64"
+printf '\npython\njq\n' >>"$profile/packages.x86_64"
 live=$profile/airootfs
 installer=$live/usr/share/titan-installer
-install -d "$installer"/{bin,lib/titan,system/hardware,keys,installation} "$live/usr/local/bin"
+install -d "$installer"/{bin,scripts,lib/titan,system/hardware,keys,installation} "$live/usr/local/bin"
 install -m755 "$root/bin/titan-install" "$installer/bin/"
+install -m755 "$root/bin/titan" "$installer/bin/"
+install -m755 "$root/scripts/titan-snapshot" "$installer/scripts/"
+install -m644 "$root/lib/titan/"{boot,snapshots,snapshot_restore}.sh "$installer/lib/titan/"
 install -m644 "$root/lib/titan/"{install,hardware}.py "$installer/lib/titan/"
 install -m644 "$root/system/hardware/profiles.json" "$installer/system/hardware/"
 install -m644 "$root/keys/titan-packager.asc" "$installer/keys/"
 install -m644 "$root/installation/packages.txt" "$installer/installation/"
 install -m644 "$root/"{LICENSE,NOTICE,version} "$installer/"
 ln -s /usr/share/titan-installer/bin/titan-install "$live/usr/local/bin/titan-install"
+ln -s /usr/share/titan-installer/bin/titan "$live/usr/local/bin/titan"
 cat >"$live/etc/motd" <<'MOTD'
 TITAN / LIVE INSTALLER
 
@@ -60,6 +66,8 @@ Preview: titan-install --disk /dev/vda --user titan --timezone UTC
 Install: repeat with --apply; the exact erase confirmation is required.
 After a failed attempt: titan-install --status, then --recover --disk /dev/vda.
 Recovery releases verified mounts; a fresh install requires another ERASE.
+Limine snapshot recovery: titan snapshot restore ID --disk /dev/vda.
+Inspect/resume interruption: titan snapshot restore-status|restore-resume --disk /dev/vda.
 The initial VM prototype is unencrypted. It never reboots automatically.
 MOTD
 find "$profile/efiboot" -type f -name '*.conf' -exec sed -i 's/Arch Linux/Titan live installer/g' {} +

@@ -735,7 +735,7 @@
     "omarchy-refresh-limine": {
       "status": "partial",
       "equivalent": "titan-install --bootloader limine / titan boot status|refresh / lib/titan/boot.sh",
-      "notes": "Original Bash fresh-UEFI-QEMU installation, guarded kernel-menu/EFI refresh and independent matched-kernel snapshot previews exist. Appearance overrides and prior changed-file backups are preserved. Automatic Snapper synchronization, confirmed restore and existing-machine migration remain open."
+      "notes": "Original Bash fresh-UEFI-QEMU installation, guarded kernel-menu/EFI refresh, matched-kernel snapshot previews and confirmed offline restore exist. Restore retains displaced roots/boot files and resumes from a durable journal across live boots. Automatic Snapper synchronization and existing-machine migration remain open."
     },
     "omarchy-reminder": {
       "status": "partial",
@@ -754,8 +754,8 @@
     },
     "omarchy-snapshot": {
       "status": "partial",
-      "equivalent": "scripts/install-snapshots / titan snapshot list|create / docs/snapshots.md",
-      "notes": "Existing-install Snapper integration and original Shell Limine QEMU recovery previews exist. Matched saved kernel/initramfs and read-only root boot through a temporary overlay, with separate volumes unmounted. No automatic Snapper menu synchronization, cleanup or confirmed restore interface yet."
+      "equivalent": "scripts/install-snapshots / titan snapshot list|create|restore|restore-status|restore-resume / docs/snapshots.md",
+      "notes": "Existing-install Snapper integration and original Shell Limine QEMU previews/offline restore exist. Saved kernels match read-only roots; previews use a temporary overlay. Confirmed live-ISO restore retains the displaced root and boot assets, preserves separate home/log/cache volumes and supports journalled resume across live boots. Automatic Snapper menu synchronization, cleanup/capacity management and physical-machine recovery remain open."
     },
     "omarchy-system-lid-close": {
       "status": "titan-policy",

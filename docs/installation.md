@@ -66,11 +66,20 @@ migration is provided, and the laptop remains on systemd-boot.
 
 Limine snapshot previews now use matched historical kernel/module assets and
 a read-only root with temporary overlay writes; see [snapshots](snapshots.md#experimental-limine-recovery-previews).
-An explicit restore workflow and automatic Snapper menu synchronization remain open.
+The live ISO provides confirmed offline restore and journalled resume across
+live boots, retaining displaced roots and boot files. Automatic Snapper menu
+synchronization remains open. See [offline restore](snapshots.md#experimental-offline-limine-restore).
 The existing Snapper tooling is unchanged. Installing Limine does not complete
 snapshot recovery. See the [boot port batch](research/omarchy-port-plan.md#boot).
 The live ISO continues to use Archiso's systemd-boot path; this choice controls
 the bootloader on the newly installed virtual disk.
+
+`tools/vm-install-test BUILD_RUN --bootloader limine --snapshot-restore` extends
+the existing preview test with a deliberately broken ordinary kernel/greeter,
+live-ISO restore, SIGKILL at root and boot publication boundaries, resume across
+live boots, retained-data checks and ISO-detached graphical acceptance. The
+restore code must already match the ISO's embedded source; this path never
+overlays runtime recovery code.
 
 ## Recover an interrupted attempt
 

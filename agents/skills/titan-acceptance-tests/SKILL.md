@@ -22,7 +22,7 @@ keeps QEMU running for debugging or ISO building. See `docs/installation.md`
 for `vm-build-iso` followed by `vm-install-test`, which installs a new disk and
 boots it with the ISO detached. `vm-install-test RUN --bootloader limine`
 adds booted-loader, refresh/backup/refusal, real LTS-kernel transaction and
-upgraded-disk graphical checks. Snapshot boot/restore is not covered. These are Titan's own harnesses; it has no
+upgraded-disk graphical checks. These are Titan's own harnesses; it has no
 Omarchy `test/acceptance.d` suite or sibling `omarchy-iso` checkout.
 
 `--workflows` tests the local checkout only and keeps command logs, JSON
@@ -42,6 +42,12 @@ removes LTS from the ordinary installation, boots its saved snapshot kernel,
 checks temporary overlay writes and excluded-volume mounts, then cold-boots the
 normal root and verifies that the writes disappeared. `tests/vm_snapshots.py`
 owns those guest-only phases; the host's disks and bootloader are never exposed.
+Add `--snapshot-restore` for the deliberately broken normal kernel/greeter,
+live-ISO restore, SIGKILL during root/boot renames, resume across live boots,
+retained data and ISO-detached restored-desktop checks. The live recovery code
+must already match the embedded ISO, with no runtime overlay; regenerate the
+ISO after recovery-source changes. `tests/vm_snapshot_restore.py` owns the
+fault injection, which never ships as a runtime flag.
 Do not edit a running Bash harness file; finish its run before changing it.
 
 ## Choose meaningful coverage

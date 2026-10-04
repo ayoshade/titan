@@ -1,5 +1,94 @@
 # Verification
 
+## Confirmed offline snapshot restore and cross-boot resume — 2026-10-04
+
+Added original Bash recovery in `lib/titan/snapshot_restore.sh`, reached through
+`titan snapshot restore ID --disk DEVICE`, `restore-status`, `restore-resume`
+and live `list --disk DEVICE`. Restore is confined to root in the live UEFI
+QEMU ISO, an unused two-partition dedicated disk and a matching unencrypted
+Titan Limine snapshot. Inspection uses read-only mounts with log replay
+disabled. Both apply and resume require exact typed confirmation.
+
+- **Recovery state:** the Btrfs top-level `titan-restore/journal.json` survives
+  live reboots and the replacement of `@`. The displaced root remains at
+  `@titan-before-ID-TRANSACTION`; displaced ordinary boot outputs remain under
+  `/boot/titan/restores/ID-TRANSACTION/before/`. The restored root gets the saved
+  kernel/initramfs and captured EFI binary/appearance. Only the captured pair
+  becomes an ordinary boot entry; other snapshot previews remain available.
+  Separate home/log/cache volumes retain their current contents. No snapshot,
+  displaced root or backup is automatically deleted or rebooted into.
+- **Local checks:** 69 tests pass through `mise exec -- python3 -m unittest
+  discover -s tests -p 'test_*.py'`. New cases cover malformed/changed journal
+  identity, stale numeric fstab bindings and diverted home mounts, symlinked
+  journals/staging (including preparing), altered staged assets/backups/live
+  destinations, and each interrupted root/boot transition. Source/argument
+  refusal runs without privileged host disk writes. Bash syntax, host doctor
+  and `git diff --check` pass. Doctor initially inherited a stale compositor
+  instance; rerunning with the actual live instance passes. No host compositor
+  reload or shell restart was necessary.
+- **Packages:** `tools/vm-test --full --stay --reuse run.OWNZaL` rebuilt the
+  current packages and passed all 19 package/configuration checks. The final
+  ISO was then built in that VM; its checksum passes. No signing/publishing
+  operation was performed.
+- **Final fresh ISO acceptance:** `install.Yl6544` ran
+  `tools/vm-install-test run.OWNZaL --bootloader limine --snapshot-restore`.
+  The installer and all five embedded recovery entrypoint/library hashes match
+  the checkout; no recovery runtime overlay was used. Fresh installation,
+  ISO-detached login/Welcome, an actual LTS upgrade and boot, saved historical
+  kernel preview after package removal, temporary writes/excluded mounts and
+  independent normal boot all pass. Each ordinary boot passed all eight
+  graphical checks, including shell/keybinding, rendered lock, VT redraw,
+  rescue, lockout explanation and unlock.
+- **Broken-system rehearsal:** the fixture captured Linux 7.2.8, removed its
+  ordinary kernel and masked greetd. The next disk boot visibly failed to open
+  `vmlinuz-linux` in Limine (capture inspected). The live fixture also corrupted
+  the ordinary menu. Cancellation, an installer lock, mounted target, a mount
+  appearing during confirmation and a corrupt saved kernel all refused before
+  creating a journal. Live inventory and status passed with the disk unmounted.
+- **Real interruptions:** SIGKILL after retaining the old root left no `@` and
+  a durable `staged` journal. Another cold live boot resumed and was killed
+  after installing the new root but before its checkpoint; a third live boot
+  was killed during an atomic initramfs publication. Resume handled each
+  completed rename, verified identities/hashes and reached `complete`.
+  Cancelled resume and a new restore during the pending transaction refused;
+  redundant resume after completion refused. The fixture normally released
+  killed-command mounts before cold boots; production instructions use a fresh
+  live boot rather than forced/lazy unmount.
+- **Restored disk:** with ISO detached, the saved Linux kernel and captured
+  root booted to active greetd and the Titan desktop. The root marker reverted,
+  separate-volume markers kept their latest data, the displaced root kept the
+  broken-system marker, the source remained read-only, and every staged/retained
+  boot hash matched the journal. No capture pacman lock leaked into the root;
+  normal `titan boot refresh` succeeds. Restored Welcome/desktop and recovered
+  lock captures were inspected at 1280×800. All final graphical checks pass.
+  The shell log retains the known missing-BlueZ and Qt portal registration
+  warnings; this recovery work does not resolve those VM integration warnings.
+- **Corrections retained:** the first fresh run `install.8r3BzA` exposed OVMF's
+  persistent disk-first BootOrder. The harness now preserves its virtual
+  variable store and uses a fresh store when explicitly booting the ISO.
+  Development retries found missing executable permissions in the ISO profile
+  and rejection of standalone `nologreplay` by live Linux 7.2.8; explicit file
+  permissions and `ro,rescue=nologreplay` fix those. A focused recovery run with
+  a development overlay passed before the final embedded-source acceptance.
+  Those failures and successful retry logs remain in `install.8r3BzA`.
+- **Build capacity:** a final rebuild filled the 24 GiB build guest. Its failed
+  log is `run.OWNZaL/restore-iso-disk-full.log`. Only the verified stopped qcow2
+  was expanded to 64 GiB; its third partition and Btrfs root were grown inside
+  the guest. The rebuilt ISO passes. All task QEMU processes are stopped. Host
+  disks, bootloader, services, power policy and user settings remain unchanged.
+
+Artifacts: `install.Yl6544/{iso-source-check.json,restore-iso-source.json,
+restore-snapshot.json,restore-interrupt.log,restore-resume-interrupt.log,
+restore-finish.log,restore-verify.log,restore-verified.json}` and graphical
+captures; `run.OWNZaL/{restore-final-packages.log,restore-final-iso-rebuild.log,iso}`.
+Test ISO keys remain disposable and these images must not be distributed.
+
+Next: bounded snapshot/ESP capacity and automatic Snapper menu synchronization,
+then package-family migration to Bash. Physical-machine restore, Secure Boot,
+encryption, graphical preview and a public 0.3.0 release remain outside this
+verified scope. Omarchy coverage remains 66 adapted, 109 partial, 6 policy and
+298 pending out of 479; this experimental recovery path does not imply parity.
+
 ## Shell service migration and matched-kernel Limine previews — 2026-10-04
 
 `titan service` now uses original Bash in `lib/titan/services.sh`; the previous

@@ -54,7 +54,7 @@ titan_boot_status() {
    [[ ! -f $file || -L $file ]] || snapshot=true
   done
  fi
- printf '{"schema":1,"bootloader":"%s","experimental":true,"refresh_scope":"fresh Titan Limine QEMU installations only","configuration_exists":%s,"efi_exists":%s,"snapshot_boot":%s,"snapshot_preview_supported":%s,"snapshot_restore_supported":false}\n' "$loader" "$config" "$binary" "$snapshot" "$preview"
+ printf '{"schema":1,"bootloader":"%s","experimental":true,"refresh_scope":"fresh Titan Limine QEMU installations only","configuration_exists":%s,"efi_exists":%s,"snapshot_boot":%s,"snapshot_preview_supported":%s,"snapshot_restore_supported":%s,"snapshot_restore_scope":"live UEFI QEMU ISO only"}\n' "$loader" "$config" "$binary" "$snapshot" "$preview" "$preview"
 }
 
 titan_boot_guard() {

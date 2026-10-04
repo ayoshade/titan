@@ -114,6 +114,13 @@ their source instead (see [theming.md](theming.md) and
 - **Recovery:** if the shell breaks, Super+Return still opens Kitty, and
   `titan-shell restart` (or `~/dotfiles/scripts/shell-restart` from a TTY)
   recovers it.
+- **Experimental snapshots:** confirmed offline restore exists only for
+  dedicated-disk Titan Limine QEMU installs from the live UEFI ISO. Follow
+  `docs/snapshots.md`; `titan snapshot list --disk DEVICE`, `restore-status`
+  and `restore-resume` inspect/recover the target. Restore/resume require typed
+  confirmation, retain displaced roots/boot files and preserve separate user
+  volumes. Never treat this as a laptop/systemd-boot migration or run a restore
+  without the user's request. Do not boot the target before journal `complete`.
 
 ## Finish
 

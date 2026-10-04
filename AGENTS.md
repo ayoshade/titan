@@ -21,8 +21,10 @@ instead of maintaining two competing instruction sets.
   tree adds an experimental UEFI ISO/installer, currently confined to live
   QEMU VMs; it is not published. Fresh VM installs default to systemd-boot
   with an opt-in Limine path (`--bootloader limine`). `titan boot refresh`
-  uses original Bash and refuses physical machines; Limine snapshot boot/restore
-  and live bootloader migration remain unimplemented. See `docs/installation.md`.
+  uses original Bash and refuses physical machines. Matched-kernel snapshot
+  previews and confirmed offline restore are QEMU-only experiments; automatic
+  Snapper menu sync and live bootloader migration remain unimplemented.
+  See `docs/installation.md`.
   The owner's development checkout is `~/dotfiles` on the laptop
   `umbra`, local user `shade`.
 - **Titan** is the product name. **Umbra** is the existing shell/configuration
@@ -236,7 +238,7 @@ wl-clipboard, grim/slurp and suitable XDG portals.
 | `default/agents/skills/` | Three bundled end-user skills: `titan`, `titan-app`, `diagnose-crash`; `titan skills` links them into Claude and Codex (respecting `CODEX_HOME`) |
 | `default/config/`, `default/catalog/`, `default/bash/` | Copied-once developer dotfiles, optional package/runtime/database recipes, modular interactive Bash defaults |
 | `lib/titan/{apps,configuration,packages,development,utilities,media_tools,system_status,plugins}.py` | Remaining Python operations behind `scripts/titan-*` and `titan`; shared primitives in `ops.py`, parser in `desktop_cli.py` |
-| `lib/titan/{services,boot,snapshots}.sh` | Original Bash service lifecycle, guarded Limine refresh and read-only recovery previews; existing public routes remain compatible |
+| `lib/titan/{services,boot,snapshots,snapshot_restore}.sh` | Original Bash service lifecycle, guarded Limine refresh, recovery previews and confirmed offline restore; existing public routes remain compatible |
 | `docs/` | Research, hardware, decisions, validation and recovery |
 
 Shell settings are declared once in `theme/settings-schema.json`. The Settings
@@ -288,8 +290,14 @@ Fresh experimental Limine VMs can use `titan snapshot create|list` for independe
 read-only `@titan-snapshots/ID` roots with matched ESP boot assets. Preview boots
 use Arch's `sd-volatile` hook and temporary overlay writes, ignore fstab/GPT
 automounts and enter a text recovery session; separate user volumes stay unmounted.
-No automatic deletion, Snapper menu sync or restore command exists yet. The
-host's Snapper setup and systemd-boot are separate and remain unchanged.
+The live UEFI QEMU ISO provides `titan snapshot restore ID --disk DEVICE`,
+`restore-status` and `restore-resume`. Restore requires typed confirmation,
+retains the displaced root and boot files, and preserves separate home/log/cache
+volumes. Its journal at top-level `titan-restore/journal.json` supports resuming
+across live boots; never boot the installed disk before `complete`. SIGKILL can
+leave owned mounts, so use a fresh live boot for resume. No automatic deletion
+or Snapper menu sync exists. The host's Snapper setup and systemd-boot remain
+separate. See `docs/snapshots.md` for recovery commands and limitations.
 
 As Titan grows, separate distribution defaults, machine profiles, persistent
 user overrides, runtime state and build outputs. Updates must preserve user

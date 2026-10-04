@@ -165,7 +165,8 @@ executing it on the user's working session.
 `titan boot status [--json]` reads the installer bootloader choice and generated
 file presence without mutation (schema 1). `snapshot_preview_supported` reports
 the Limine preview capability, `snapshot_boot` reports a published manifest's
-presence, and `snapshot_restore_supported` remains false. These are inventory
+presence, and `snapshot_restore_supported` describes the live-ISO recovery
+capability for the Limine layout. These are inventory
 fields, not a guarantee that every historical entry has been booted.
 `titan boot refresh` is the Bash Limine generator for fresh UEFI QEMU Titan
 installations. It requires root, validates the installed root/ESP and retains
@@ -177,3 +178,15 @@ captures a read-only Btrfs root and matching boot assets in a fresh Limine VM.
 Select the temporary recovery preview in Limine; it uses a text session and
 discards writes on reboot. See [snapshots](snapshots.md#experimental-limine-recovery-previews)
 for scope and limitations. No automatic reboot or restore is performed.
+
+In the live UEFI QEMU ISO, `titan snapshot list --disk DEVICE [--json]` inspects
+the target inventory using read-only mounts and verifies the saved asset hashes.
+`titan snapshot restore ID --disk DEVICE` restores
+the captured root and matching boot files, retaining the displaced root and
+boot outputs. `restore-status --disk DEVICE [--json]` reads the persistent
+schema-1 journal with read-only mounts; `restore-resume --disk DEVICE` continues
+an interrupted restore, including across live boots. Restore/resume require
+exact typed confirmation and preserve separate home/log/cache volumes.
+Exit 1 means refusal/failure, 2 invalid arguments and 130 handled interruption.
+SIGKILL has the usual process exit status and requires another live boot if
+owned mounts remain. No `--yes`, reboot or automatic deletion is provided.
