@@ -155,6 +155,7 @@ titan doctor                        # health check
 titan update check --json           # read-only local update readiness
 titan update status --json          # last update stage/result and current lock
 titan pkg add --plan fzf zoxide     # read-only package transaction plan
+titan dev plan laravel              # read-only developer provisioning plan (Bash)
 titan boot status --json             # experimental installer bootloader status
 titan snapshot list --json           # experimental Limine recovery preview inventory
 titan hardware --json                # read-only hardware inventory and installer packages

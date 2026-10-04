@@ -40,20 +40,23 @@ approval.
    compatibility dispatch from the Python CLI. Noninteractive calls are bounded;
    pairing/editing stay interactive and Quickshell owns native reactive services.
    `tools/vm-system-checks RUN` checks real controls/refusals and restoration.
-   Continue with developer provisioning/jobs one family at a time. Keep the public
+   Developer environment recipes and local Docker database lifecycles now use
+   `development.sh`; `tools/vm-workflows RUN --only development` verifies native
+   routes, Node/Laravel provisioning and all five data-persistence paths.
+   Continue with developer jobs one family at a time. Keep the public
    CLI, structured status, confirmation boundaries and exit codes; use `jq`
    for JSON and argv arrays for subprocess arguments.
    Dependency predicates (`commands.sh`), package predicates/drop/history/cache
    helpers (`packages.sh`) and mise list/upgrade wrappers (`development.sh`) now
    use Bash. Update readiness/status and staged execution live in `update.sh`,
    preserving full upgrades and recording failures/interruption for inspection.
-   `packages.py` retains only read-only catalog/argv helpers for the remaining
-   Python developer recipes and menu generation. Direct Python package CLI callers
-   delegate to Bash. Real package installation/removal and menu command adapters
+   `packages.py` and `development.py` retain only read-only catalog adapters
+   for existing Python maintenance-menu generation. Direct Python package/developer
+   CLI callers delegate to Bash. Real package installation/removal and menu command adapters
    pass `tools/vm-package-checks RUN`; package plans/catalogs now require the
-   declared jq dependency. Developer recipes/databases still use Python until
-   their provisioning paths pass their own focused migration.
-3. Migrate developer environment/jobs, defaults/launchers and configuration
+   declared jq dependency. Developer recipes/databases passed their focused Bash
+   migration; remaining jobs and configuration operations still use Python.
+3. Migrate remaining developer jobs, defaults/launchers and configuration
    operations with their existing real-VM acceptance checks. Keep user data,
    backups, locks and old paths compatible throughout.
 4. Move reactive desktop logic into QML/native Quickshell APIs where appropriate;

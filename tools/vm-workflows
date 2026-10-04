@@ -11,8 +11,8 @@ import sys
 
 root = Path(__file__).resolve().parent.parent
 parser = argparse.ArgumentParser(description=__doc__)
-parser.add_argument('run', type=Path, help='Running --graphical --stay VM run directory')
-parser.add_argument('--only', choices=('apps', 'preservation', 'services'), help='Focused app/config/service regression checks')
+parser.add_argument('run', type=Path, help='Running --graphical --stay VM (--full --stay suffices for --only development)')
+parser.add_argument('--only', choices=('apps', 'preservation', 'services', 'development'), help='Focused app/config/service/developer regression checks')
 args = parser.parse_args()
 run = args.run.resolve()
 cache = Path(os.environ.get('XDG_CACHE_HOME', Path.home() / '.cache')) / 'titan/vm/runs'
@@ -28,8 +28,8 @@ try:
     port = int(os.environ.get('TITAN_VM_SSH_PORT') or (run / 'ssh-port').read_text())
     if not 1024 <= port <= 65535:
         raise ValueError('Invalid SSH port')
-    user = (run / 'graphical-user').read_text().strip()
-    if not user.startswith('titanuser') or not user[9:].isdigit():
+    user = None if args.only == 'development' else (run / 'graphical-user').read_text().strip()
+    if user is not None and (not user.startswith('titanuser') or not user[9:].isdigit()):
         raise ValueError('Missing graphical acceptance account')
 except (OSError, ValueError) as error:
     parser.error(str(error))
@@ -48,15 +48,17 @@ subprocess.run(scp + [str(root / 'tests/vm_workflows.py'), str(run / 'workflow-s
                      f'tester@127.0.0.1:{remote}/'], check=True, timeout=30)
 status = 1
 try:
-    argv = ['python3', '-u', remote + '/vm_workflows.py', '--graphical-user', user,
+    argv = ['python3', '-u', remote + '/vm_workflows.py',
             '--manifest', remote + '/workflow-source.json', '--output', remote]
+    if user is not None:
+        argv += ['--graphical-user', user]
     if args.only:
         argv += ['--only', args.only]
     status = subprocess.run(ssh + [shlex.join(argv)], timeout=3600).returncode
 finally:
     for source, target in [('results.json', 'workflow-results.json'), ('commands.log', 'workflow-commands.log')]:
         subprocess.run(scp + [f'tester@127.0.0.1:{remote}/{source}', str(run / target)], timeout=30)
-    for terminal in ('foot', 'ghostty', 'alacritty'):
+    for terminal in (() if args.only == 'development' else ('foot', 'ghostty', 'alacritty')):
         subprocess.run(scp + [f'tester@127.0.0.1:{remote}/{terminal}.png', str(run / ('workflow-' + terminal + '.png'))],
                        timeout=30, stderr=subprocess.DEVNULL)
 print(f'Workflow artifacts: {run}', flush=True)

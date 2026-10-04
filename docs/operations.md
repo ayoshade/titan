@@ -66,7 +66,7 @@ titan dev upgrade
 titan dev upgrade --plan
 ```
 
-The whole package CLI, dependency predicates and mise list/upgrade wrappers use Bash.
+The whole package and developer CLI families and dependency predicates use Bash.
 Package list/bundle plans require jq. Install/remove plans run no pacman or sudo
 and work even when those tools are absent. AUR plans require an existing helper;
 bundle plans use paru as their descriptive fallback when none is installed.
@@ -152,6 +152,10 @@ titan dev db remove postgres
 ```
 
 Database recipes create editable Docker Compose JSON in the user layer.
+Creation shares the existing `databases.lock`, writes private (0600) files
+atomically and refuses existing files, including dangling symlinks. Listing
+creates no state and requires no Docker; lifecycle commands read your edited
+Compose file without regenerating it.
 PostgreSQL, MySQL, MariaDB, Redis and MongoDB bind only to `127.0.0.1`; they are
 local development services with permissive local authentication. Named volumes
 retain data through `stop` and `remove` (Compose `down`, without `-v`). Docker
@@ -314,16 +318,19 @@ command implementations now use Bash. Existing interfaces
 remain supported while their operations migrate.
 
 Currently, `bin/titan` routes to distinct scripts and Python modules: `apps`,
-`configuration`, `development`, `utilities`, `media_tools`,
+`configuration`, `utilities`, `media_tools`,
 `plugins`, with shared primitives in `ops`. Services live in
 `lib/titan/services.sh`, reached through the existing `scripts/titan-system`.
 Dependency predicates use `commands.sh`; the entire package CLI uses
-`packages.sh`; mise list/upgrade wrappers use `development.sh`.
+`packages.sh`; the whole developer recipe, mise and Compose CLI uses
+`development.sh`. `tools/vm-workflows RUN --only development` checks real
+Node/Laravel provisioning, all five database persistence paths, edited Compose
+files and Docker service-state restoration.
 Battery, network, Bluetooth, power and audio CLI operations use `system_status.sh`;
 the retired Python module is no longer packaged. `tools/vm-system-checks RUN`
 checks real controls, native refusals and restoration in an owned build VM.
-`packages.py` contains only read-only catalog/argv helpers still used by Python
-developer recipes and menu generation; it no longer owns CLI execution or parsing.
+`packages.py` and `development.py` retain only read-only catalog adapters
+for Python maintenance-menu generation; neither owns CLI execution or parsing.
 Other operations continue using the Python parser. New functionality
 does not accumulate in the legacy `workflow.py`; it only adapts shortcuts and
 menus to shared operations. Help is available at every level. Exit 0 means

@@ -2,7 +2,7 @@
 """Acceptance fixtures for disposable Titan QEMU guests, never the host.
 
 Not collected by unittest. tools/vm-workflows invokes this after graphical
-login. Installs packages and changes services only in the disposable guest.
+login, or on a headless full-package VM with --only development. Installs packages and changes services only in the disposable guest.
 """
 import argparse
 import hashlib
@@ -16,12 +16,13 @@ import subprocess
 import sys
 import time
 import traceback
+import tempfile
 
 parser = argparse.ArgumentParser(description=__doc__)
-parser.add_argument('--graphical-user', required=True)
+parser.add_argument('--graphical-user')
 parser.add_argument('--manifest', required=True, type=Path)
 parser.add_argument('--output', required=True, type=Path)
-parser.add_argument('--only', choices=('apps', 'preservation', 'services'))
+parser.add_argument('--only', choices=('apps', 'preservation', 'services', 'development'))
 args = parser.parse_args()
 root = Path('/usr/share/titan')
 if (Path.home() != Path('/home/tester') or os.getuid() == 0
@@ -29,7 +30,8 @@ if (Path.home() != Path('/home/tester') or os.getuid() == 0
         or Path('/sys/class/dmi/id/sys_vendor').read_text().strip() != 'QEMU'
         or not (root / 'bin/titan').is_file()):
     sys.exit('Refusing to run outside the disposable Titan QEMU tester account')
-if not args.graphical_user.startswith('titanuser') or not args.graphical_user[9:].isdigit():
+if args.only != 'development' and (not args.graphical_user or
+        not args.graphical_user.startswith('titanuser') or not args.graphical_user[9:].isdigit()):
     sys.exit('Select the generated graphical acceptance account')
 args.output.mkdir(exist_ok=True)
 log = (args.output / 'commands.log').open('w')
@@ -151,6 +153,70 @@ def runtime_laravel():
     command('mise', 'exec', 'php', '--', executable, '--version')
 
 
+def developer_contracts():
+    # Use real packaged routes with a PATH containing no Python, mise, pacman,
+    # sudo or Docker. Inspection and config generation must stand alone.
+    with tempfile.TemporaryDirectory(prefix='titan-dev native ', dir=Path.home()) as directory:
+        fixture = Path(directory)
+        tools = fixture / 'bin'
+        tools.mkdir()
+        for name in ('bash','dirname','readlink','jq','cat','flock','mkdir','mktemp','ln','rm'):
+            (tools / name).symlink_to('/usr/bin/' + name)
+        prefix = ['env', 'PATH=' + str(tools), 'XDG_CONFIG_HOME=' + str(fixture / 'config'),
+                  'XDG_STATE_HOME=' + str(fixture / 'state')]
+        def native(*argv, **kwargs):
+            return command(*prefix, root / 'bin/titan', 'dev', *argv, **kwargs)
+        recipes = json.loads(native('list').stdout)['environments']
+        for name, recipe in recipes.items():
+            plan = json.loads(native('plan', name).stdout)
+            expected = []
+            if recipe.get('packages'): expected.append(['sudo','pacman','-Syu','--needed','--',*recipe['packages']])
+            if recipe.get('tools'): expected.append(['mise','use','-g',*recipe['tools']])
+            expected.extend(recipe.get('commands', []))
+            assert plan == {'schema':1,'commands':expected}
+        assert json.loads(native('db','list').stdout)['configured'] == []
+        for argv in [('install','node'), ('install','unknown'), ('db','create','unknown'),
+                     ('db','create','redis','--port','80'), ('db','create','../escape'),
+                     ('db','start','redis')]:
+            assert native(*argv,success=False).returncode == 1
+        direct = command(*prefix, '/usr/bin/python3', root / 'lib/titan/desktop_cli.py', 'dev','plan','laravel')
+        assert json.loads(direct.stdout) == json.loads(native('plan','laravel').stdout)
+        assert not (fixture / 'config').exists() and not (fixture / 'state').exists()
+        for name in ('postgres','mysql','mariadb','redis','mongodb'):
+            native('db','create',name)
+            file = fixture / 'config/titan/development/databases' / (name + '.json')
+            before = file.read_bytes()
+            assert file.stat().st_mode & 0o777 == 0o600
+            assert native('db','create',name,success=False).returncode == 1
+            assert file.read_bytes() == before
+        assert json.loads(native('db','list').stdout)['configured'] == sorted(('postgres','mysql','mariadb','redis','mongodb'))
+    # The existing shell maintenance menu continues to generate public routes.
+    sys.path.insert(0, str(root / 'lib/titan'))
+    from maintenance_menu import items
+    menu = items('install-dev')
+    assert {row['label'] for row in menu} == set(recipes)
+    assert all(json.loads(row['value']) == ['dev','install',row['label']] for row in menu)
+
+
+def developer_databases():
+    units = ('docker.service','docker.socket')
+    baseline = {unit: (command('systemctl','is-enabled',unit,success=False).stdout.strip(),
+                       command('systemctl','is-active',unit,success=False).stdout.strip()) for unit in units}
+    try:
+        stage('Docker setup for developer database acceptance', lambda: titan('service','setup','docker',timeout=600,input='y\n'*20))
+        if results[-1]['status'] == 'pass':
+            for index, name in enumerate(('postgres','mysql','mariadb','redis','mongodb')):
+                stage(name + ' custom config, loopback binding and data survive stop/remove/recreate',
+                      lambda name=name, index=index: database_check(name, 15000 + index))
+    finally:
+        for unit, (enabled, active) in baseline.items():
+            command('sudo','systemctl','enable' if enabled == 'enabled' else 'disable',unit)
+            command('sudo','systemctl','start' if active == 'active' else 'stop',unit)
+        for unit, (enabled, active) in baseline.items():
+            assert command('systemctl','is-enabled',unit,success=False).stdout.strip() == enabled
+            assert command('systemctl','is-active',unit,success=False).stdout.strip() == active
+
+
 def service_check(name):
     plan = json.loads(titan('service', 'plan', name).stdout)
     assert plan['schema'] == 1 and plan['commands'][0][:5] == ['sudo', 'pacman', '-Syu', '--needed', '--']
@@ -181,6 +247,14 @@ def database_check(name, port):
     titan('dev', 'db', 'create', name, '--port', str(port))
     container = 'titan-dev-' + name
     volume = container + '_data'
+    file = Path.home() / '.config/titan/development/databases' / (name + '.json')
+    # Keep an actual user edit through duplicate creation and every lifecycle.
+    data = json.loads(file.read_text())
+    data['services'][name]['labels'] = {'titan.acceptance': 'custom preserved'}
+    custom = json.dumps(data, indent=2) + '\n'
+    file.write_text(custom)
+    assert titan('dev','db','create',name,success=False).returncode == 1
+    assert file.read_text() == custom
     def execute(*argv, **kwargs):
         return command('sudo', 'docker', 'exec', container, *argv, **kwargs)
     def reachable():
@@ -217,6 +291,7 @@ def database_check(name, port):
         titan('dev', 'db', 'stop', name)
         titan('dev', 'db', 'start', name)
         wait(lambda: execute(*read, success=False).stdout.strip() == 'persisted')
+        assert file.read_text() == custom, 'Lifecycle replaced the editable Compose configuration'
         titan('dev', 'db', 'remove', name)
         command('sudo', 'docker', 'volume', 'inspect', volume)
         titan('dev', 'db', 'start', name)
@@ -225,7 +300,8 @@ def database_check(name, port):
         titan('dev', 'db', 'logs', name, success=False)
         titan('dev', 'db', 'remove', name, success=False)
         # Remove only the configuration created by this fixture; retain its volume.
-        (Path.home() / '.config/titan/development/databases' / (name + '.json')).unlink(missing_ok=True)
+        assert file.read_text() == custom
+        file.unlink(missing_ok=True)
 
 
 def graphical_prefix():
@@ -290,6 +366,15 @@ if args.only == 'preservation':
 elif args.only == 'services':
     for name in ('docker', 'printing', 'tailscale'):
         stage(name + ' service plan/list/setup/status/disable/enable', lambda name=name: service_check(name))
+elif args.only == 'development':
+    choices = {p: p.read_bytes() for p in (Path.home() / '.config/titan').glob('*.json')}
+    stage('developer plans, native routes, direct compatibility, private config and menu contracts', developer_contracts)
+    stage('Node LTS installs through mise and executes in interactive Bash', runtime_node)
+    stage('PHP, Composer and Laravel installer execute after the framework recipe', runtime_laravel)
+    stage('developer database acceptance restores Docker service state', developer_databases)
+    def choices_preserved():
+        assert all(p.read_bytes() == data for p, data in choices.items()), 'Developer operation changed user choices'
+    stage('developer operations preserve normal user choice JSON', choices_preserved)
 elif not args.only:
     stage('package reinstall, setup, migrations and config restore preserve user choices', defaults_preservation)
     stage('AUR helper and multilib refusals precede any package mutation', package_guards)

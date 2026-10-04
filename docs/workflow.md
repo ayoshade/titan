@@ -102,9 +102,21 @@ work is tracked in [the Omarchy ledger](research/omarchy.md).
   `last_upgrade` is null for an empty readable history. Missing/unreadable log fails.
 - `titan pkg cache-prune [--keep N] [--plan]`: explicit paccache cleanup with
   at least two retained versions (2–999); execution requires pacman-contrib/sudo.
-- `titan dev tools` and `upgrade [--plan]` use Bash mise wrappers, preserving
-  the caller's configuration and release-age policy. Plans need jq and create
-  no state. Cleanup/upgrades aren't automatically added to `titan update`.
+- The whole `titan dev` family uses original Bash `development.sh` through
+  `scripts/titan-dev`; direct `desktop_cli.py dev …` callers delegate there.
+  `list` returns schema-1 `environments`; `plan NAME` returns schema-1 command
+  arrays without invoking provisioning tools or creating state. `install NAME`
+  checks catalog fields/executables before the first command, retains full Arch
+  upgrades/native confirmation and stops on failure. Arguments stay literal;
+  mise keeps the caller's configuration and release-age policy.
+  `db list` returns schema-1 `databases` and sorted `configured` names without
+  Docker or state writes. `db create NAME [--port PORT]` accepts ports 1024–65535,
+  shares the existing database lock and atomically publishes private files
+  without replacing existing configs. `start|stop|status|logs|remove NAME` uses
+  the editable Compose file through sudo; remove retains config and volumes.
+  Invalid syntax exits 2; migrated recipe/database validation/tool failures 1;
+  subprocess interruption 130. `tools` and `upgrade [--plan]` retain native mise
+  exit codes. Plans need jq. Cleanup/upgrades aren't added to `titan update`.
 - `titan-shell ipc welcome` opens the first-login Welcome screen.
 - `bin/titan-install --status [--json]`: schema-1 read-only JSON with the
   last installation checkpoint, operation lock state and target mounts.

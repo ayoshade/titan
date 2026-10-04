@@ -149,6 +149,30 @@ Coverage remains 75 adapted, 107 partial, 6 policy and 291 pending of 479.
 Next: developer recipe/job provisioning with existing workflow acceptance;
 hardware/security/authentication remain separate batches.
 
+## Developer recipe/database Bash migration — 2026-10-04
+
+The whole `titan dev` family now uses original Bash `development.sh`, including
+mise recipes, plans and editable Docker Compose lifecycles. Direct Python CLI
+callers delegate to the same routes. `development.py` and `packages.py` retain
+only catalog adapters for the existing maintenance menu. Plans need jq but no
+provisioning tools or state; installation retains full Arch upgrades and native
+confirmation. Private atomic creation shares the previous database lock and
+preserves existing configs; stop/remove keep named volumes.
+
+`tools/vm-workflows RUN --only development` checks installed runtime hashes,
+all native plans and direct compatibility, private config creation, menu command
+adapters, real Node/PHP/Composer/Laravel execution, all five database loopback/
+stop/remove/recreate persistence paths and custom Compose edits. Docker service
+state and normal user choices are restored/preserved. Other frameworks and
+MSSQL remain outside this acceptance. The pinned upstream installer was reviewed
+for behavior; Titan keeps its own declarative recipes, managed mise shims,
+cooldowns and package-first PHP approach rather than upstream source installers.
+
+Coverage remains 75 adapted, 107 partial, 6 policy and 291 pending of 479.
+Next: remaining developer jobs (SSH-forward/rsync/tmux/worktrees), then
+configuration recovery/defaults/launchers with real acceptance. Hardware,
+security/authentication and release work remain separate batches.
+
 ## Implemented in the initial foundation batch
 
 See [operations](../operations.md) for commands, state, recovery and module

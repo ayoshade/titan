@@ -153,6 +153,9 @@ services and terminal windows. It tests the local checkout, keeps source hashes,
 command logs, JSON results and screenshots in the run directory, and reboots
 only the guest if its upgrade replaced the running kernel's modules. It doesn't
 install packages or change services on the host.
+`tools/vm-workflows RUN --only development` focuses on developer recipe plans,
+native Bash routes, real Node/Laravel provisioning and all five database
+persistence paths with custom Compose edits and restored Docker service state.
 
 Developer mode (this laptop) keeps the `~/.config → ~/dotfiles` symlinks
 through `scripts/bootstrap`, which then runs `titan setup`. Both modes share

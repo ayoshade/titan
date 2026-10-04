@@ -1367,7 +1367,7 @@
       "summary": "Install a supported development environment",
       "status": "adapted",
       "equivalent": "titan dev install NAME / mise use -g TOOL",
-      "notes": "Runtime recipes use mise; not all installations have been exercised."
+      "notes": "Original Bash developer recipes use mise; Node and PHP/Composer/Laravel execute in QEMU. Other framework installations remain untested. Titan preserves mise cooldowns and uses managed shims rather than upstream wrapper/source-install choices."
     },
     {
       "command": "omarchy-install-docker-dbs",
@@ -1375,7 +1375,7 @@
       "summary": "Install one of the supported databases in a Docker container with the suitable development options.",
       "status": "partial",
       "equivalent": "titan dev db",
-      "notes": "Five loopback-only databases with named volumes; MSSQL is not implemented."
+      "notes": "Original Bash Compose lifecycles preserve editable configs, loopback bindings and named volumes. All five database stop/remove/recreate persistence paths pass QEMU; MSSQL is not implemented."
     },
     {
       "command": "omarchy-install-editor-emacs",
@@ -1927,7 +1927,7 @@
       "summary": "Install a small mise-backed wrapper for a given tool.",
       "status": "adapted",
       "equivalent": "titan dev install NAME / mise use -g TOOL",
-      "notes": "Runtime recipes use mise; not all installations have been exercised."
+      "notes": "Original Bash developer recipes use mise; Node and PHP/Composer/Laravel execute in QEMU. Other framework installations remain untested. Titan preserves mise cooldowns and uses managed shims rather than upstream wrapper/source-install choices."
     },
     {
       "command": "omarchy-monitor-state",

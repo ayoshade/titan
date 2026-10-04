@@ -1,10 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 root=$(cd -- "$(dirname -- "$(readlink -f "${BASH_SOURCE[0]}")")/.." && pwd)
-if [[ ${1:-} == dev && ( ${2:-} == tools || ${2:-} == upgrade ) ]]; then
- source "$root/lib/titan/development.sh"
- shift
- titan_dev_tools "$@"
-else
- exec python3 "$root/lib/titan/desktop_cli.py" "$@"
-fi
+[[ ${1:-} == dev ]] || { echo 'Usage: titan-dev dev …' >&2; exit 2; }
+source "$root/lib/titan/development.sh"
+shift
+titan_dev "$@"

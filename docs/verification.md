@@ -1,5 +1,69 @@
 # Verification
 
+## Developer recipe/database Bash migration — 2026-10-04
+
+The whole `titan dev` family now uses original Bash `development.sh` through
+`scripts/titan-dev`, including catalog/list, plans, mise provisioning and local
+Docker Compose lifecycles. Direct Python CLI callers delegate there.
+`development.py` and `packages.py` retain only read-only catalog adapters for
+maintenance menus; Python developer provisioning/argument parsing is retired.
+
+- **Contracts:** schema-1 catalogs/plans retain their command order and literal
+  argv; plans/listing require declared jq but no provisioning tools or state.
+  Installation checks executable fields/dependencies before the first command,
+  retains full Arch upgrades/native confirmation and mise cooldowns, and stops
+  after a failed stage. Database creation shares the existing `databases.lock`,
+  uses private directories/files (0700/0600), and atomically publishes without
+  replacing existing files, dangling links or a concurrent external editor's
+  file. Loopback port validation remains 1024–65535. Lifecycle calls read the
+  editable Compose file; remove uses `down` without volume/config deletion.
+  Syntax errors return 2, migrated recipe/database failures 1, subprocess
+  interruption 130; pre-existing mise tools/upgrade native exit codes remain.
+- **Local:** 127 tests pass, including 11 focused developer checks for all
+  recipe plans/native-PATH/direct compatibility, help and bad syntax, literal
+  quoted/trailing-newline argv, malformed executable/database catalogs, missing
+  dependencies, failure/interruption ordering, private config/custom edits,
+  existing links, old Python flock compatibility, concurrent creators and
+  concurrent external-file publication. Test-owned stubs never provision the
+  host. Bash/Python syntax and `git diff --check` pass.
+- **Host:** read-only plans/listing and `scripts/doctor` pass. No host package
+  installation, service/device/power-policy change, user-config replacement or
+  shell restart occurred.
+- **Packages:** `tools/vm-test --full --stay --reuse run.OWNZaL` rebuilt current
+  unsigned test packages and passed all 19 standard package/config checks.
+  Final catalog-helper doc/format corrections were rebuilt and installed in
+  that same owned 2 GiB guest; final acceptance verifies exact runtime/catalog/
+  menu source hashes without overlays. No ISO, signing or publication occurs.
+- **Focused real acceptance:** `tools/vm-workflows run.OWNZaL --only development`
+  passes 13 checks: installed source hashes; all plans without Python/mise/
+  pacman/sudo/Docker on PATH, direct compatibility, private config creation and
+  unchanged menu adapters; real Node execution in interactive Bash; real PHP,
+  Composer and Laravel installer execution after the recipe; Docker setup; all
+  five PostgreSQL/MySQL/MariaDB/Redis/MongoDB loopback bindings and data survive
+  stop/remove/recreate while custom Compose labels/bytes remain; Docker service/
+  socket state restored; byte-identical normal user choice JSON; guest doctor.
+  Fixture containers/configs are removed, named data volumes retained. A final
+  guest doctor/service-state inspection passes and the task-owned VM is stopped.
+  This mode also works without a graphical acceptance account on a running
+  `--full --stay` guest.
+- **Limits:** Node and Laravel were executed against a retained workflow guest
+  with existing runtime/image caches; this does not establish cold-download
+  coverage for every framework. All recipe plans were checked, but other
+  framework installations and MSSQL remain untested/unimplemented. Menu command
+  adapters were checked; no new graphical menu click-through was performed.
+  Remaining SSH-forward/rsync/tmux/worktree jobs still use Python and need their
+  own focused Bash migration and real acceptance.
+
+Artifacts: `run.OWNZaL/{development-source.json,development-results.json,
+development-commands.log,development-initial-source.json,
+development-initial-results.json,development-initial-commands.log,
+development-package-refresh.log,development-final-inspection.log}` and host
+`~/.cache/titan/development-{build,final-rebuild,final-local-tests,
+final-contracts,host-doctor,final-acceptance,coverage}.log`.
+Coverage remains 75 adapted, 107 partial, 6 policy and 291 pending of 479.
+Next: remaining developer jobs, then configuration recovery/defaults/launchers;
+keep hardware/security, UI research, detached updates and release work separate.
+
 ## Host power-command dependency reconciled — 2026-10-04
 
 The owner reports completing `sudo pacman -Syu --needed python-gobject` and

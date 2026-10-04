@@ -193,7 +193,7 @@
         "apps"
       ],
       "language": "Shell for system tools, mise, jobs and per-user config operations.",
-      "scope": "Verify existing framework/runtime and SSH/rsync operations, then migrate Python command families in focused batches with the same CLI contracts. Keep copied-once defaults, backups and owned jobs; dev-link needs explicit source/package switching and recovery design.",
+      "scope": "Developer environment recipes and local Compose database lifecycles now use original Bash; Node/Laravel and all five edited-config/data-persistence paths pass focused QEMU acceptance. Next: remaining developer jobs (SSH-forward/rsync/tmux/worktrees), defaults/launchers and configuration recovery with real fixtures. Preserve user data, locks, backups and compatible paths.",
       "acceptance": "Real provisioning, executable tools and Bash activation; worktree and backup data preservation; authenticated localhost SSH forward and rsync event delivery; unit/process cleanup; no implicit mise project trust."
     },
     {

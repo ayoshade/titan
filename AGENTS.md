@@ -244,8 +244,8 @@ wl-clipboard, grim/slurp and suitable XDG portals.
 | `agents/skills/` | Repository development guides, read through the task table above; not shipped as desktop defaults |
 | `default/agents/skills/` | Three bundled end-user skills: `titan`, `titan-app`, `diagnose-crash`; `titan skills` links them into Claude and Codex (respecting `CODEX_HOME`) |
 | `default/config/`, `default/catalog/`, `default/bash/` | Copied-once developer dotfiles, optional package/runtime/database recipes, modular interactive Bash defaults |
-| `lib/titan/{apps,configuration,development,utilities,media_tools,plugins}.py` | Remaining Python operations behind `scripts/titan-*` and `titan`; shared primitives in `ops.py`, parser in `desktop_cli.py`; `packages.py` retains read-only recipe helpers for developer/menu consumers |
-| `lib/titan/{services,boot,snapshots,snapshot_restore,commands,packages,development,update,system_status}.sh` | Original Bash services, guarded boot/recovery, dependency predicates, entire package CLI, mise wrappers, update diagnostics/stages and battery/network/Bluetooth/power/audio wrappers; developer recipes/databases still use Python. Focused acceptance: `tools/vm-package-checks RUN` and `tools/vm-system-checks RUN` |
+| `lib/titan/{apps,configuration,utilities,media_tools,plugins}.py` | Remaining Python operations behind `scripts/titan-*` and `titan`; shared primitives in `ops.py`, parser in `desktop_cli.py`; `packages.py` and `development.py` retain only read-only catalog adapters for menu consumers |
+| `lib/titan/{services,boot,snapshots,snapshot_restore,commands,packages,development,update,system_status}.sh` | Original Bash services, guarded boot/recovery, dependency predicates, entire package CLI, developer recipes/Compose lifecycles/mise wrappers, update diagnostics/stages and battery/network/Bluetooth/power/audio wrappers. Focused acceptance: `tools/vm-package-checks RUN`, `tools/vm-system-checks RUN` and `tools/vm-workflows RUN --only development` |
 | `docs/` | Research, hardware, decisions, validation and recovery |
 
 Shell settings are declared once in `theme/settings-schema.json`. The Settings

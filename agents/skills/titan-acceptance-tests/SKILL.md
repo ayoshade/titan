@@ -17,6 +17,7 @@ tools/vm-test --workflows        # graphical + real runtimes/services/databases/
 tools/vm-test --full --reuse RUN_DIRECTORY
 tools/vm-package-checks RUN_DIRECTORY  # running --full --stay VM; real package transactions
 tools/vm-system-checks RUN_DIRECTORY   # running --full --stay VM; real controls/refusals/restoration
+tools/vm-workflows RUN_DIRECTORY --only development  # running --full --stay VM; recipes/Compose persistence
 ```
 
 `--graphical` implies full packages and kept artifacts. `--stay` deliberately
@@ -36,9 +37,13 @@ authenticate Tailscale. Expect PHP source compilation to take several minutes.
 For a running `--graphical --stay` guest, `tools/vm-workflows RUN` runs only
 this companion suite. Guest upgrades that replace the running kernel's modules
 require a guest reboot; `vm-test` performs that before acceptance checks.
-Use `tools/vm-workflows RUN --only apps`, `--only preservation` or `--only services` for focused
-regressions after rebuilding the installed package. Inspect the captures even
-when automated checks pass: a mapped terminal can still display config errors.
+Use `tools/vm-workflows RUN --only apps`, `--only preservation`, `--only services`
+or `--only development` for focused regressions after rebuilding the installed
+package. The developer suite checks all recipe plans without provisioning
+tools/Python on PATH, direct-call compatibility, private config creation, menu
+adapters, Node/Laravel execution and all five database persistence paths while
+preserving custom Compose edits and restoring Docker service state. Inspect
+the captures even when automated checks pass: a mapped terminal can still display config errors.
 `tools/vm-install-test BUILD_RUN --bootloader limine` also captures an LTS root,
 removes LTS from the ordinary installation, boots its saved snapshot kernel,
 checks temporary overlay writes and excluded-volume mounts, then cold-boots the
