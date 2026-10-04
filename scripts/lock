@@ -3,4 +3,7 @@ set -euo pipefail
 exec 9>"${XDG_RUNTIME_DIR:?}/umbra-lock.lock"
 flock -n 9 || exit 0
 root=$(cd -- "$(dirname -- "$(readlink -f "${BASH_SOURCE[0]}")")/.." && pwd)
-exec hyprlock --immediate-render --no-fade-in --config "$root/config/hypr/hyprlock.conf"
+args=(--immediate-render --no-fade-in --config "$root/config/hypr/hyprlock.conf")
+# Keep Hyprlock's own log in the journal (journalctl --user -t titan-lock).
+if command -v systemd-cat >/dev/null; then exec systemd-cat -t titan-lock hyprlock "${args[@]}"; fi
+exec hyprlock "${args[@]}"

@@ -60,9 +60,14 @@ instead of maintaining two competing instruction sets.
   `docs/research/shell-panels.md` (control center, Settings, menus, themes,
   wallpapers); `docs/research/saneaspect-videos.md` tracks which of his videos
   were reviewed and how deeply. Update them with each visual change.
-- Hyprlock has had black-screen rendering failures. Authentication has
-  succeeded, but reliable lock rendering still needs testing. Suspend/resume testing is
-  deferred while the user's always-awake policy is active.
+- Hyprlock: the first "black screen" report coincided with a `pam_faillock`
+  lockout, which Hyprlock showed only briefly. After a lockout ends, the first
+  correct password is also refused. The lock screen now explains both, logs to
+  the journal (`-t titan-lock`) and can be replaced if it crashes
+  (`allow_session_lock_restore`). See `docs/lock-recovery.md`. The QEMU graphical
+  test covers rendering, restore and lockout. Visible rendering on the Intel
+  laptop, including during TTY switches, still needs a hands-on test.
+  Suspend/resume testing is deferred while the always-awake policy is active.
   Do not confuse a successful password check with a verified visible lock screen.
 
 ## Start each task

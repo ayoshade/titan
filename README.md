@@ -178,6 +178,10 @@ titan update                        # snapshot, full upgrade, migrations (asks f
 - **If the shell misbehaves:** Super+Return still opens Kitty. Run
   `titan-shell restart` (or `scripts/shell-restart` from a TTY). It escalates
   to TERM/KILL if Quickshell hangs while exiting.
+- **If you can't unlock:** after 3 wrong passwords the account is locked for
+  10 minutes, and the lock screen says so. After a lockout, enter the password
+  a second time if the first try is refused. For a black or crashed lock, use
+  [docs/lock-recovery.md](docs/lock-recovery.md) from a TTY (Ctrl+Alt+F3).
 - **Logs:**
 
   ```sh
@@ -310,6 +314,7 @@ sudo systemctl disable greetd.service   # return to text login next boot
 | [docs/workflow.md](docs/workflow.md) | Command and IPC interfaces |
 | [docs/keybindings.md](docs/keybindings.md) | Complete shortcut reference |
 | [docs/snapshots.md](docs/snapshots.md) | Snapshots and recovery |
+| [docs/lock-recovery.md](docs/lock-recovery.md) | Lock screen states, lockouts and TTY recovery |
 | [docs/design-reference.md](docs/design-reference.md) and [docs/research/](docs/research/) | saneAspect research, measurements, checklists |
 | [docs/verification.md](docs/verification.md) | Dated record of what was tested, and what was not |
 | [docs/always-awake.md](docs/always-awake.md), [docs/hardware.md](docs/hardware.md) | Development-laptop policy and hardware |

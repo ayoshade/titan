@@ -31,8 +31,10 @@
 
 ## Hands-on checks still required
 
-1. Retest visible lock rendering from the desktop without switching TTYs.
-   Authentication succeeded in recovery, but black-screen rendering was observed.
+1. Retest visible lock rendering on the laptop (Super+Ctrl+L, then once with a
+   TTY switch while locked). The QEMU test now covers rendering, crash restore
+   and faillock lockouts; see "Lock screen diagnosis" below and
+   `docs/lock-recovery.md`.
 2. Suspend/resume verification is deferred: the user now requires always-awake
    operation and all sleep targets are masked. Only test it after an explicitly
    requested change to that policy.
@@ -758,3 +760,41 @@ All runs used the local 0.3.0 build of `6dd8bd2`, one 2 GiB VM at a time.
   interactive Bash.
 - Still open: a hands-on keypress through a `workflow` binding, the version
   bump/release, and removing the compatibility links one release later.
+
+## Lock screen diagnosis and QEMU lock test — 2026-10-03
+
+- **Journal evidence (previous boot):** three failed attempts at 03:32:21–03:33:15
+  triggered `pam_faillock` ("account temporarily locked"). A later Hyprlock was
+  told "temporarily locked out" at 03:35:17. Hyprlock's own output was not
+  captured, and there are no hyprlock core dumps. Arch's faillock defaults apply
+  (deny 3, fail_interval 900 s, unlock_time 600 s). The first "black screen"
+  report therefore at least overlapped a lockout during which the right
+  password could not work.
+- **Found in QEMU:** Hyprlock 0.9.6 shows PAM's "(N minutes left)" for only about
+  2 s. Its input field faded out while empty, so an idle lock showed only the
+  clock on `#08090b`. After a lockout expires (tested with a 40 s VM-only
+  `unlock_time`) or is reset, the first correct password is still refused with
+  a stale message. The attempt began during the lockout, it is not recorded,
+  and the second try unlocks. Attempts refused during a lockout add no tally
+  record, and the tally clears after expiry.
+- **Changes:**
+  - `scripts/lock` sends Hyprlock's output to the journal (`-t titan-lock`).
+  - The `misc:allow_session_lock_restore` option is on.
+  - `hyprlock.conf` keeps the field visible (`fade_on_empty = false`, an
+    adaptation for clarity) and adds a `scripts/lock-status` label. The label
+    reports the lockout and its remaining minutes, and then the "enter it
+    again" hint.
+  - New `docs/lock-recovery.md`.
+- **QEMU graphical test, extended and passing:** a real Super+Shift+Backspace
+  `workflow` binding toggles gaps and back. Super+Ctrl+L renders the lock
+  (framebuffer measured, capture inspected: clock, label, field). A
+  `kill -KILL` of Hyprlock shows Hyprland's lockdead screen, and the documented
+  `hyprctl --instance 0 dispatch` relaunch renders the lock again. Three wrong
+  passwords show the red lockout line, the right password stays refused,
+  `faillock --reset` follows, and the unlock succeeds on try 2.
+- **lock-status cases checked with a fake faillock:** a lockout, failures within
+  and beyond `fail_interval`, an ended lockout, and invalid entries.
+- **On umbra:** Hyprland reloads without config errors and
+  `allow_session_lock_restore` is on. No lock was started on the owner's
+  session. Still open: a hands-on Super+Ctrl+L on the Intel laptop, including a
+  TTY switch while locked.

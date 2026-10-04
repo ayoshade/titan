@@ -40,6 +40,22 @@ class Monitor:
             snapshot.seek(16)
             return struct.unpack(">II", snapshot.read(8))
 
+    def pixels(self, path):
+        """Dump the guest framebuffer as PPM; return (width, height, RGB bytes)."""
+        self.command("screendump", filename=str(path), format="ppm")
+        data = open(path, "rb").read()
+        fields, offset = [], 0
+        while len(fields) < 4:  # P6, width, height, maxval
+            while data[offset:offset + 1].isspace():
+                offset += 1
+            end = offset
+            while not data[end:end + 1].isspace():
+                end += 1
+            fields.append(data[offset:end])
+            offset = end
+        width, height = int(fields[1]), int(fields[2])
+        return width, height, data[offset + 1:offset + 1 + width * height * 3]
+
     def click(self, x, y, width=1024, height=768):
         self.command("input-send-event", events=[
             {"type": "abs", "data": {"axis": "x", "value": int(x * 32767 / width)}},

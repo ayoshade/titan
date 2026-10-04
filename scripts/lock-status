@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+# lock-status: one line for the lock screen about pam_faillock, which Hyprlock
+# reports only briefly. Prints nothing when no lockout applies. Read-only.
+#
+# pam_faillock locks after `deny` failures within `fail_interval` seconds, for
+# `unlock_time` seconds after the last one; records stay until a successful
+# login. Hyprlock starts its next PAM attempt as soon as one fails, so the
+# attempt that began during a lockout fails even after the lockout ends (or is
+# reset). The password then works on the following try (docs/lock-recovery.md).
+set -uo pipefail
+deny=3 interval=900 unlock=600
+conf=/etc/security/faillock.conf
+value() { sed -nE "s/^\s*$1\s*=\s*([0-9]+).*/\1/p" "$conf" | tail -1; }
+if [[ -r $conf ]]; then
+ v=$(value deny); [[ -n $v ]] && deny=$v
+ v=$(value fail_interval); [[ -n $v ]] && interval=$v
+ v=$(value unlock_time); [[ -n $v ]] && unlock=$v
+fi
+((deny > 0)) || exit 0
+times=()
+while read -r day time _; do
+ t=$(date -d "$day $time" +%s 2>/dev/null) && times+=("$t")
+done < <(faillock --user "$(id -un)" 2>/dev/null | awk '$NF == "V" && $1 ~ /^[0-9]{4}-/')
+((${#times[@]} >= deny)) || exit 0
+mapfile -t times < <(printf '%s\n' "${times[@]}" | sort -n)
+# Did `deny` failures ever fall within one fail_interval (a lockout happened)?
+lockout_end=0
+for ((i = deny - 1; i < ${#times[@]}; i++)); do
+ if ((times[i] - times[i - deny + 1] <= interval)); then lockout_end=$((times[i] + unlock)); fi
+done
+((lockout_end)) || exit 0
+now=$(date +%s)
+if ((unlock == 0)); then
+ echo "Too many failed attempts: an administrator must run faillock --reset"
+elif ((now < lockout_end)); then
+ echo "Too many failed attempts: locked for about $(( (lockout_end - now + 59) / 60 )) min, even with the right password"
+else
+ echo "Lockout over: if your password is refused once more, enter it again"
+fi

@@ -91,6 +91,93 @@ try:
     (run / "shell-status.json").write_text(json.dumps(status, indent=2) + "\n")
     print("PASS  Titan session sets up a fresh account on first login", flush=True)
     print("PASS  ReGreet login starts Hyprland and the live Titan shell", flush=True)
+
+    # A real workflow keybinding: Super+Shift+Backspace toggles gaps, twice.
+    def gaps():
+        return json.loads(guest(prefix + "hyprctl getoption general:gaps_out -j").stdout)
+    before = gaps()
+    monitor.key("meta_l", "shift", "backspace")
+    time.sleep(2)
+    toggled = gaps()
+    monitor.key("meta_l", "shift", "backspace")
+    time.sleep(2)
+    if toggled == before or gaps() != before:
+        raise RuntimeError(f"Gaps keybinding did not toggle and restore: {before} {toggled} {gaps()}")
+    print("PASS  workflow keybinding (Super+Shift+Backspace) toggles gaps and back", flush=True)
+
+    # The lock screen: the real Super+Ctrl+L binding, judged by framebuffer pixels.
+    def lock_frame(name):
+        w, h, rgb = monitor.pixels(run / f"{name}.ppm")
+        monitor.screenshot(run / f"{name}.png")
+        background = (0x08, 0x09, 0x0b)
+        lit = sum(1 for i in range(0, len(rgb), 3 * 7)
+                  if abs(rgb[i] - background[0]) + abs(rgb[i + 1] - background[1]) + abs(rgb[i + 2] - background[2]) > 40)
+        band = [rgb[(y * w + x) * 3:(y * w + x) * 3 + 3] for y in range(h // 2 + 100, h // 2 + 132) for x in range(w // 4, 3 * w // 4)]
+        warning = sum(1 for p in band if p[0] > 120 and p[0] - p[1] > 40)
+        return lit / (len(rgb) / 21), warning
+
+    def locked():
+        return guest(f"pgrep -u {user} -x hyprlock >/dev/null", check=False).returncode == 0
+
+    monitor.key("meta_l", "ctrl", "l")
+    wait_for(f"pgrep -u {user} -x hyprlock >/dev/null", 20)
+    time.sleep(3)
+    lit, _ = lock_frame("lock")
+    if not 0.002 < lit < 0.5:
+        raise RuntimeError(f"Lock screen is not visibly rendered (lit fraction {lit:.4f}); see lock.png")
+    if not guest(f"sudo journalctl -b _UID={uid} -t titan-lock --no-pager -q | grep -q .", check=False).returncode == 0:
+        raise RuntimeError("Hyprlock output is not in the journal (titan-lock)")
+    print(f"PASS  Super+Ctrl+L shows a rendered lock screen (lit {lit:.3f}); Hyprlock logs to the journal", flush=True)
+
+    # Recovery: a killed locker leaves the session locked; relaunching restores it.
+    guest(f"sudo pkill -KILL -u {user} -x hyprlock")
+    time.sleep(3)
+    monitor.screenshot(run / "lock-dead.png")
+    if json.loads(guest(prefix + "hyprctl getoption misc:allow_session_lock_restore -j").stdout).get("bool") is not True:
+        raise RuntimeError("allow_session_lock_restore is not enabled")
+    # The documented TTY command (docs/lock-recovery.md), without the instance signature.
+    guest(user_prefix + "hyprctl --instance 0 dispatch 'hl.dsp.exec_cmd(\"/usr/share/titan/scripts/lock\")'")
+    wait_for(f"pgrep -u {user} -x hyprlock >/dev/null", 20)
+    time.sleep(3)
+    lit, _ = lock_frame("lock-restored")
+    if not 0.002 < lit < 0.5:
+        raise RuntimeError(f"Restored lock is not visibly rendered (lit {lit:.4f})")
+    print("PASS  a killed Hyprlock is replaced from outside the session and renders again", flush=True)
+
+    # pam_faillock: three failures lock the account; the lock screen must say so.
+    for _ in range(3):
+        monitor.type("wrongpass")
+        monitor.key("ret")
+        time.sleep(4)
+    time.sleep(3)
+    _, warning = lock_frame("lock-faillock")
+    tally = guest(f"sudo faillock --user {user}").stdout.count(" V")
+    if tally < 3 or warning < 20:
+        raise RuntimeError(f"Lockout not shown (failures {tally}, warning pixels {warning}); see lock-faillock.png")
+    monitor.type("titanvm")
+    monitor.key("ret")
+    time.sleep(5)
+    if not locked():
+        raise RuntimeError("The correct password unlocked during a faillock lockout")
+    print(f"PASS  after 3 failures the lock screen explains the lockout ({warning} warning pixels)", flush=True)
+
+    guest(f"sudo faillock --user {user} --reset")
+    time.sleep(3)
+    # Hyprlock's pending PAM attempt began during the lockout, so the first
+    # correct password may still be refused (docs/lock-recovery.md); the next works.
+    tries = 0
+    while locked() and tries < 2:
+        monitor.type("titanvm")
+        monitor.key("ret")
+        tries += 1
+        deadline = time.monotonic() + 8
+        while locked() and time.monotonic() < deadline:
+            time.sleep(1)
+    if locked():
+        raise RuntimeError("The correct password did not unlock within two tries after the tally was reset")
+    time.sleep(2)
+    monitor.screenshot(run / "unlocked.png")
+    print(f"PASS  the correct password unlocks after the tally is reset (try {tries})", flush=True)
 except Exception as error:
     (run / "graphical-error.log").write_text(traceback.format_exc())
     print(f"FAIL  graphical session: {error}", file=sys.stderr)

@@ -7,6 +7,8 @@ hl.config({
  animations={enabled=true}, dwindle={preserve_split=true},
  misc={key_press_enables_dpms=true, mouse_move_enables_dpms=true,
   disable_hyprland_logo=true, force_default_wallpaper=0,
+  -- A crashed locker can be replaced from a TTY (docs/lock-recovery.md).
+  allow_session_lock_restore=true,
   background_color="rgba(08090bff)"},
 })
 hl.curve("restrained", {type="bezier", points={{0.2,0.8},{0.2,1}}})
