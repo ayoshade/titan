@@ -20,7 +20,7 @@ grim -g 'X,Y WxH' /path/to/scratch/titan-panel.png
 ```
 
 Replace the geometry and path with inspected values. Titan's user capture flow
-is `scripts/workflow capture full` or `capture screenshot`; it saves to
+is `bin/workflow capture full` or `capture screenshot`; it saves to
 `~/Pictures/Screenshots` **and changes the clipboard**. Prefer direct `grim`
 for verification unless the capture/clipboard behavior itself is under test.
 Never log clipboard-list or commit screenshots of private applications.
@@ -35,7 +35,7 @@ motion or interaction.
 
 For timing or transitions, record a short, focused UI-only sequence with an
 available Wayland recorder and review frames/playback. Titan's
-`scripts/workflow capture record` toggles recording: inspect whether
+`bin/workflow capture record` toggles recording: inspect whether
 `titan-screenrecord.service` is already active first so you do not stop the
 user's recording. Track and stop only a recording you started.
 

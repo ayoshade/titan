@@ -32,9 +32,9 @@ instead of maintaining two competing instruction sets.
   changing shortcuts. Super+A/C/V/X are universal editing, Super+L changes
   workspace layout, and Super+Ctrl+L locks. Keep chords exact unless the user
   requests a change. Titan owns the implementation and Quickshell UI.
-- `titan` (`scripts/titan`: version, migrate, update, theme, settings, skills) is the
-  user-facing command; `titan-shell` (`scripts/titan-shell`) controls the shell;
-  `scripts/workflow` is the shared desktop-operation interface; implementations
+- `titan` (`bin/titan`: version, migrate, update, theme, settings, skills) is the
+  user-facing command; `titan-shell` (`bin/titan-shell`) controls the shell;
+  `bin/workflow` is the shared desktop-operation interface; implementations
   live under `lib/titan/`. Workflow packages have their own manifest and installer.
   User state lives outside Git. Clipboard labels contain private content; never
   dump clipboard-list into logs. Optional Omarchy apps are not bundled. Do not
@@ -192,7 +192,8 @@ wl-clipboard, grim/slurp and suitable XDG portals.
 | `config/kitty/`, `config/gtk-*/` | Application configuration |
 | `assets/` | Original wallpapers and other shared assets |
 | `packages/` | Explicit package manifests |
-| `scripts/` | Installation, bootstrap, checks, session and user operations |
+| `bin/` | Public, stable commands: `titan`, `titan-shell`, `titan-session`, `titan-install`, `workflow`. Renaming or removing one needs a migration; `scripts/NAME` symlinks keep pre-0.3 paths working for one release (`scripts/legacy-paths` reports users still calling them) |
+| `scripts/` | Internal helpers: installation, bootstrap, checks, session and desktop operations; callers in the tree are updated with any change |
 | `tools/` | Developer and release tooling (package builds, publishing, QEMU tests, ISO); never packaged |
 | `system/` | Reviewed templates for privileged system configuration |
 | `installation/`, `lib/titan/install.py` | Experimental QEMU-only dedicated-disk installer and its base packages |
@@ -202,7 +203,7 @@ wl-clipboard, grim/slurp and suitable XDG portals.
 | `docs/` | Research, hardware, decisions, validation and recovery |
 
 Shell settings are declared once in `theme/settings-schema.json`. The Settings
-window, `Settings.qml` and `scripts/workflow settings` all use it; user values
+window, `Settings.qml` and `bin/workflow settings` all use it; user values
 live in `~/.config/titan/settings.json`. Add a setting to the schema
 rather than hard-coding a new preference. Theme wallpapers live outside Git in
 `~/Pictures/Wallpapers/<theme>/` (downloaded third-party images; never commit
@@ -229,7 +230,7 @@ Phase 2 tooling: `tools/vm-test --graphical --stay` prepares a build VM;
 `tools/vm-install-test RUN` tests the ISO on a new virtual disk. Keep runs on
 disk, one 2 GiB VM at a time on this laptop. Test ISOs contain a temporary SSH
 public key: never distribute them. `tools/build-iso` full builds and
-`scripts/titan-install --apply` are guarded to QEMU; do not remove those guards
+`bin/titan-install --apply` are guarded to QEMU; do not remove those guards
 to try the installer on this daily-use machine.
 Installer `--status` is read-only; `--recover --disk DEVICE` verifies and releases
 owned mounts in the same live boot, preserving partial data before a separately
@@ -242,7 +243,7 @@ The Plymouth template is applied only to a new target, never the laptop's
 bootloader or initramfs. The installed plan goes
 to `/etc/titan/install-plan.json`; user overrides keep their existing paths.
 Never hard-code `~/dotfiles`: Lua uses the `TITAN_ROOT` global, shell QML uses
-`Paths.root`/`Paths.script()`, and scripts resolve their own location.
+`Paths.root`/`Paths.bin()`/`Paths.script()`, and scripts resolve their own location.
 Snapshots: `scripts/install-snapshots` (user runs it with sudo; `--dry-run` is
 safe for agents) enables Snapper and snap-pac on the Btrfs root; recovery is in
 `docs/snapshots.md`. Never roll back or delete snapshots without the user.

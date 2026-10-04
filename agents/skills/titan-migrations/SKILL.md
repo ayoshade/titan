@@ -6,7 +6,7 @@ description: Create, change, or troubleshoot Titan's numbered migrations and per
 # Titan migrations
 
 Adapted from Omarchy's migrations guide. Read the checkout's `AGENTS.md`,
-`docs/distribution.md`, `scripts/titan` and existing migrations first.
+`docs/distribution.md`, `bin/titan` and existing migrations first.
 
 Migrations repair existing state that package replacement cannot safely own.
 Files live in `migrations/*.sh`; completion is per user in

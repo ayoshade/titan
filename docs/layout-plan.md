@@ -1,6 +1,8 @@
 # Plan: split `scripts/` into `bin/`, `scripts/` and `tools/`
 
-Status: **approved 2026-10-03; step 1 done** (tools moved). The owner accepted
+Status: **approved 2026-10-03; steps 1–4 done** (tools moved, commands in
+`bin/`, migration `1791073344-public-commands-bin`, docs). Step 5 (VM tests and a
+release) remains. The owner accepted
 the recommended answers to the open questions: `workflow` stays off `PATH`,
 the folder is `tools/`, compatibility links last one release after `bin/` ships.
 

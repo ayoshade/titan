@@ -2,14 +2,14 @@
 
 The chord reference is in [keybindings.md](keybindings.md). Native Hyprland Lua
 bindings are separated into six modules under config/hypr/bindings/. Commands
-call scripts/workflow, a Bash entrypoint for lib/titan/workflow.py. This module
+call bin/workflow, a Bash entrypoint for lib/titan/workflow.py. This module
 uses subprocess argument arrays and typed/validated Lua values, never shell
 interpolation of user text, filenames or calculator expressions.
 
 ## Agent interfaces
 
 - `titan version|setup|migrate|update|doctor|hardware|skills|theme|settings|wallpaper|shell`
-  (`scripts/titan`) is the top-level command. `titan doctor` (`scripts/doctor`)
+  (`bin/titan`) is the top-level command. `titan doctor` (`scripts/doctor`)
   always fails on static errors: scripts, Python, Hyprland config, and live
   `configerrors`. In a checkout it also requires the package set and
   `~/.config` links. On packaged installs missing packages, `titan setup` and
@@ -29,7 +29,7 @@ interpolation of user text, filenames or calculator expressions.
   or changes configuration. Installer/ISO commands and their QEMU-only apply
   boundary are described in [installation.md](installation.md).
 - `titan-shell ipc welcome` opens the first-login Welcome screen.
-- `scripts/titan-install --status [--json]`: schema-1 read-only JSON with the
+- `bin/titan-install --status [--json]`: schema-1 read-only JSON with the
   last installation checkpoint, operation lock state and target mounts.
   `--recover --disk DEVICE` confirms verified unmount/empty-marker cleanup in
   the same live UEFI QEMU boot. It preserves partial disk contents; a subsequent
@@ -37,7 +37,7 @@ interpolation of user text, filenames or calculator expressions.
   `--json` is limited to inspection. Exit 1 on refusal/failure, 2 on invalid
   arguments, 130 on interruption. See [installation.md](installation.md).
 - `titan-shell status|restart|ipc METHOD [ARG…]|functions|log [-f]|open PANEL|close`
-  (`scripts/titan-shell`, linked into `~/.local/bin` by `scripts/bootstrap`) is
+  (`bin/titan-shell`, linked into `~/.local/bin` by `scripts/bootstrap`) is
   the user-facing shell command. Its IPC calls time out after 5 s, and `status`
   exits 1 when the shell is unresponsive.
 - `qs -c umbra ipc call shell status`: JSON status, current menu/panel and bar.
@@ -55,49 +55,49 @@ interpolation of user text, filenames or calculator expressions.
   media, clock, appearance, motion, launcher, notifications, control, lock,
   system); `wallpapers` opens the wallpaper carousel. Quickshell hot-reloads
   QML edits, but newly added IPC functions need `scripts/shell-restart`.
-- `scripts/workflow settings get [KEY]`, `set KEY VALUE`, `reset KEY` and
+- `bin/workflow settings get [KEY]`, `set KEY VALUE`, `reset KEY` and
   `schema`: the same validated settings the Settings window edits (schema in
   `config/quickshell/umbra/theme/settings-schema.json`, values in
   `~/.config/titan/settings.json`). The shell reloads them live. Invalid
   values exit non-zero without writing.
-- `scripts/workflow wallpaper list|current|next|set PATH`: wallpapers of the
+- `bin/workflow wallpaper list|current|next|set PATH`: wallpapers of the
   current theme (JSON for `list`). `scripts/fetch-wallpapers` fills
   `~/Pictures/Wallpapers/<theme>/` from Wallhaven; it uses the network, so
   run it only when asked.
-- `scripts/workflow toggles`: JSON `{"nightlight":BOOL,"gameMode":BOOL}`; safe as
+- `bin/workflow toggles`: JSON `{"nightlight":BOOL,"gameMode":BOOL}`; safe as
   a diagnostic, and it refreshes `$XDG_RUNTIME_DIR/titan/toggles.json`, which the
-  shell watches. `scripts/workflow nightlight [toggle|on|off|apply]` and
+  shell watches. `bin/workflow nightlight [toggle|on|off|apply]` and
   `game-mode` change the desktop. Night light uses the `nightlightTemp` setting
   (kelvin); `apply` restarts it at the new temperature only if it is on.
   Game mode turns Hyprland animations, blur and shadows off at runtime. It saves
   the previous values in `$XDG_RUNTIME_DIR/titan/game-mode.json` and restores them
   on the next toggle; a Hyprland reload also restores the configured values.
-- `scripts/workflow keybindings`, `clipboard-list`, `reminder-list` and
+- `bin/workflow keybindings`, `clipboard-list`, `reminder-list` and
   `worldclock` return JSON arrays for Quickshell. Never dump clipboard-list
   into agent logs: its labels contain user clipboard content.
-- `scripts/workflow calculator EXPRESSION`: bounded arithmetic parser supporting
+- `bin/workflow calculator EXPRESSION`: bounded arithmetic parser supporting
   numbers, parentheses, + - * / // % **, pi and e; no Python evaluation or calls.
-- `scripts/workflow app NAME`: installed native applications/TUIs and exact
+- `bin/workflow app NAME`: installed native applications/TUIs and exact
   reference web-app URLs. Launching an absent optional command produces a notice.
-- `scripts/workflow layout`, `width save|restore`, `pop`, `tiled-fullscreen`,
+- `bin/workflow layout`, `width save|restore`, `pop`, `tiled-fullscreen`,
   `transparency`, `gaps`, `square`, `desktop` and `scale up|down` implement
   compositor operations. These change the desktop; do not run them as diagnostics.
-- `scripts/workflow capture screenshot|full|record|color|text`: Wayland capture.
+- `bin/workflow capture screenshot|full|record|color|text`: Wayland capture.
   `scripts/screenshot region|full` delegates to this shared implementation.
-- `scripts/workflow pick`: select geometry without taking a screenshot.
+- `bin/workflow pick`: select geometry without taking a screenshot.
   The helper owns its slurp PID; selection handlers affect that process only.
   Enter chooses the highlighted window, Ctrl+Enter the monitor, Tab/Ctrl+Tab
   cycle windows, and arrows choose a neighboring window. Dynamic bindings last
   only while a selection layer exists and are removed by their own handles.
-- `scripts/workflow reminder-set '20 Stretch'`: minutes plus text.
+- `bin/workflow reminder-set '20 Stretch'`: minutes plus text.
   `reminder-list` lists future reminders; `reminder-clear` cancels managed timers.
   Timers survive shell reloads but are transient user-session units: restarting
   the user manager or rebooting does not currently recreate them. This is a
   known lifecycle gap; do not claim durable reminders yet.
-- `scripts/workflow clipboard-start` starts an event-driven user service only
+- `bin/workflow clipboard-start` starts an event-driven user service only
   if absent. `clipboard-clear` clears retained history. Store filters sensitive
   clipboard states, caps item size at 1 MiB and clips history to 100 entries.
-- `scripts/workflow shell-init` initializes private state before the shell loads.
+- `bin/workflow shell-init` initializes private state before the shell loads.
 
 Quickshell menu data lives in assets/menus.json; emoji data in assets/emojis.json.
 Presentation uses CommandPanel.qml and existing shared typography/action tokens.

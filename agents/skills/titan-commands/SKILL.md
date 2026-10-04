@@ -16,15 +16,20 @@ Find the source root through `titan version` or the current checkout. Read its
 
 | Interface | Implementation |
 | --- | --- |
-| `titan COMMAND` | `scripts/titan`: top-level dispatch and `usage()` |
-| Desktop operations | `scripts/workflow`, `lib/titan/workflow.py` |
-| Shell control | `scripts/titan-shell`, IPC target `shell` in `config/quickshell/umbra/shell.qml` |
+| `titan COMMAND` | `bin/titan`: top-level dispatch and `usage()` |
+| Desktop operations | `bin/workflow`, `lib/titan/workflow.py` |
+| Shell control | `bin/titan-shell`, IPC target `shell` in `config/quickshell/umbra/shell.qml` |
 | Settings | `config/quickshell/umbra/theme/settings-schema.json`, consumed by the CLI and Settings UI |
 | Menu actions | `config/quickshell/umbra/assets/menus.json` and the existing action handlers |
 
+`bin/` is the public interface (on `PATH` for `titan*` names; `workflow` is
+called by path). Helpers go in `scripts/`, developer tooling in `tools/`.
+Moving or renaming anything in `bin/` needs a migration and a compatibility
+link; see `docs/layout-plan.md`.
+
 Prefer a shared operation called by both UI and CLI. Add a standalone script
 only when it has a distinct responsibility. Top-level commands belong in
-`scripts/titan`; do not invent Omarchy's prefix scanner or an unimplemented
+`bin/titan`; do not invent Omarchy's prefix scanner or an unimplemented
 `titan commands --json` interface.
 
 ## Keep the contract explicit

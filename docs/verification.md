@@ -700,3 +700,29 @@ only callers and docs changed. Historical entries above keep their old paths.
 - Not yet verified: `tools/build-iso --prepare` (needs archiso, absent on this
   laptop) and the VM runs (`vm-test --full`, `vm-build-iso`, `vm-install-test`).
   These are part of step 5 of the plan.
+
+## Layout split steps 2–4: public commands in `bin/` — 2026-10-03
+
+`titan`, `titan-shell`, `titan-session`, `titan-install` and `workflow` moved to
+`bin/`, with relative `scripts/NAME → ../bin/NAME` compatibility links. Callers
+updated: Hyprland bindings, `Paths.qml` (`workflow`, new `bin()`), Quickshell
+users of `Paths.workflow`, `lib/titan/workflow.py`, helper scripts, `bootstrap`,
+the PKGBUILD (`/usr/bin` links, `bin` copied) and the ISO (`/usr/share/titan-installer/bin/`).
+`bin/workflow` now resolves its root through `readlink -f` like the others.
+Migration `1791073344-public-commands-bin` repoints checkout `~/.local/bin` links
+and reports (never rewrites) user files found by `scripts/legacy-paths`.
+
+- Verified on umbra: 37 unit tests, including a new `tests/test_layout.py`. It checks
+  the links, that no code in the tree calls the compatibility paths, and that the
+  migration relinks, reports, leaves user files unchanged and is idempotent.
+  `scripts/doctor` passes with the new bin/ checks. qmllint shows no errors.
+  After `hyprctl reload` there are no config errors and 231 binds. The shell hot
+  reload logged no errors and IPC responds. `titan settings/theme/shell`,
+  `bin/workflow toggles` and the `scripts/workflow` compatibility path all work.
+  The live migration repointed `~/.local/bin/titan{,-shell}` and found no
+  user-file references.
+- Not verified: a keypress through a `workflow` binding. Bindings are Lua
+  closures, so the command path was checked in source, not inspected live.
+  Also untested: the packaged layout in a VM, an upgrade from 0.2.0 with an
+  old-path `hypr.lua`, and ISO build/install with the moved `titan-install`.
+  All three belong to step 5.

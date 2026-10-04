@@ -13,11 +13,11 @@ Adapted from Omarchy's install-scripts guide. Read the checkout's `AGENTS.md`,
 | Layer | Titan source |
 | --- | --- |
 | Development config links | `scripts/bootstrap` (refuses unrelated existing files) |
-| Per-user defaults and state | `titan setup` in `scripts/titan`; `scripts/titan-session` invokes it on first login |
+| Per-user defaults and state | `titan setup` in `bin/titan`; `bin/titan-session` invokes it on first login |
 | Agent skill links | `scripts/install-agent-skills`, also used by setup and update |
 | Packages | `packages/*.txt`, `packaging/titan*/PKGBUILD` |
 | Read-only hardware inventory | `lib/titan/hardware.py`, `system/hardware/profiles.json` |
-| Live installer | `scripts/titan-install`, `lib/titan/install.py`, `installation/packages.txt` |
+| Live installer | `bin/titan-install`, `lib/titan/install.py`, `installation/packages.txt` |
 | ISO and VM orchestration | `tools/build-iso`, `tools/vm-build-iso`, `tools/vm-install-test` |
 | Reviewed privileged templates | `system/`, installed through the relevant `scripts/install-*` |
 

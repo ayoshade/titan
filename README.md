@@ -222,9 +222,10 @@ The experimental ISO builder and installation tests run inside QEMU; see
 │   ├── kitty/  gtk-3.0/  gtk-4.0/  xdg-desktop-portal/
 ├── agents/skills/           Development guides for repository agents
 ├── default/                 Defaults copied once, Bash defaults (mise) and the three end-user agent skills
-├── lib/titan/               Python behind scripts/workflow (desktop operations, paths)
-├── scripts/                 titan, titan-shell, titan-session, workflow, bootstrap, install-*,
-│                            apply-theme, fetch-wallpapers, doctor
+├── lib/titan/               Python behind bin/workflow (desktop operations, paths)
+├── bin/                     Public commands: titan, titan-shell, titan-session, titan-install, workflow
+├── scripts/                 Internal helpers: bootstrap, install-*, apply-theme, fetch-wallpapers,
+│                            doctor, lock, screenshot (plus compatibility links to bin/ for one release)
 ├── tools/                   Developer and release tooling, not packaged: build-repo, publish-repo,
 │                            build-iso, vm-test, vm-build-iso, vm-install-test, vm-graphical
 ├── migrations/              Numbered upgrade steps run by `titan migrate`

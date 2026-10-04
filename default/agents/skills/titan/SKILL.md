@@ -31,7 +31,7 @@ reference file for the area you are changing.
 | `~/.bashrc`, developer tools | The user's file. Titan appends one marked line sourcing `default/bash/rc`, which activates **mise**, the default tool manager. Install CLIs and runtimes with `mise use -g TOOL` (global, `~/.config/mise/config.toml`) or `mise use TOOL` in a project; prefer it over copying binaries into `~/.local/bin`. Desktop packages still come from pacman |
 | `titan-shell` | The desktop shell: island/bar, control center, launcher, menus, notifications, Settings window. Command: `titan-shell status|restart|ipc|functions|log|open|close` |
 | "bar" | The **island** at the top centre (it has notch mode and a full-width game-mode bar). Hide or show it: `titan-shell ipc bar` |
-| "user-facing titan commands" | `titan` (`version`, `setup`, `migrate`, `update`, `doctor`, `hardware --json`, `theme list|current|ID`, `settings …`, `wallpaper …`, `shell …`), `titan-shell`, and `~/dotfiles/scripts/workflow OPERATION` for everything else |
+| "user-facing titan commands" | `titan` (`version`, `setup`, `migrate`, `update`, `doctor`, `hardware --json`, `theme list|current|ID`, `settings …`, `wallpaper …`, `shell …`), `titan-shell`, and `~/dotfiles/bin/workflow OPERATION` for everything else |
 | `titan dev link` (excluded) | No such workflow exists. Changing Titan's own source or defaults is development: follow `~/dotfiles/AGENTS.md` and [contributing.md](contributing.md), not this file |
 
 **Important:** `~/.config/hypr`, `kitty`, `quickshell` and `gtk-*` are symlinks
@@ -47,13 +47,13 @@ apply to every Titan user (see [contributing.md](contributing.md)). Never
 Prefer earlier rows. They validate input, persist correctly, and are what the
 UI uses.
 
-1. **A setting:** `scripts/workflow settings get|set|reset|schema`. This is
+1. **A setting:** `bin/workflow settings get|set|reset|schema`. This is
    island geometry, notch mode, fonts, radii, motion, clock format, week start,
    launcher, toasts, control-center content and night-light temperature. Values
    are validated against `config/quickshell/umbra/theme/settings-schema.json`
    and applied live; the shell watches `~/.config/titan/settings.json`.
    The Settings window is `titan-shell open settings SECTION`.
-2. **An existing operation:** `scripts/workflow …` for themes, wallpaper, gaps,
+2. **An existing operation:** `bin/workflow …` for themes, wallpaper, gaps,
    transparency, layout, scale, night light, game mode, capture, reminders and
    more (see `~/dotfiles/docs/workflow.md`), or `titan-shell ipc …`.
 3. **Hyprland Lua config** for anything those don't cover: rules, binds,
@@ -106,7 +106,7 @@ their source instead (see [theming.md](theming.md) and
 
 ## Undo
 
-- **Settings:** `scripts/workflow settings reset KEY`.
+- **Settings:** `bin/workflow settings reset KEY`.
 - **Theme:** `titan theme PREVIOUS_ID`. Read the current one with
   `titan theme current` *before* changing it.
 - **Config files:** they are in Git, so `git -C ~/dotfiles diff FILE` shows

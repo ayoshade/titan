@@ -6,7 +6,7 @@ job.
 | Want | Mechanism | Size |
 | --- | --- | --- |
 | A new entry in Super+Space menus | `assets/menus.json` | Data only |
-| A new desktop action, callable from a key, menu and agent | A `scripts/workflow` operation | Small Python |
+| A new desktop action, callable from a key, menu and agent | A `bin/workflow` operation | Small Python |
 | A new preference the user can change | `theme/settings-schema.json` entry | Data plus one binding |
 | A new shell surface or widget | Quickshell QML module | Real code |
 | Compositor behaviour Lua can't do | Hyprland plugin | Not set up on Titan |
@@ -34,7 +34,7 @@ Each menu is `"id": {"title": "…", "items": [ … ]}`, optionally with
 | `settings` | Open the Settings window at a section |
 | `bar`, `dnd`, `wallpaper` | Built-in toggles |
 | `close` | Close the menu |
-| Any `scripts/workflow` operation | Run it, with `value` as its argument |
+| Any `bin/workflow` operation | Run it, with `value` as its argument |
 
 `icon` names an SVG in `assets/icons/`; without one, a default is chosen by
 action. Open a menu with `titan-shell ipc menu ID`. Validate the file with
@@ -63,7 +63,7 @@ Add a function and a branch in `main()`, as `nightlight` and `game-mode` do.
    automatically.
 2. Read it in QML as `Settings.values.KEY` (import `"../theme"`). Add a
    `Theme` token if it is a design token.
-3. `scripts/workflow settings get|set KEY` works immediately, because it reads
+3. `bin/workflow settings get|set KEY` works immediately, because it reads
    the same schema.
 
 ## 4. Quickshell (titan-shell) modules

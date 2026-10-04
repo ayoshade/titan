@@ -12,8 +12,8 @@ generated files.
 | Current theme and accent choice | `~/.config/titan/preferences.json` (`theme`, `accent`, `motion`, `wallpaper`) over `theme/preferences-default.json` | `titan theme ID` and the Settings window |
 | Kitty colours | **Generated** `~/.local/state/titan/generated/kitty-theme.conf` (then `~/.config/titan/kitty.conf` overrides) | apply-theme (sends SIGUSR1 to Kitty to reload) |
 | Hyprland border colours | **Generated** `~/.local/state/titan/generated/hypr-theme.lua` | apply-theme, then `hyprctl reload` |
-| Shell tokens (fonts, radii, motion, island size) | `theme/settings-schema.json` defaults plus `~/.config/titan/settings.json` | `scripts/workflow settings set`; applied live |
-| Wallpapers | `~/Pictures/Wallpapers/<theme>/` (outside Git) plus the choice in `settings.json` → `wallpapers` map | wallpaper carousel, `scripts/workflow wallpaper …` |
+| Shell tokens (fonts, radii, motion, island size) | `theme/settings-schema.json` defaults plus `~/.config/titan/settings.json` | `bin/workflow settings set`; applied live |
+| Wallpapers | `~/Pictures/Wallpapers/<theme>/` (outside Git) plus the choice in `settings.json` → `wallpapers` map | wallpaper carousel, `bin/workflow wallpaper …` |
 | GTK | `config/gtk-3.0`, `config/gtk-4.0` (dark Adwaita) and `gsettings` set by `scripts/bootstrap` | Not themed per palette |
 
 ## Switch or inspect the theme
@@ -36,7 +36,7 @@ or `custom`.
 
 ```sh
 titan-shell ipc accent ice                                     # silver | ice | sage
-~/dotfiles/scripts/workflow settings set accentCustom '"#e0a060"'
+~/dotfiles/bin/workflow settings set accentCustom '"#e0a060"'
 ```
 
 The UI is Settings → Appearance → Accent. Typing a custom hex there also
@@ -64,11 +64,11 @@ reference design).
 ## Wallpapers / background
 
 ```sh
-~/dotfiles/scripts/workflow wallpaper list            # JSON: theme, current, files
-~/dotfiles/scripts/workflow wallpaper next
-~/dotfiles/scripts/workflow wallpaper set ~/Pictures/Wallpapers/nord/x.jpg
+~/dotfiles/bin/workflow wallpaper list            # JSON: theme, current, files
+~/dotfiles/bin/workflow wallpaper next
+~/dotfiles/bin/workflow wallpaper set ~/Pictures/Wallpapers/nord/x.jpg
 titan-shell open wallpapers                           # carousel (Settings → Appearance → Wallpaper)
-~/dotfiles/scripts/workflow settings set wallpaperEnabled false   # solid theme background
+~/dotfiles/bin/workflow settings set wallpaperEnabled false   # solid theme background
 ```
 
 - **Per theme:** the choice is stored per theme. Without a choice the first
@@ -88,13 +88,13 @@ titan-shell open wallpapers                           # carousel (Settings → A
 All of these are settings, validated against the schema and applied live:
 
 ```sh
-~/dotfiles/scripts/workflow settings set bodyFont '"Inter"'        # must be an installed family: fc-list : family | grep -i NAME
-~/dotfiles/scripts/workflow settings set displayFont '"Inter Display"'
-~/dotfiles/scripts/workflow settings set fontSize 13               # 10–16
-~/dotfiles/scripts/workflow settings set cornerRadius 12           # 4–24
-~/dotfiles/scripts/workflow settings set panelRadius 22            # 10–36
-~/dotfiles/scripts/workflow settings set reduceMotion true
-~/dotfiles/scripts/workflow settings schema                        # every key, type, range, label
+~/dotfiles/bin/workflow settings set bodyFont '"Inter"'        # must be an installed family: fc-list : family | grep -i NAME
+~/dotfiles/bin/workflow settings set displayFont '"Inter Display"'
+~/dotfiles/bin/workflow settings set fontSize 13               # 10–16
+~/dotfiles/bin/workflow settings set cornerRadius 12           # 4–24
+~/dotfiles/bin/workflow settings set panelRadius 22            # 10–36
+~/dotfiles/bin/workflow settings set reduceMotion true
+~/dotfiles/bin/workflow settings schema                        # every key, type, range, label
 ```
 
 - **Strings:** values are parsed as JSON, so `'"Inter"'` is the unambiguous
@@ -111,7 +111,7 @@ All of these are settings, validated against the schema and applied live:
   - Its colours are generated: never edit `theme.conf`, edit the palette.
   - Everything else (font, padding, cursor, opacity) goes in `kitty.conf`.
   - Window opacity is better done per app with a window rule, or globally
-    with Super+Backspace (`scripts/workflow transparency`).
+    with Super+Backspace (`bin/workflow transparency`).
 - **Other terminals:** if the user installs Alacritty, foot or Ghostty and
   wants palette colours, extend `scripts/apply-theme` to generate their
   colour file from the same palette. That is a Titan change (see

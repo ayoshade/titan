@@ -24,8 +24,8 @@ always-awake policy is never copied into a fresh installation.
 
 ```sh
 titan hardware --json                 # CPU/GPU/laptop inventory and packages
-scripts/titan-install                 # list whole disks (no root needed)
-scripts/titan-install --disk /dev/vda --user titan --timezone UTC --json
+bin/titan-install                 # list whole disks (no root needed)
+bin/titan-install --disk /dev/vda --user titan --timezone UTC --json
 ```
 
 The last command prints a plan and refuses mounted disks, active swap,

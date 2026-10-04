@@ -18,7 +18,7 @@ them when unsure of a field name.
 | `keybindings.json` | Catalog shown by the Super+K keybindings menu | Keep in sync with binds |
 | `theme.lua` | **Generated** border colours from the palette | Never by hand |
 | `hyprlock.conf`, `hypridle.conf` | Lock-screen look (classic hyprlang syntax); idle policy file, but Hypridle is not started | See below |
-| `~/.local/state/titan/hypr-runtime.lua` | **Generated** runtime overrides (per-workspace layout, gaps toggle, square aspect, monitor scale) written by `scripts/workflow` | Never by hand |
+| `~/.local/state/titan/hypr-runtime.lua` | **Generated** runtime overrides (per-workspace layout, gaps toggle, square aspect, monitor scale) written by `bin/workflow` | Never by hand |
 
 ## Core API
 
@@ -56,11 +56,11 @@ hl.env("NAME", "value"); hl.gesture({ fingers = 3, direction = "horizontal", act
   colour in `appearance.lua` would be overridden by `theme.lua`.
   - The Super+Shift+Backspace gaps toggle and per-window transparency toggle
     write runtime overrides. A user who says "gaps keep coming back" may have
-    the toggle saved in `workflow.json` (`scripts/workflow gaps` flips it).
+    the toggle saved in `workflow.json` (`bin/workflow gaps` flips it).
 - **Animations:** `hl.curve` and `hl.animation` in `appearance.lua`. Leaves
   include `windows`, `fade`, `workspaces`, `layers` and their sub-leaves (see
   the stubs).
-  - Game mode (`scripts/workflow game-mode`) turns animations, blur and shadows
+  - Game mode (`bin/workflow game-mode`) turns animations, blur and shadows
     off at runtime and restores the previous values on the next toggle.
   - Shell animations are separate: Settings → Motion
     (`settings set movementMs|fadeMs|hoverMs|bounce|reduceMotion`).
@@ -99,19 +99,19 @@ hl.env("NAME", "value"); hl.gesture({ fingers = 3, direction = "horizontal", act
     `border_size`, `no_border`, `no_rounding`, `no_shadow`, `decorate`,
     `on_created_empty`.
   - Super+L toggles dwindle/scrolling for the current workspace and stores the
-    choice in runtime state (`scripts/workflow layout`).
+    choice in runtime state (`bin/workflow layout`).
   - The island shows workspaces 1–10 (at least five marks).
 - **Monitors and display:**
   - `hl.monitor` in `hyprland.lua`. The development laptop is `eDP-1`,
     1366×768, scale 1; list connected outputs with `hyprctl monitors -j`.
-  - Scale up and down with Super+/ and Super+Alt+/ (`scripts/workflow scale
+  - Scale up and down with Super+/ and Super+Alt+/ (`bin/workflow scale
     up|down`, saved in runtime overrides). Mirroring is
-    `scripts/workflow mirror`.
+    `bin/workflow mirror`.
   - Keep monitor names in config only for this machine's profile. Titan aims to
     be portable, so prefer `output = ""` with `mode = "preferred"` defaults.
 - **Input:** `input.lua` (`kb_layout`, `follow_mouse`, sensitivity, touchpad
   `natural_scroll`, `tap_to_click`, gestures). The touchpad toggle is
-  `scripts/workflow touchpad toggle`.
+  `bin/workflow touchpad toggle`.
 
 ## Keybindings
 
@@ -121,7 +121,7 @@ Bindings are registered through helpers defined in `bindings.lua`. Use the
 ```lua
 b.bind(KEY, DESCRIPTION, DISPATCHER, opts)   -- raw dispatcher
 b.run(KEY, DESCRIPTION, "command args")      -- hl.dsp.exec_cmd
-b.task(KEY, DESCRIPTION, "workflow-op args") -- ~/dotfiles/scripts/workflow …
+b.task(KEY, DESCRIPTION, "workflow-op args") -- ~/dotfiles/bin/workflow …
 b.shell(KEY, DESCRIPTION, "ipc-method args") -- qs -c umbra ipc call shell …
 ```
 
@@ -159,8 +159,8 @@ b.shell(KEY, DESCRIPTION, "ipc-method args") -- qs -c umbra ipc call shell …
 
 ## Night light
 
-`scripts/workflow nightlight [toggle|on|off|apply]` runs `wlsunset` as the user
+`bin/workflow nightlight [toggle|on|off|apply]` runs `wlsunset` as the user
 unit `titan-nightlight`. Super+Ctrl+N toggles it. Set the temperature (kelvin,
-2500–6000) with `scripts/workflow settings set nightlightTemp 4000`; when night
+2500–6000) with `bin/workflow settings set nightlightTemp 4000`; when night
 light is on, the shell restarts it at the new temperature. It does not persist
 across reboot by design.

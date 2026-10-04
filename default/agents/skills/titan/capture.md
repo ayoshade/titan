@@ -1,6 +1,6 @@
 # Screenshots, OCR, colour picker and recording
 
-All capture goes through one implementation: `scripts/workflow capture KIND`
+All capture goes through one implementation: `bin/workflow capture KIND`
 (Python in `lib/titan/workflow.py`, function `capture`). Keys, the Capture menu
 (Super+Ctrl+C) and `scripts/screenshot` all call it, so change behaviour there
 once rather than in each caller.
@@ -9,12 +9,12 @@ once rather than in each caller.
 
 | Action | Key | Command | Result |
 | --- | --- | --- | --- |
-| Region / window screenshot | Print | `scripts/workflow capture screenshot` (`scripts/screenshot region`) | `~/Pictures/Screenshots/YYYY-MM-DD_HH-MM-SS-*.png`, also copied to the clipboard as `image/png`, and a notification |
-| Whole focused monitor | Ctrl+Return while selecting, or the Capture menu | `scripts/workflow capture full` (`scripts/screenshot full`) | Same folder |
-| Text (OCR) | Super+Ctrl+Print | `scripts/workflow capture text` | Text recognized by `tesseract -l eng` is copied to the clipboard; the temporary PNG in `$XDG_RUNTIME_DIR/titan` is deleted |
-| Colour picker | Super+Print | `scripts/workflow capture color` | `hyprpicker -a` (copies the hex); runs as user unit `titan-colorpicker`; pressing again cancels |
-| Start / stop recording | Alt+Print | `scripts/workflow capture record` | `wf-recorder` region recording to `~/Videos/Recordings/*.mp4` as user unit `titan-screenrecord`; pressing again sends SIGINT so the file is finalized |
-| Select geometry only | — | `scripts/workflow pick` | Prints `X,Y WxH` (exit 1 if cancelled) |
+| Region / window screenshot | Print | `bin/workflow capture screenshot` (`scripts/screenshot region`) | `~/Pictures/Screenshots/YYYY-MM-DD_HH-MM-SS-*.png`, also copied to the clipboard as `image/png`, and a notification |
+| Whole focused monitor | Ctrl+Return while selecting, or the Capture menu | `bin/workflow capture full` (`scripts/screenshot full`) | Same folder |
+| Text (OCR) | Super+Ctrl+Print | `bin/workflow capture text` | Text recognized by `tesseract -l eng` is copied to the clipboard; the temporary PNG in `$XDG_RUNTIME_DIR/titan` is deleted |
+| Colour picker | Super+Print | `bin/workflow capture color` | `hyprpicker -a` (copies the hex); runs as user unit `titan-colorpicker`; pressing again cancels |
+| Start / stop recording | Alt+Print | `bin/workflow capture record` | `wf-recorder` region recording to `~/Videos/Recordings/*.mp4` as user unit `titan-screenrecord`; pressing again sends SIGINT so the file is finalized |
+| Select geometry only | — | `bin/workflow pick` | Prints `X,Y WxH` (exit 1 if cancelled) |
 
 Super+Print is the colour picker, **not** a full screenshot. This matches the
 Omarchy chord set; see `docs/keybindings.md`.

@@ -43,7 +43,7 @@ to `hyprland.lua` after the other `dofile` lines. Example:
 ```lua
 -- config/hypr/hooks.lua — user event hooks
 hl.on("monitor.added", function(monitor)
-  hl.exec_cmd(os.getenv("HOME") .. "/dotfiles/scripts/workflow scale up")   -- example action
+  hl.exec_cmd(os.getenv("HOME") .. "/dotfiles/bin/workflow scale up")   -- example action
 end)
 ```
 
@@ -103,7 +103,7 @@ re-applying the current theme. These unit files are user state outside
 
 ## What not to do
 
-- **Don't wrap `scripts/apply-theme` or `scripts/workflow`** with
+- **Don't wrap `scripts/apply-theme` or `bin/workflow`** with
   pre/post logic by editing their callers ad hoc. If the user wants a real
   post-theme hook, propose adding a documented hook point to `apply-theme`
   (a Titan change).
