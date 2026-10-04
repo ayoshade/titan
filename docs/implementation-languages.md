@@ -32,8 +32,10 @@ approval.
 
 1. Implement new system workflows in Shell now: the initial Limine helper is
    `scripts/titan-boot` plus `lib/titan/boot.sh`.
-2. Move service/package lifecycles and simple tool wrappers from `services.py`,
-   `packages.py` and `system_status.py` one family at a time. Keep the public
+2. Service lifecycles now use `lib/titan/services.sh`; the Python service module
+   has been retired after real Docker/CUPS/Tailscale VM checks. Continue with
+   package operations and simple wrappers from `packages.py` and
+   `system_status.py` one family at a time. Keep the public
    CLI, structured status, confirmation boundaries and exit codes; use `jq`
    for JSON and argv arrays for subprocess arguments.
 3. Migrate developer environment/jobs, defaults/launchers and configuration

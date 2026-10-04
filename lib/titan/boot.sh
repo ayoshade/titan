@@ -35,10 +35,11 @@ titan_boot_render() {
   fi
  done
  ((found)) || { titan_boot_fail 'No supported kernel/initramfs pairs on /boot'; return 1; }
+ titan_snapshot_render "$uuid" "$esp"
 }
 
 titan_boot_status() {
- local loader=unmanaged plan=/etc/titan/install-plan.json config=false binary=false
+ local loader=unmanaged plan=/etc/titan/install-plan.json config=false binary=false snapshot=false preview=false file
  if [[ -e $plan || -L $plan ]]; then
   [[ -f $plan && ! -L $plan ]] || { titan_boot_fail 'Installer plan must be a regular file'; return 1; }
   command -v jq >/dev/null || { titan_boot_fail "Managed boot status requires jq (installed by the Limine recipe)"; return 1; }
@@ -47,19 +48,31 @@ titan_boot_status() {
  [[ ! -f /boot/limine.conf ]] || config=true
  [[ ! -f /boot/EFI/BOOT/BOOTX64.EFI ]] || binary=true
  case $loader in unmanaged|systemd-boot|limine) ;; *) titan_boot_fail 'Invalid bootloader in installer plan'; return 1 ;; esac
- printf '{"schema":1,"bootloader":"%s","experimental":true,"refresh_scope":"fresh Titan Limine QEMU installations only","configuration_exists":%s,"efi_exists":%s,"snapshot_boot":false}\n' "$loader" "$config" "$binary"
+ if [[ $loader == limine ]]; then
+  preview=true
+  for file in /boot/titan/snapshots/*/manifest.json; do
+   [[ ! -f $file || -L $file ]] || snapshot=true
+  done
+ fi
+ printf '{"schema":1,"bootloader":"%s","experimental":true,"refresh_scope":"fresh Titan Limine QEMU installations only","configuration_exists":%s,"efi_exists":%s,"snapshot_boot":%s,"snapshot_preview_supported":%s,"snapshot_restore_supported":false}\n' "$loader" "$config" "$binary" "$snapshot" "$preview"
 }
 
-titan_boot_refresh() {
+titan_boot_guard() {
  ((EUID == 0)) || { titan_boot_fail 'Refresh requires root; run sudo titan boot refresh in the installed VM'; return 1; }
  case $(systemd-detect-virt --vm) in qemu|kvm) ;; *) titan_boot_fail 'Limine refresh is experimental and confined to QEMU VMs'; return 1 ;; esac
  [[ -d /sys/firmware/efi ]] || { titan_boot_fail 'Limine refresh requires UEFI'; return 1; }
- local plan=/etc/titan/install-plan.json uuid config=/boot/limine.conf binary=/boot/EFI/BOOT/BOOTX64.EFI path stage source=/usr/share/limine/BOOTX64.EFI
+ local plan=/etc/titan/install-plan.json uuid
  [[ -f $plan && ! -L $plan ]] || { titan_boot_fail 'Missing or linked Titan installer plan'; return 1; }
  jq -e '.bootloader == "limine" and .apply_scope == "QEMU live VM only"' "$plan" >/dev/null || { titan_boot_fail 'Refresh requires a fresh Titan Limine installer plan'; return 1; }
  uuid=$(jq -er '.root_uuid' "$plan")
- [[ $(findmnt -nro FSTYPE --mountpoint /boot) == vfat ]] || { titan_boot_fail '/boot must be a mounted FAT EFI partition'; return 1; }
  [[ $(findmnt -nro FSTYPE --mountpoint /) == btrfs && $(findmnt -nro FSROOT --mountpoint /) == /@ && $(findmnt -nro UUID --mountpoint /) == "$uuid" ]] || { titan_boot_fail 'The running Btrfs root does not match the installer plan'; return 1; }
+ [[ $(findmnt -nro FSTYPE --mountpoint /boot) == vfat ]] || { titan_boot_fail '/boot must be a mounted FAT EFI partition'; return 1; }
+ titan_boot_uuid=$uuid
+}
+
+titan_boot_refresh() {
+ titan_boot_guard || return
+ local uuid=$titan_boot_uuid config=/boot/limine.conf binary=/boot/EFI/BOOT/BOOTX64.EFI path stage source=/usr/share/limine/BOOTX64.EFI
  [[ -f $source && ! -L $source ]] || { titan_boot_fail 'Install the official Arch limine package first'; return 1; }
  [[ ! -L /run/titan-boot.lock ]] || { titan_boot_fail 'Boot lock must not be a symlink'; return 1; }
  exec 9>/run/titan-boot.lock
@@ -91,3 +104,5 @@ titan_boot_refresh() {
  sync -f /boot
  echo 'Limine refreshed; previous changed files retained beside outputs.'
 }
+
+source "$(dirname -- "${BASH_SOURCE[0]}")/snapshots.sh"

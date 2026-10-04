@@ -235,7 +235,8 @@ wl-clipboard, grim/slurp and suitable XDG portals.
 | `agents/skills/` | Repository development guides, read through the task table above; not shipped as desktop defaults |
 | `default/agents/skills/` | Three bundled end-user skills: `titan`, `titan-app`, `diagnose-crash`; `titan skills` links them into Claude and Codex (respecting `CODEX_HOME`) |
 | `default/config/`, `default/catalog/`, `default/bash/` | Copied-once developer dotfiles, optional package/runtime/database recipes, modular interactive Bash defaults |
-| `lib/titan/{apps,configuration,packages,development,utilities,media_tools,system_status,plugins}.py` | Modular operations behind `scripts/titan-*` and `titan`; shared primitives in `ops.py`, parser in `desktop_cli.py` |
+| `lib/titan/{apps,configuration,packages,development,utilities,media_tools,system_status,plugins}.py` | Remaining Python operations behind `scripts/titan-*` and `titan`; shared primitives in `ops.py`, parser in `desktop_cli.py` |
+| `lib/titan/{services,boot,snapshots}.sh` | Original Bash service lifecycle, guarded Limine refresh and read-only recovery previews; existing public routes remain compatible |
 | `docs/` | Research, hardware, decisions, validation and recovery |
 
 Shell settings are declared once in `theme/settings-schema.json`. The Settings
@@ -283,6 +284,12 @@ Never hard-code `~/dotfiles`: Lua uses the `TITAN_ROOT` global, shell QML uses
 Snapshots: `scripts/install-snapshots` (user runs it with sudo; `--dry-run` is
 safe for agents) enables Snapper and snap-pac on the Btrfs root; recovery is in
 `docs/snapshots.md`. Never roll back or delete snapshots without the user.
+Fresh experimental Limine VMs can use `titan snapshot create|list` for independent
+read-only `@titan-snapshots/ID` roots with matched ESP boot assets. Preview boots
+use Arch's `sd-volatile` hook and temporary overlay writes, ignore fstab/GPT
+automounts and enter a text recovery session; separate user volumes stay unmounted.
+No automatic deletion, Snapper menu sync or restore command exists yet. The
+host's Snapper setup and systemd-boot are separate and remain unchanged.
 
 As Titan grows, separate distribution defaults, machine profiles, persistent
 user overrides, runtime state and build outputs. Updates must preserve user

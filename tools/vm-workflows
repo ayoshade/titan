@@ -12,11 +12,11 @@ import sys
 root = Path(__file__).resolve().parent.parent
 parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument('run', type=Path, help='Running --graphical --stay VM run directory')
-parser.add_argument('--only', choices=('apps', 'preservation'), help='Focused app/config regression checks')
+parser.add_argument('--only', choices=('apps', 'preservation', 'services'), help='Focused app/config/service regression checks')
 args = parser.parse_args()
 run = args.run.resolve()
 cache = Path(os.environ.get('XDG_CACHE_HOME', Path.home() / '.cache')) / 'titan/vm/runs'
-if run.parent != cache.resolve() or not run.name.startswith('run.'):
+if run.parent != cache.resolve() or not run.name.startswith(('run.', 'install.')):
     parser.error('Select a Titan VM run under the disk-backed cache')
 try:
     pid = int((run / 'qemu.pid').read_text())
@@ -39,7 +39,7 @@ options = ['-i', str(run / 'key'), '-o', 'StrictHostKeyChecking=no',
 ssh = ['ssh', '-q', *options, '-p', str(port), 'tester@127.0.0.1']
 scp = ['scp', '-q', *options, '-P', str(port)]
 manifest = {str(p.relative_to(root)): hashlib.sha256(p.read_bytes()).hexdigest()
-            for folder in ('lib/titan', 'default/config', 'default/catalog')
+            for folder in ('bin', 'scripts', 'lib/titan', 'default/config', 'default/catalog')
             for p in (root / folder).rglob('*') if p.is_file() and '__pycache__' not in p.parts}
 (run / 'workflow-source.json').write_text(json.dumps(manifest) + '\n')
 remote = '/home/tester/titan-workflow-acceptance'

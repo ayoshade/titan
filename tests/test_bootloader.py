@@ -24,6 +24,17 @@ class BootSafety(unittest.TestCase):
         self.assertEqual(result.returncode, 1)
         self.assertIn('requires root', result.stderr)
 
+    def test_nonroot_snapshot_capture_and_invalid_routes_refuse(self):
+        if os.geteuid() == 0:
+            self.skipTest('Nonroot refusal requires ordinary test runner')
+        result = subprocess.run([str(ROOT / 'bin/titan'), 'snapshot', 'create'], capture_output=True, text=True)
+        self.assertEqual(result.returncode, 1)
+        self.assertIn('requires root', result.stderr)
+        for arguments in [('snapshot', 'restore', '1'), ('service', 'setup', '--arbitrary-unit'),
+                          ('service', 'receive', 'docker', '/tmp')]:
+            result = subprocess.run([str(ROOT / 'bin/titan'), *arguments], capture_output=True, text=True)
+            self.assertEqual(result.returncode, 2, result.stderr)
+
     def test_incomplete_kernel_and_linked_paths_refuse(self):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)

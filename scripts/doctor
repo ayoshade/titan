@@ -28,6 +28,9 @@ done
 for script in "$root"/default/bash/*; do
  [[ -f $script ]] && bash -n "$script"
 done
+for script in "$root"/lib/titan/*.sh; do
+ [[ -f $script ]] && bash -n "$script"
+done
 for name in titan titan-shell titan-session titan-install workflow; do
  [[ -x $root/bin/$name && $(readlink -f "$root/scripts/$name") == "$root/bin/$name" ]] || { printf 'Missing command or compatibility link: %s\n' "$name" >&2; exit 1; }
 done

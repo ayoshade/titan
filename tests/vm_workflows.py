@@ -21,7 +21,7 @@ parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument('--graphical-user', required=True)
 parser.add_argument('--manifest', required=True, type=Path)
 parser.add_argument('--output', required=True, type=Path)
-parser.add_argument('--only', choices=('apps', 'preservation'))
+parser.add_argument('--only', choices=('apps', 'preservation', 'services'))
 args = parser.parse_args()
 root = Path('/usr/share/titan')
 if (Path.home() != Path('/home/tester') or os.getuid() == 0
@@ -152,6 +152,10 @@ def runtime_laravel():
 
 
 def service_check(name):
+    plan = json.loads(titan('service', 'plan', name).stdout)
+    assert plan['schema'] == 1 and plan['commands'][0][:5] == ['sudo', 'pacman', '-Syu', '--needed', '--']
+    listed = json.loads(titan('service', 'list').stdout)
+    assert next(item for item in listed['services'] if item['id'] == name)['bundle'] == name
     titan('service', 'setup', name, timeout=600, input='y\n' * 20)
     service = {'docker': 'docker.service', 'printing': 'cups.service', 'tailscale': 'tailscaled.service'}[name]
     command('systemctl', 'is-active', '--quiet', service)
@@ -166,8 +170,11 @@ def service_check(name):
         assert command('systemctl', 'is-enabled', '--quiet', unit, success=False).returncode != 0, unit + ' remains enabled'
     if name == 'docker':
         assert command('sudo', 'docker', 'info', timeout=15, success=False).returncode != 0, 'Docker reactivated after disable'
-        titan('service', 'enable', 'docker')
         assert 'docker' not in command('id', '-nG').stdout.split(), 'User added to privileged Docker group'
+    titan('service', 'enable', name)
+    command('systemctl', 'is-active', '--quiet', service)
+    if name != 'docker' or args.only == 'services':
+        titan('service', 'disable', name)
 
 
 def database_check(name, port):
@@ -280,6 +287,9 @@ if results[-1]['status'] != 'pass':
     sys.exit(1)
 if args.only == 'preservation':
     stage('package reinstall, setup, migrations and config restore preserve user choices', defaults_preservation)
+elif args.only == 'services':
+    for name in ('docker', 'printing', 'tailscale'):
+        stage(name + ' service plan/list/setup/status/disable/enable', lambda name=name: service_check(name))
 elif not args.only:
     stage('package reinstall, setup, migrations and config restore preserve user choices', defaults_preservation)
     stage('AUR helper and multilib refusals precede any package mutation', package_guards)
@@ -292,7 +302,7 @@ elif not args.only:
             stage(name + ' loopback binding and data survive stop/remove/recreate',
                   lambda name=name, index=index: database_check(name, 15000 + index))
         titan('service', 'disable', 'docker', success=False)
-if args.only != 'preservation':
+if args.only in (None, 'apps'):
     stage('optional terminals map windows, execute commands in cwd, and editor configs load', optional_apps)
 stage('package doctor after workflow operations', lambda: titan('doctor'))
 log.close()

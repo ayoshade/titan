@@ -34,7 +34,7 @@ Owner/language: Shell; isolate privileged target operations from per-user UI.
 
 Prerequisites: existing Titan foundation.
 
-Opt-in Limine install and refresh first; then version-matched snapshot boot assets, read-only overlay boot, explicit restore and recovery. Encryption, hibernation, direct UKI boot and factory reset need separate fixtures.
+Fresh opt-in Limine installation/refresh and independent matched-kernel read-only overlay previews exist. Next: confirmed offline restore with matching boot assets and recoverable interruption, then automatic Snapper menu synchronization and bounded capacity. Encryption, hibernation, direct UKI boot and factory reset need separate fixtures.
 
 Acceptance: Fresh UEFI disk boot with ISO detached; real kernel and bootloader upgrades; preserved custom settings; snapshot boot with matching kernel/modules; explicit restore and failed-boot recovery. No host disk or bootloader changes.
 

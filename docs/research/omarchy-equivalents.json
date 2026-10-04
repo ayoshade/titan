@@ -735,7 +735,7 @@
     "omarchy-refresh-limine": {
       "status": "partial",
       "equivalent": "titan-install --bootloader limine / titan boot status|refresh / lib/titan/boot.sh",
-      "notes": "Original Bash fresh-UEFI-QEMU installation and guarded kernel-menu/EFI refresh exist. Appearance overrides and prior changed-file backups are preserved. Limine snapshot synchronization/boot/restore and existing-machine migration remain missing."
+      "notes": "Original Bash fresh-UEFI-QEMU installation, guarded kernel-menu/EFI refresh and independent matched-kernel snapshot previews exist. Appearance overrides and prior changed-file backups are preserved. Automatic Snapper synchronization, confirmed restore and existing-machine migration remain open."
     },
     "omarchy-reminder": {
       "status": "partial",
@@ -754,8 +754,8 @@
     },
     "omarchy-snapshot": {
       "status": "partial",
-      "equivalent": "scripts/install-snapshots / docs/snapshots.md",
-      "notes": "Snapper integration exists; no full interactive snapshot browser/rollback interface."
+      "equivalent": "scripts/install-snapshots / titan snapshot list|create / docs/snapshots.md",
+      "notes": "Existing-install Snapper integration and original Shell Limine QEMU recovery previews exist. Matched saved kernel/initramfs and read-only root boot through a temporary overlay, with separate volumes unmounted. No automatic Snapper menu synchronization, cleanup or confirmed restore interface yet."
     },
     "omarchy-system-lid-close": {
       "status": "titan-policy",

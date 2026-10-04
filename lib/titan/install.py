@@ -423,8 +423,9 @@ def _apply(args, installation):
         shutil.copytree(TARGET / "usr/share/titan/system/plymouth/titan",
                         TARGET / "usr/share/plymouth/themes/titan")
         chroot("plymouth-set-default-theme", "titan")
+        volatile = " sd-volatile" if installation["bootloader"] == "limine" else ""
         write("/etc/mkinitcpio.conf.d/titan.conf",
-              "HOOKS=(base systemd plymouth autodetect microcode modconf kms keyboard sd-vconsole block filesystems fsck)\n")
+              f"HOOKS=(base systemd plymouth autodetect microcode modconf kms keyboard sd-vconsole block filesystems{volatile} fsck)\n")
         # microcode is embedded by mkinitcpio's hook; rebuild after all packages.
         checkpoint(record, step="initramfs")
         chroot("mkinitcpio", "-P")

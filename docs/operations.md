@@ -255,12 +255,15 @@ The existing visual design and keyboard chords are preserved.
 
 Shell and QML are the primary language direction; see
 [implementation languages](implementation-languages.md) for current byte
-concentrations and a focused migration sequence. The new `titan boot` route
-uses Bash. Existing interfaces remain supported while their operations migrate.
+concentrations and a focused migration sequence. Boot, snapshot and service
+command implementations now use Bash. Existing interfaces
+remain supported while their operations migrate.
 
 Currently, `bin/titan` routes to distinct scripts and Python modules: `apps`,
 `configuration`, `packages`, `development`, `utilities`, `media_tools`,
-`system_status`, `services`, `plugins`, with shared primitives in `ops`. New functionality
+`system_status`, `plugins`, with shared primitives in `ops`. Services live in
+`lib/titan/services.sh`, reached through the existing `scripts/titan-system`;
+other families continue using the Python parser. New functionality
 does not accumulate in the legacy `workflow.py`; it only adapts shortcuts and
 menus to shared operations. Help is available at every level. Exit 0 means
 success, 1 means an operation failed/refused, 2 means invalid CLI syntax, and

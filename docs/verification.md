@@ -1,5 +1,85 @@
 # Verification
 
+## Shell service migration and matched-kernel Limine previews — 2026-10-04
+
+`titan service` now uses original Bash in `lib/titan/services.sh`; the previous
+Python service module is removed. Public commands and JSON plans remain
+compatible, including full `pacman -Syu`, explicit activation units and
+systemctl status exit codes. The common Python entrypoint forwards direct
+internal service callers to Shell. Boot/snapshot operations also use Bash;
+this is an implementation change, without language-statistics exclusions.
+
+- **Service acceptance:** `install.cQXPpv` ran `tools/vm-workflows --only services`
+  against rebuilt packages, checking source hashes, JSON plan/list, real
+  Docker/CUPS/Tailscale setup, active/enabled status, disable and re-enable.
+  Docker/CUPS activation sockets/path units stayed disabled; Docker did not
+  reactivate through its client, and the user was not added to the Docker group.
+  All three services ended disabled. VM package-server failures were resolved
+  before the passing run. All Bash plans matched the previous Python JSON
+  contract. The receive-path regression uses a stub client to check literal
+  spaces, shell expressions and trailing newlines, plus missing-directory
+  refusal before privilege invocation. No Tailscale account login or actual
+  external transfer was tested.
+- **Recovery preview:** `titan snapshot create|list` captures independent
+  read-only Btrfs roots and matched, hashed kernel/initramfs copies on the ESP.
+  Capture holds the pacman and snapshot locks, removes its transient lock from
+  the private copy before sealing it read-only, checks the running/installed
+  kernel pair and initramfs support, and preserves captured recovery data on
+  menu failure. Refresh validates manifests/assets before replacing the menu.
+  Fresh Limine installation now adds Arch's `sd-volatile` hook.
+- **Historical boot rehearsal:** in `install.cQXPpv`, the guest captured Linux
+  `7.2.8-arch1-2`, removed Linux from the ordinary root through pacman, and booted
+  normally with LTS `6.18.55-1-lts`. Limine then booted the snapshot's saved
+  Linux kernel and module tree. The root was an OverlayFS temporary write
+  layer; fstab/GPT automounts were disabled and home/log/cache/ESP mounts were
+  absent. Writes to their underlying directories and `/etc` disappeared after
+  normal boot; all persistent baseline markers stayed intact. Refresh and
+  capture refused from the preview. Native systemd can detach its lower mount
+  at switch-root; the fixture allows this and rejects any visible writable
+  Btrfs/FAT mount. Creation verifies the snapshot's read-only property.
+  Lock contention and a deliberately corrupt saved kernel refused without
+  changing the published menu. The guest restored normal boot independently.
+  A fresh installer run exposed a harness ordering error: a new menu entry
+  does not appear in Limine's EFI `LoaderEntries` until Limine boots again.
+  The harness now performs that normal boot before selecting LTS with bootctl;
+  selecting from a newly generated menu in the same session was insufficient.
+- **Final fresh ISO run:** `run.OWNZaL` built a current ISO, whose embedded
+  installer/entrypoint hashes match the checkout in `install.PzOqZ8`.
+  The full corrected `vm-install-test --bootloader limine` passed: independent
+  disk boot without ISO, all eight graphical checks on Linux, LTS and the normal
+  root after preview; guarded refresh and real kernel transaction; an LTS
+  snapshot boot after removing LTS from the ordinary installation; volatile
+  writes, excluded-volume preservation and capture-lock removal. A final hash
+  comparison matched all 78 files under `bin`, `scripts`, `lib/titan`,
+  `default/config` and `default/catalog` and confirmed the retired
+  Python service file is absent. I inspected the greeter, welcome/desktop and
+  restored lock captures. Final CLI plan/list and ordinary-user doctor passed
+  through SSH login; optional services and the uninitialized tester account
+  produced warnings. Static Hyprland validation requires an ordinary-user
+  login environment, not a root or bare sudo invocation. All task VMs stopped.
+- **Host checks:** 63 unit/integration tests, Bash parsing, `scripts/doctor`,
+  compatible JSON plan comparison and `git diff --check` passed. `doctor` now
+  parses library Shell modules too. Read-only host plan/list checks used jq
+  provisioned through mise (1.8.2); no host pacman packages, bootloader, power
+  policy or services changed. The desktop remains usable.
+
+Artifacts: `install.cQXPpv/{workflow-results.json,workflow-source.json,
+workflow-commands.log,snapshot-prepare.log,snapshot-kernel-removal.log,
+snapshot-normal-lts.log,snapshot-preview.log,snapshot-verify.log}` and
+`install.PzOqZ8/{iso-source-check.json,runtime-source-check.json,snapshot.json,
+snapshot-*.log,bootloader-*.log,final-cli-check.log}` plus graphical captures and
+`run.OWNZaL/iso`. The failed pre-correction selector run `install.oTsbJX` is
+preserved for comparison. Test ISO keys remain disposable and images are not
+published.
+
+Next: confirmed offline restore with matching boot files and interruption
+recovery, automatic Snapper menu synchronization and bounded snapshot capacity;
+then package-family migration to Shell. Snapshot preview is an experimental
+text recovery session, not a graphical desktop or a privileged security sandbox.
+No automatic snapshot deletion, complete rollback or physical firmware/Secure
+Boot support is claimed. Coverage remains 66 adapted, 109 partial, 6 policy
+and 298 pending out of 479; this batch does not imply full Omarchy parity.
+
 ## Limine foundation, full-command triage and language direction — 2026-10-04
 
 The owner asked to continue the full Omarchy command port and Limine work,

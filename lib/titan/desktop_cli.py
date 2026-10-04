@@ -4,9 +4,14 @@ import argparse
 import subprocess
 import sys
 import tarfile
+from pathlib import Path
 
 
 def main(argv=None):
+    argv = sys.argv[1:] if argv is None else argv
+    # Preserve direct internal callers while this family moves to Shell.
+    if argv and argv[0] == 'service':
+        return subprocess.call([str(Path(__file__).resolve().parents[2] / 'scripts/titan-system'), *argv])
     import apps
     import configuration
     import development
@@ -15,11 +20,10 @@ def main(argv=None):
     import media_tools
     import system_status
     import plugins
-    import services
     from ops import register_hooks
     parser = argparse.ArgumentParser(prog='titan')
     sub = parser.add_subparsers(required=True)
-    for module in (apps, configuration, development, packages, utilities, media_tools, system_status, plugins, services):
+    for module in (apps, configuration, development, packages, utilities, media_tools, system_status, plugins):
         module.register(sub)
     register_hooks(sub)
     args = parser.parse_args(argv)

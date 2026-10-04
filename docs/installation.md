@@ -46,7 +46,8 @@ sudo titan boot refresh              # installed Titan Limine VM only
 ```
 
 The Limine choice adds the official Arch `limine` package and includes `jq`
-in the base plan; `jq` is also a Titan package dependency for Shell JSON
+in the base plan and adds Arch's `sd-volatile` initramfs hook for recovery previews;
+`jq` is also a Titan package dependency for Shell JSON
 operations. The installer writes a Titan appearance file to `/etc/titan/limine.conf` and
 installs a pacman hook for supported kernel and Limine/Titan transactions.
 The original Bash helper `scripts/titan-boot` generates `/boot/limine.conf`
@@ -63,8 +64,9 @@ Changed generated menus and EFI binaries retain their prior contents as
 The user's appearance file is preserved. No existing-machine bootloader
 migration is provided, and the laptop remains on systemd-boot.
 
-Limine snapshot entries, matched historical kernel/module assets, read-only
-snapshot overlay boot and an explicit restore workflow remain unimplemented.
+Limine snapshot previews now use matched historical kernel/module assets and
+a read-only root with temporary overlay writes; see [snapshots](snapshots.md#experimental-limine-recovery-previews).
+An explicit restore workflow and automatic Snapper menu synchronization remain open.
 The existing Snapper tooling is unchanged. Installing Limine does not complete
 snapshot recovery. See the [boot port batch](research/omarchy-port-plan.md#boot).
 The live ISO continues to use Archiso's systemd-boot path; this choice controls

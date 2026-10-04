@@ -34,9 +34,14 @@ authenticate Tailscale. Expect PHP source compilation to take several minutes.
 For a running `--graphical --stay` guest, `tools/vm-workflows RUN` runs only
 this companion suite. Guest upgrades that replace the running kernel's modules
 require a guest reboot; `vm-test` performs that before acceptance checks.
-Use `tools/vm-workflows RUN --only apps` or `--only preservation` for focused
+Use `tools/vm-workflows RUN --only apps`, `--only preservation` or `--only services` for focused
 regressions after rebuilding the installed package. Inspect the captures even
 when automated checks pass: a mapped terminal can still display config errors.
+`tools/vm-install-test BUILD_RUN --bootloader limine` also captures an LTS root,
+removes LTS from the ordinary installation, boots its saved snapshot kernel,
+checks temporary overlay writes and excluded-volume mounts, then cold-boots the
+normal root and verifies that the writes disappeared. `tests/vm_snapshots.py`
+owns those guest-only phases; the host's disks and bootloader are never exposed.
 Do not edit a running Bash harness file; finish its run before changing it.
 
 ## Choose meaningful coverage

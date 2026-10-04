@@ -152,6 +152,13 @@ if [[ $bootloader == limine ]]; then
  # A real kernel-package transaction must rebuild the menu through its hook.
  ssh_vm 'pacman -Syu --needed --noconfirm linux-lts limine' >"$run/bootloader-upgrade.log" 2>&1
  ssh_vm 'grep -q "/Titan (linux-lts)" /boot/limine.conf && sync'
+ # Limine publishes LoaderEntries at boot; freshly generated menu entries
+ # are not yet visible to bootctl in this running session.
+ disk_pid=$(cat "$run/qemu.pid")
+ kill "$disk_pid"
+ for i in $(seq 1 50); do kill -0 "$disk_pid" 2>/dev/null || break; sleep .1; done
+ boot_vm
+ wait_ssh
  ssh_vm 'python3 /root/vm_bootloader.py --select-lts' >"$run/bootloader-select-lts.log" 2>&1
  disk_pid=$(cat "$run/qemu.pid")
  kill "$disk_pid"
@@ -163,5 +170,40 @@ if [[ $bootloader == limine ]]; then
  ssh_vm 'python3 /root/vm_bootloader.py' >"$run/bootloader-checks-after-upgrade.log" 2>&1
  "$root/tools/vm-graphical"
  echo 'PASS  Limine cold boot, refresh boundaries, kernel hook and updated-disk graphical login'
+ # Capture LTS, remove it from the ordinary system, then boot its preserved
+ # snapshot assets. This proves the preview does not depend on current /boot
+ # images or the normal root's module tree.
+ scp "${sshargs[@]}" -P "$sshport" "$root/tests/vm_snapshots.py" root@127.0.0.1:/root/vm_snapshots.py
+ ssh_vm 'python3 /root/vm_snapshots.py prepare' >"$run/snapshot-prepare.log" 2>&1
+ ssh_vm 'cat /root/titan-snapshot-acceptance.json' >"$run/snapshot.json"
+ ssh_vm 'pacman -R --noconfirm linux-lts && sync' >"$run/snapshot-kernel-removal.log" 2>&1
+ disk_pid=$(cat "$run/qemu.pid"); kill "$disk_pid"
+ for i in $(seq 1 50); do kill -0 "$disk_pid" 2>/dev/null || break; sleep .1; done
+ boot_vm; wait_ssh
+ ssh_vm 'uname -r; bootctl list --json=short' >"$run/snapshot-normal-boot.log"
+ ssh_vm python3 - <<'SELECT'
+import json,subprocess
+from pathlib import Path
+state=json.loads(Path('/root/titan-snapshot-acceptance.json').read_text())
+assert subprocess.check_output(['uname','-r'],text=True).strip() != state['kernel']['version']
+entries=json.loads(subprocess.check_output(['bootctl','list','--json=short'],text=True))
+entry=next(item['id'] for item in entries if item['id'].startswith('Titan-snapshot-'+state['id']))
+subprocess.run(['bootctl','set-oneshot',entry],check=True)
+SELECT
+ ssh_vm sync
+ disk_pid=$(cat "$run/qemu.pid"); kill "$disk_pid"
+ for i in $(seq 1 50); do kill -0 "$disk_pid" 2>/dev/null || break; sleep .1; done
+ boot_vm; wait_ssh
+ snapshot_id=$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["id"])' "$run/snapshot.json")
+ snapshot_version=$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["kernel"]["version"])' "$run/snapshot.json")
+ [[ $snapshot_id =~ ^[0-9]{8}T[0-9]{6}Z-[a-zA-Z0-9]{6}$ && $snapshot_version =~ ^[a-zA-Z0-9._+-]+$ ]]
+ ssh_vm "python3 /root/vm_snapshots.py preview --id $snapshot_id --version $snapshot_version" >"$run/snapshot-preview.log" 2>&1
+ ssh_vm sync
+ disk_pid=$(cat "$run/qemu.pid"); kill "$disk_pid"
+ for i in $(seq 1 50); do kill -0 "$disk_pid" 2>/dev/null || break; sleep .1; done
+ boot_vm; wait_ssh
+ ssh_vm 'python3 /root/vm_snapshots.py verify' >"$run/snapshot-verify.log" 2>&1
+ "$root/tools/vm-graphical"
+ echo 'PASS  matched historical kernel snapshot boot, volatile writes and independent normal recovery'
 fi
 echo 'All installer and installed-disk graphical checks passed.'

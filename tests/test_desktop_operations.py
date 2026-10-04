@@ -51,6 +51,22 @@ class Operations(unittest.TestCase):
         self.assertEqual(file.read_bytes(), original)
         self.assertEqual(len(json.loads(self.cli('config', 'backups').stdout)), 2)
 
+    def test_service_receive_preserves_literal_destination_and_missing_directory_refuses(self):
+        fake = self.home / 'fake-bin'; fake.mkdir()
+        record = self.home / 'received-argv.json'
+        sudo = fake / 'sudo'
+        sudo.write_text('#!/usr/bin/python3\nimport json,os,sys\n'
+                        'from pathlib import Path\nPath(os.environ["TITAN_TEST_ARGV"]).write_text(json.dumps(sys.argv[1:]))\n')
+        sudo.chmod(0o755)
+        tailscale = fake / 'tailscale'; tailscale.write_text('#!/bin/sh\nexit 0\n'); tailscale.chmod(0o755)
+        self.env.update(PATH=str(fake) + ':' + self.env['PATH'], TITAN_TEST_ARGV=str(record))
+        destination = self.home / 'literal $(touch PWN) with spaces\n'; destination.mkdir()
+        self.cli('service', 'receive', 'tailscale', str(destination))
+        self.assertEqual(json.loads(record.read_text()), ['tailscale', 'file', 'get', '--', str(destination)])
+        record.unlink()
+        self.cli('service', 'receive', 'tailscale', str(destination / 'missing'), success=False)
+        self.assertFalse(record.exists(), 'Refusal invoked the privileged client')
+
     def test_linked_directory_and_unknown_config_are_preserved(self):
         foreign = self.home / 'personal-tmux'
         foreign.mkdir()

@@ -163,9 +163,17 @@ executing it on the user's working session.
 ## Experimental boot management
 
 `titan boot status [--json]` reads the installer bootloader choice and generated
-file presence without mutation (schema 1; `snapshot_boot` is currently false).
+file presence without mutation (schema 1). `snapshot_preview_supported` reports
+the Limine preview capability, `snapshot_boot` reports a published manifest's
+presence, and `snapshot_restore_supported` remains false. These are inventory
+fields, not a guarantee that every historical entry has been booted.
 `titan boot refresh` is the Bash Limine generator for fresh UEFI QEMU Titan
 installations. It requires root, validates the installed root/ESP and retains
 changed output files as `.previous`. It cannot migrate the laptop's bootloader.
 See [installation](installation.md#opt-in-limine-in-a-fresh-vm) for selection,
-supported kernels, appearance overrides and the still-open snapshot work.
+supported kernels and appearance overrides. `titan snapshot list [--json]`
+reads the preview manifests; `sudo titan snapshot create [--description TEXT]`
+captures a read-only Btrfs root and matching boot assets in a fresh Limine VM.
+Select the temporary recovery preview in Limine; it uses a text session and
+discards writes on reboot. See [snapshots](snapshots.md#experimental-limine-recovery-previews)
+for scope and limitations. No automatic reboot or restore is performed.
