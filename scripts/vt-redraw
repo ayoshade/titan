@@ -1,0 +1,44 @@
+#!/usr/bin/env python3
+"""vt-redraw: ask Hyprland for a full redraw when its VT becomes active again.
+
+After returning from a text console, Hyprland 0.56 defers the restoring modeset
+until something requests a frame. An idle lock screen requests none, so on the
+Intel laptop it looked frozen for ~30 s and dropped visible typing
+(docs/lock-recovery.md). This waits on kernel VT-change notifications
+(sysfs_notify on tty0/active, no polling) and exits with the Hyprland session.
+"""
+import os
+import select
+import subprocess
+import sys
+import time
+
+ACTIVE = "/sys/class/tty/tty0/active"
+vt = os.environ.get("XDG_VTNR")
+signature = os.environ.get("HYPRLAND_INSTANCE_SIGNATURE")
+runtime = os.environ.get("XDG_RUNTIME_DIR", f"/run/user/{os.getuid()}")
+if not vt or not signature or not os.path.exists(ACTIVE):
+    sys.exit(0)  # not a VT-backed Hyprland session: nothing to do
+mine = f"tty{vt}"
+socket_dir = os.path.join(runtime, "hypr", signature)
+
+
+def current(handle):
+    handle.seek(0)
+    return handle.read().strip()
+
+
+with open(ACTIVE) as handle:
+    poller = select.poll()
+    poller.register(handle, select.POLLPRI | select.POLLERR)
+    last = current(handle)
+    while os.path.isdir(socket_dir):
+        if not poller.poll(60_000):
+            continue  # timeout: re-check that the session still exists
+        now = current(handle)
+        if now == mine and last != mine:
+            time.sleep(0.3)  # let the seat and DRM restore settle
+            subprocess.run(["hyprctl", "dispatch", "hl.dsp.force_renderer_reload()"],
+                           stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=10)
+            print(f"vt-redraw: {mine} active again; requested a redraw", flush=True)
+        last = now

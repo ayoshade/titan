@@ -12,4 +12,6 @@ root=$(cd -- "$(dirname -- "$(readlink -f "${BASH_SOURCE[0]}")")/.." && pwd)
 export TITAN_ROOT=$root
 "$root/bin/workflow" shell-init
 if command -v cliphist >/dev/null; then "$root/bin/workflow" clipboard-start; fi
+# Redraw when this session's VT becomes active again (docs/lock-recovery.md).
+systemd-cat -t titan-vt-redraw "$root/scripts/vt-redraw" &
 exec qs -n -d -c umbra

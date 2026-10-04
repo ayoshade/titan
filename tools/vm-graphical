@@ -129,6 +129,17 @@ try:
         raise RuntimeError("Hyprlock output is not in the journal (titan-lock)")
     print(f"PASS  Super+Ctrl+L shows a rendered lock screen (lit {lit:.3f}); Hyprlock logs to the journal", flush=True)
 
+    # Text console and back while locked: vt-redraw asks Hyprland for a frame.
+    monitor.key("ctrl", "alt", "f2")
+    time.sleep(3)
+    monitor.key("ctrl", "alt", "f1")
+    time.sleep(3)
+    redraws = guest(f"sudo journalctl -b -t titan-vt-redraw --no-pager -q | grep -c 'active again'", check=False).stdout.strip()
+    lit, _ = lock_frame("lock-after-vt")
+    if redraws != "1" or not 0.002 < lit < 0.5 or not locked():
+        raise RuntimeError(f"VT return: redraws={redraws} lit={lit:.4f} locked={locked()}")
+    print("PASS  after a text-console round trip vt-redraw fires once and the lock renders", flush=True)
+
     # Recovery: a killed locker leaves the session locked; relaunching restores it.
     guest(f"sudo pkill -KILL -u {user} -x hyprlock")
     time.sleep(3)

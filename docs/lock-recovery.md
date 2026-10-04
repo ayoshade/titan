@@ -11,7 +11,7 @@ confirms the right password, Hyprland shows no desktop content.
 | Clock, `U M B R A / ACCESS RESTRICTED`, password field | Normal | Type your password and press Enter |
 | A red line: "Too many failed attempts: locked for about N min…" | `pam_faillock` locked the account after 3 failures within 15 minutes (Arch defaults), for 10 minutes after the last one. **The right password is rejected until then** | Wait, or reset the tally from a TTY (below) |
 | "Lockout over: if your password is refused once more, enter it again" | The lockout ended, but Hyprlock's next attempt started while it was active | Enter the password; if it is refused (often with a stale "N minutes left" message), enter it again |
-| Lock looks frozen or ignores typing after switching to a text console and back | Seen on the Intel laptop (2026-10-03), not reproduced in QEMU. Typed passwords were rejected. Keys held during the switch (Ctrl+Alt) may be stuck | Tap Ctrl and Alt once, then type. If it stays stuck, run `scripts/lock-rescue` from a TTY. **Don't restart the display manager: that closes every app** |
+| Lock looks frozen (no dots, old clock) after switching to a text console and back | On the Intel laptop, Hyprland deferred the restoring modeset until something asked for a frame; an idle lock asks for none, so it stayed frozen up to ~30 s. Typing still reached Hyprlock, blind. `scripts/vt-redraw` (started by the session) now requests a redraw on return | Wait a moment; if still frozen, type the password blind and press Enter, or run `scripts/lock-rescue` from a TTY. **Don't restart the display manager: that closes every app** |
 | Plain near-black screen, no clock or field | Hyprlock is not drawing. The lock background is `#08090b`, so a lock with missing widgets looks black | Recover from a TTY (below) |
 | Hyprland's "lockdead" screen | Hyprlock crashed; the session stays locked by design | Recover from a TTY (below) |
 
@@ -52,6 +52,19 @@ On a packaged install, the lock script is `/usr/share/titan/scripts/lock`.
 After relaunching, switch back to the desktop and unlock normally. Clearing the
 lock is acceptable because you have already authenticated on the TTY. Either
 way, log out of the TTY afterwards with Ctrl+D.
+
+## Why the lock froze after a console switch
+
+Measured on the laptop on 2026-10-03. The owner returned to tty1 at 21:02:00,
+and Hyprlock got its next output configure at 21:02:28. Earlier, aquamarine
+logged "Restoring crtc" but logged "Modesetting eDP-1" only after several
+keystrokes. Typed passwords reached Hyprlock: blind entry authenticated, but
+no dots were drawn, and blind typos caused the earlier failures and a
+lockout. QEMU restores at once, so this is specific to the Intel hardware
+path. `scripts/vt-redraw` waits for kernel VT-change notifications on
+`/sys/class/tty/tty0/active`. When the session's VT (`XDG_VTNR`) is active
+again, it runs `hyprctl dispatch 'hl.dsp.force_renderer_reload()'`. Its log is
+in the journal: `journalctl --user -t titan-vt-redraw`.
 
 ## Why the first password after a lockout fails
 

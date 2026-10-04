@@ -67,10 +67,11 @@ instead of maintaining two competing instruction sets.
   (`allow_session_lock_restore`). See `docs/lock-recovery.md`. The QEMU graphical
   test covers rendering, `scripts/lock-rescue` and lockout. On the Intel laptop
   the lock renders and unlocks (owner, 2026-10-03), but after switching to a
-  text console and back it looked frozen and rejected typed passwords. That
-  happened twice and was not reproduced in QEMU. The cause is unconfirmed;
-  stuck Ctrl/Alt is the leading hypothesis. Recover with `scripts/lock-rescue`
-  from a TTY, not by restarting greetd.
+  text console and back it stayed frozen for ~28 s. Hyprland deferred the
+  restoring modeset until a frame was requested, so typing was blind.
+  `scripts/vt-redraw` (from `session-start`) forces a redraw on VT return; it is
+  VM-tested and awaits hands-on laptop confirmation. Recover with
+  `scripts/lock-rescue` from a TTY, not by restarting greetd.
   Suspend/resume testing is deferred while the always-awake policy is active.
   Do not confuse a successful password check with a verified visible lock screen.
 

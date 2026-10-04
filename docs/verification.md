@@ -31,9 +31,9 @@
 
 ## Hands-on checks still required
 
-1. Lock after a TTY switch on the laptop: rendering and unlock work (owner,
-   2026-10-03), but after a console switch and return the lock appeared frozen.
-   Next: tap Ctrl/Alt, else run `scripts/lock-rescue` and share its output. The QEMU test now covers rendering, crash restore
+1. Lock after a TTY switch on the laptop: the delayed redraw is measured (about
+   28 s). `scripts/vt-redraw` is the fix and still needs the owner's
+   hands-on confirmation. The QEMU test now covers rendering, crash restore
    and faillock lockouts; see "Lock screen diagnosis" below and
    `docs/lock-recovery.md`.
 2. Suspend/resume verification is deferred: the user now requires always-awake
@@ -829,3 +829,28 @@ All runs used the local 0.3.0 build of `6dd8bd2`, one 2 GiB VM at a time.
   - It then replaces Hyprlock in the same session.
   - The QEMU graphical test now uses it for the restore stage. A fresh VM
     passed all 19 package checks and 7 graphical/lock checks.
+
+## Cause of the post-console-switch freeze; vt-redraw — 2026-10-03
+
+- **Owner run 3** (with a VT trace recording only `/sys/class/tty/tty0/active`
+  changes): locked at 21:01:45, left for tty3 at 21:01:50.927, and returned to
+  tty1 at 21:02:00.044. Hyprlock's next output configure came at 21:02:28.033.
+  The owner waited 15 s, then typed: dots appeared and the unlock was
+  immediate. Run 2: blind password authenticated at 20:59:35, but "Unlocking
+  session" waited for the configure at 20:59:40. Aquamarine's log shows
+  "Restoring crtc 151" followed by several keystrokes ("palm: keyboard
+  timeout") before "Modesetting eDP-1". Conclusion: input works, but Hyprland
+  defers the restoring modeset until a frame is requested, and an idle lock
+  requests none. The stuck-modifier hypothesis is withdrawn.
+- **Fix:** `scripts/vt-redraw`, started by `session-start` and logged with
+  `-t titan-vt-redraw`.
+  - It waits on sysfs notifications for `tty0/active`, with no polling.
+  - When `XDG_VTNR` is active again it runs
+    `hl.dsp.force_renderer_reload()`; the dispatcher was confirmed on umbra.
+  - It exits when the Hyprland instance directory disappears.
+- **QEMU:** the session started vt-redraw automatically, and it fired once on
+  the return to tty1, not on leaving. A new graphical stage (Ctrl+Alt+F2 → F1
+  while locked: one redraw, rendered lock) passed on a fresh VM, along with
+  the other stages.
+- **umbra:** vt-redraw is running in the current session (started through
+  `hyprctl dispatch`). Its effect on the Intel freeze awaits the owner's test.
