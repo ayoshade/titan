@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+# Copy missing developer dotfiles; existing files and linked directories win.
+set -euo pipefail
+root=$(cd -- "$(dirname -- "$(readlink -f "${BASH_SOURCE[0]}")")/.." && pwd)
+exec "$root/scripts/titan-config" config install "$@"

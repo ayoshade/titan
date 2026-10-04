@@ -8,6 +8,12 @@ description: Develop Titan's Quickshell QML shell, services, components, panels,
 Adapted from Omarchy's shell-dev guide. Read the checkout's `AGENTS.md`,
 `docs/workflow.md` and `docs/design-reference.md` before editing.
 
+Use [the agent reference library](../../../docs/research/agent-references.md):
+[Quickshell archive](/home/shade/.webfetch/quickshell/index.md) (v0.3.1 for the
+installed runtime) and [Omarchy clone](/home/shade/.cache/titan/references/omarchy).
+Read the exact API page from the archive before relying on it; distinguish
+upstream behavior from Titan's own architecture.
+
 The desktop is one long-running Quickshell process using configuration `umbra`.
 Its root is `config/quickshell/umbra/shell.qml`. Keep screen lifecycle and IPC
 there, native reactive integrations in `services/`, reusable UI in
@@ -23,9 +29,11 @@ Do not spawn another desktop shell for each component or introduce Waybar.
   do not copy Omarchy's plugin IPC method names or invent an additional bar target.
 - Settings are declared once in `theme/settings-schema.json`; CLI and UI share
   validation. User values are outside Git in `~/.config/titan/`.
-- Titan currently has components/modules and menu actions, not Omarchy's plugin
-  manifest registry or capability facades. Build against the existing objects;
-  do not advertise plugin cloning/sandboxing that has not been implemented.
+- Titan keeps its existing components/modules and menu actions. Optional user
+  extensions use Titan's own panel/service manifests and `PluginHost.qml`;
+  see [operations](../../../docs/operations.md). Built-in cloning, bar
+  replacement and capability sandboxing remain unimplemented. Don't claim
+  Omarchy manifest compatibility or sandboxing.
 - Prefer native Quickshell services over polling. Bound unavoidable polling and
   stop it when hidden. Keep costly scanning, image work and processes tied to
   visibility or an explicit user action.

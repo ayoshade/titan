@@ -40,6 +40,7 @@ ShellRoot {
   function close(): void { UiState.close() }
   function osd(kind: string): void { UiState.osd(kind) }
  }
+ PluginHost {}
  Variants { model: Quickshell.screens; Background {} }
  LazyLoader { active: UiState.settingsOpen; SettingsApp {} }
  Variants { model: Quickshell.screens; Bar {} }

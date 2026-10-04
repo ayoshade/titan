@@ -52,6 +52,14 @@ wrote generated files into the checkout, kept settings in state, and linked
 
 ## Version and migrations
 
+The 0.3.0 development tree also ships original developer dotfiles under
+`default/config/`, optional recipes under `default/catalog/` and modular Bash
+defaults. Setup installs only missing dotfiles; migration
+`1791096000-developer-defaults.sh` does the same on existing installs. Optional
+packages/services are explicit operations, not new meta-package dependencies.
+See [operations](operations.md) for backup/restore, defaults, hooks and plugins.
+Generated application palettes stay in machine state and custom configs win.
+
 - **Version:** `version` holds Titan's version (semantic versioning). Bump the
   minor version for layout or behaviour changes and the patch version for
   fixes. `titan version` prints it with the commit.

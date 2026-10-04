@@ -1,5 +1,64 @@
 # Verification
 
+## Modular Omarchy workflows and local agent references — 2026-10-04
+
+Reference: `omacom/omarchy` revision
+`5c4da021469517449770579793b37ce26d0a0d48`; see
+[the agent reference library](research/agent-references.md) and
+[coverage ledger](research/omarchy.md). The local Quickshell 0.3.1 Process and
+FileView pages were read for argv and file-watch behavior. The archive's 790-page
+coverage wasn't independently re-audited here. Original code/defaults were
+written; no Omarchy implementation or external desktop configuration was copied.
+
+- **Automated:** 57 unit/integration tests pass. New cases exercise copied-once
+  dotfiles, linked-directory refusal, backed-up reset/restore including Unicode
+  and CRLF, launcher serialization and unsafe URLs, invalid default choices,
+  side-effect-free package/runtime plans, database loopback ports/data volumes,
+  archive roundtrip/traversal refusal, hook failure/argument boundaries,
+  plugin installation/enable/disable/removal, Bash user-value preservation,
+  generated theme files, four actual tmux panes on an owned socket and actual
+  MP4/GIF/PNG conversions with output preservation. The existing first-login
+  fixture now includes the new helper/modules and still preserves Welcome.
+- **Static:** doctor passes on umbra, including new Bash modules; Hyprland
+  config verification and live configerrors are clean. PluginHost and shell
+  lint cleanly. CommandPanel has the pre-existing qmllint warning for unresolved
+  `QProcess::ExitStatus` signal parameters; its exit code is 0. Runtime reloads
+  report `Configuration Loaded`, with no corresponding runtime error.
+- **Live menu:** inspected a UI crop of Application bundles at 1366×768, scale
+  1, the owner's current everforest/theme-accent choice. 24 searchable catalog
+  entries were loaded, with consistent rows/icons and no clipping in the
+  visible first ten. The menu was closed afterward. Package installation and
+  sudo transactions were not triggered. Other new menus were not individually
+  visually inspected.
+- **Live extension:** installed an original temporary nonvisual fixture,
+  enabled it, and observed `Titan acceptance plugin: theme context received`
+  in the shell log. Disabled and removed it afterward. The fixture's removed
+  copy is retained under `state/titan/plugin-backups/`; no extension remains
+  enabled. Third-party manifests and capabilities were not tested.
+- **Activation:** ran the sole pending `1791096000-developer-defaults.sh`
+  migration. Ten missing files were installed and report `default`; all prior
+  migration markers remain applied. Regenerated application palettes from the
+  current everforest theme. Shell status afterward still reports everforest,
+  theme accent, bar visible, wallpaper enabled and no open panel. No new
+  packages/services were installed or enabled on the laptop.
+- **Dependency review:** official package names were checked against the
+  local configured Arch databases. Steam requires the currently disabled
+  multilib repository; its bundle checks for it before a transaction. LocalSend
+  uses an explicit AUR recipe rather than an unavailable official package.
+  Runtime tool names were checked with the installed mise registry; Composer
+  and Symfony use documented explicit HTTP/GitHub backends. Those downloads
+  and full framework installs were not executed.
+- **Limits:** no QEMU/package/service acceptance run: MemAvailable was about
+  1.75 GiB, below the harness's 3 GiB threshold for its 2 GiB guest. No host
+  applications were terminated to free memory. Database startup/data persistence,
+  SSH authentication/forwarding, rsync event delivery, optional terminal reloads,
+  font switching, QR camera capture, service/AUR installation and physical
+  hardware remain unverified. Full Omarchy parity is unfinished; the inventory
+  explicitly distinguishes adapted, partial, policy and pending commands.
+
+`git diff --check` passes. CLI usage, layers, agent guidance and design research
+notes were updated. Follow the remaining-work ledger before repeating this batch.
+
 ## Completed during setup
 
 - All manifest packages installed from Arch repositories, including Hyprland

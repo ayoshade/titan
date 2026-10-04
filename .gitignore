@@ -1,4 +1,5 @@
 *.log
+.webfetch/
 __pycache__/
 .cache/
 docs/installed-versions.txt

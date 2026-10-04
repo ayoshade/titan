@@ -1,0 +1,227 @@
+{
+  "cli": {
+    "tools": [
+      "gh",
+      "ghui",
+      "lazydocker",
+      "uv"
+    ]
+  },
+  "node": {
+    "tools": [
+      "node@lts"
+    ]
+  },
+  "bun": {
+    "tools": [
+      "bun"
+    ]
+  },
+  "deno": {
+    "tools": [
+      "deno"
+    ]
+  },
+  "go": {
+    "tools": [
+      "go"
+    ]
+  },
+  "python": {
+    "tools": [
+      "python",
+      "uv"
+    ]
+  },
+  "rust": {
+    "tools": [
+      "rust"
+    ]
+  },
+  "ruby": {
+    "packages": [
+      "libyaml",
+      "openssl",
+      "base-devel"
+    ],
+    "tools": [
+      "ruby"
+    ]
+  },
+  "rails": {
+    "packages": [
+      "libyaml",
+      "openssl",
+      "base-devel"
+    ],
+    "tools": [
+      "ruby",
+      "node@lts"
+    ],
+    "commands": [
+      [
+        "mise",
+        "exec",
+        "ruby",
+        "--",
+        "gem",
+        "install",
+        "rails",
+        "--no-document"
+      ]
+    ]
+  },
+  "php": {
+    "tools": [
+      "php",
+      "http:composer[bin=composer,url=https://getcomposer.org/download/latest-stable/composer.phar]"
+    ]
+  },
+  "laravel": {
+    "tools": [
+      "php",
+      "http:composer[bin=composer,url=https://getcomposer.org/download/latest-stable/composer.phar]",
+      "node@lts"
+    ],
+    "commands": [
+      [
+        "mise",
+        "exec",
+        "php",
+        "http:composer",
+        "--",
+        "composer",
+        "global",
+        "require",
+        "laravel/installer"
+      ]
+    ]
+  },
+  "symfony": {
+    "tools": [
+      "php",
+      "http:composer[bin=composer,url=https://getcomposer.org/download/latest-stable/composer.phar]",
+      "github:symfony-cli/symfony-cli"
+    ]
+  },
+  "elixir": {
+    "tools": [
+      "erlang",
+      "elixir"
+    ],
+    "commands": [
+      [
+        "mise",
+        "exec",
+        "elixir",
+        "--",
+        "mix",
+        "local.hex",
+        "--force"
+      ]
+    ]
+  },
+  "phoenix": {
+    "tools": [
+      "erlang",
+      "elixir",
+      "node@lts"
+    ],
+    "commands": [
+      [
+        "mise",
+        "exec",
+        "elixir",
+        "--",
+        "mix",
+        "local.hex",
+        "--force"
+      ],
+      [
+        "mise",
+        "exec",
+        "elixir",
+        "--",
+        "mix",
+        "local.rebar",
+        "--force"
+      ],
+      [
+        "mise",
+        "exec",
+        "elixir",
+        "--",
+        "mix",
+        "archive.install",
+        "hex",
+        "phx_new",
+        "--force"
+      ]
+    ]
+  },
+  "java": {
+    "tools": [
+      "java"
+    ]
+  },
+  "zig": {
+    "tools": [
+      "zig",
+      "zls"
+    ]
+  },
+  "ocaml": {
+    "packages": [
+      "bubblewrap",
+      "base-devel"
+    ],
+    "tools": [
+      "opam"
+    ],
+    "commands": [
+      [
+        "mise",
+        "exec",
+        "opam",
+        "--",
+        "opam",
+        "init",
+        "--yes",
+        "--no-setup"
+      ],
+      [
+        "mise",
+        "exec",
+        "opam",
+        "--",
+        "opam",
+        "install",
+        "--yes",
+        "ocaml-lsp-server",
+        "ocamlformat",
+        "utop"
+      ]
+    ]
+  },
+  "dotnet": {
+    "tools": [
+      "dotnet"
+    ]
+  },
+  "clojure": {
+    "packages": [
+      "rlwrap"
+    ],
+    "tools": [
+      "java",
+      "clojure"
+    ]
+  },
+  "scala": {
+    "tools": [
+      "java",
+      "scala",
+      "scala-cli"
+    ]
+  }
+}

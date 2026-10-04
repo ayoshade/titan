@@ -1,0 +1,7 @@
+# Initializers run only in interactive Bash. Every tool remains optional.
+[[ $- == *i* ]] || return 0
+if command -v mise >/dev/null; then eval "$(mise activate bash)"; fi
+if command -v fzf >/dev/null; then eval "$(fzf --bash)"; fi
+if command -v zoxide >/dev/null && ! declare -F z >/dev/null; then eval "$(zoxide init bash)"; fi
+# An existing prompt is retained unless the user opts in with this variable.
+if [[ ${TITAN_PROMPT:-} == starship ]] && command -v starship >/dev/null; then eval "$(starship init bash)"; fi

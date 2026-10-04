@@ -66,6 +66,27 @@
         "value": ""
       },
       {
+        "label": "Install",
+        "action": "menu",
+        "value": "install",
+        "icon": "apps",
+        "detail": "Packages, developer environments and web apps"
+      },
+      {
+        "label": "Setup",
+        "action": "menu",
+        "value": "setup",
+        "icon": "settings",
+        "detail": "Default apps and dotfile recovery"
+      },
+      {
+        "label": "Remove",
+        "action": "menu",
+        "value": "remove",
+        "icon": "close",
+        "detail": "Packages and managed web-app launchers"
+      },
+      {
         "label": "System",
         "action": "panel",
         "value": "session",
@@ -79,7 +100,7 @@
     "items": [
       {
         "label": "Screenshot region / window",
-        "detail": "Print · drag, or Tab / arrows then Enter",
+        "detail": "Print \u00b7 drag, or Tab / arrows then Enter",
         "action": "capture",
         "value": "screenshot",
         "icon": "capture"
@@ -100,7 +121,7 @@
       },
       {
         "label": "Pick a color",
-        "detail": "Super+Print · copies hex color",
+        "detail": "Super+Print \u00b7 copies hex color",
         "action": "capture",
         "value": "color",
         "icon": "capture"
@@ -193,7 +214,7 @@
         "icon": "monitor"
       },
       {
-        "label": "Power · Performance",
+        "label": "Power \u00b7 Performance",
         "action": "settings",
         "value": "system",
         "icon": "bolt"
@@ -270,7 +291,7 @@
       },
       {
         "label": "Claude",
-        "detail": "Requires the Claude CLI · reads CLAUDE.md",
+        "detail": "Requires the Claude CLI \u00b7 reads CLAUDE.md",
         "action": "app",
         "value": "claude",
         "icon": "sparkle"
@@ -360,18 +381,181 @@
   },
   "reminder": {
     "title": "Set reminder",
-    "input": "Minutes and text · e.g. 20 Stretch"
+    "input": "Minutes and text \u00b7 e.g. 20 Stretch"
   },
   "transcode": {
     "title": "Transcode to MP4",
-    "input": "Local video path · source is preserved"
+    "input": "Local video path \u00b7 source is preserved"
   },
   "weather": {
     "title": "Weather",
-    "input": "City · Enter opens wttr.in in Firefox"
+    "input": "City \u00b7 Enter opens wttr.in in Firefox"
   },
   "worldclock": {
     "title": "World clock",
     "items": []
+  },
+  "install": {
+    "title": "Install",
+    "items": [
+      {
+        "label": "Application bundles",
+        "action": "menu",
+        "value": "install-packages"
+      },
+      {
+        "label": "Development environment",
+        "action": "menu",
+        "value": "install-dev"
+      },
+      {
+        "label": "Web app",
+        "action": "maintenance",
+        "value": "[\"--dialog\", \"webapp\"]"
+      },
+      {
+        "label": "Search packages",
+        "action": "maintenance",
+        "value": "[\"--dialog\", \"package-search\"]"
+      },
+      {
+        "label": "Install package",
+        "action": "maintenance",
+        "value": "[\"--dialog\", \"package-add\"]"
+      }
+    ]
+  },
+  "setup": {
+    "title": "Setup",
+    "items": [
+      {
+        "label": "Default terminal",
+        "action": "menu",
+        "value": "defaults-terminal"
+      },
+      {
+        "label": "Default browser",
+        "action": "menu",
+        "value": "defaults-browser"
+      },
+      {
+        "label": "Default editor",
+        "action": "menu",
+        "value": "defaults-editor"
+      },
+      {
+        "label": "Default agent",
+        "action": "menu",
+        "value": "defaults-agent"
+      },
+      {
+        "label": "Services",
+        "action": "menu",
+        "value": "services"
+      },
+      {
+        "label": "Compare dotfiles",
+        "action": "menu",
+        "value": "config-diff"
+      },
+      {
+        "label": "Reset a dotfile",
+        "action": "menu",
+        "value": "config-reset"
+      },
+      {
+        "label": "Health check",
+        "action": "maintenance",
+        "value": "[\"doctor\"]"
+      },
+      {
+        "label": "Update Titan and Arch",
+        "action": "maintenance",
+        "value": "[\"update\"]"
+      }
+    ]
+  },
+  "remove": {
+    "title": "Remove",
+    "items": [
+      {
+        "label": "Web app",
+        "action": "menu",
+        "value": "remove-webapps"
+      },
+      {
+        "label": "Package",
+        "action": "maintenance",
+        "value": "[\"--dialog\", \"package-remove\"]"
+      }
+    ]
+  },
+  "install-packages": {
+    "title": "Application bundles",
+    "items": [],
+    "maintenance": true
+  },
+  "install-dev": {
+    "title": "Development",
+    "items": [],
+    "maintenance": true
+  },
+  "config-reset": {
+    "title": "Reset dotfile",
+    "items": [],
+    "maintenance": true
+  },
+  "config-diff": {
+    "title": "Compare dotfiles",
+    "items": [],
+    "maintenance": true
+  },
+  "remove-webapps": {
+    "title": "Remove web app",
+    "items": [],
+    "maintenance": true
+  },
+  "defaults-terminal": {
+    "title": "Default terminal",
+    "items": [],
+    "maintenance": true
+  },
+  "defaults-browser": {
+    "title": "Default browser",
+    "items": [],
+    "maintenance": true
+  },
+  "defaults-editor": {
+    "title": "Default editor",
+    "items": [],
+    "maintenance": true
+  },
+  "defaults-agent": {
+    "title": "Default agent",
+    "items": [],
+    "maintenance": true
+  },
+  "services": {
+    "title": "Services",
+    "items": [
+      {
+        "label": "Setup docker",
+        "action": "maintenance",
+        "value": "[\"service\", \"setup\", \"docker\"]",
+        "detail": "Install and enable the service in a maintenance terminal"
+      },
+      {
+        "label": "Setup printing",
+        "action": "maintenance",
+        "value": "[\"service\", \"setup\", \"printing\"]",
+        "detail": "Install and enable the service in a maintenance terminal"
+      },
+      {
+        "label": "Setup tailscale",
+        "action": "maintenance",
+        "value": "[\"service\", \"setup\", \"tailscale\"]",
+        "detail": "Install and enable the service in a maintenance terminal"
+      }
+    ]
   }
 }

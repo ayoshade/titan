@@ -1,0 +1,9 @@
+[general]
+import = ["@@GENERATED@@/alacritty.toml"]
+[font]
+size = 11
+[font.normal]
+family = "monospace"
+[window.padding]
+x = 18
+y = 18

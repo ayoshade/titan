@@ -1,0 +1,9 @@
+# Defaults are conditional so a user's exported values retain priority.
+[[ ${HISTSIZE+x} ]] || HISTSIZE=50000
+[[ ${HISTFILESIZE+x} ]] || HISTFILESIZE=100000
+[[ ${HISTCONTROL+x} ]] || HISTCONTROL=ignoreboth:erasedups
+shopt -s histappend checkwinsize
+[[ ${EDITOR+x} ]] || export EDITOR=nvim
+[[ ${VISUAL+x} ]] || export VISUAL=$EDITOR
+[[ ${INPUTRC+x} || -f $HOME/.inputrc ]] || export INPUTRC="${XDG_CONFIG_HOME:-$HOME/.config}/readline/inputrc"
+[[ ${LESS+x} ]] || export LESS=-FRX

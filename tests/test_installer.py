@@ -309,9 +309,10 @@ class FirstLogin(unittest.TestCase):
             home = Path(folder) / "home"
             (root / "scripts").mkdir(parents=True)
             (root / "bin").mkdir()
-            for path in ["bin/titan", "scripts/install-agent-skills", "scripts/install-bash-defaults", "version"]:
+            for path in ["bin/titan", "scripts/install-agent-skills", "scripts/install-bash-defaults",
+                         "scripts/install-user-defaults", "scripts/titan-config", "scripts/titan-hooks", "version"]:
                 shutil.copy(source / path, root / path)
-            for path in ["migrations", "default", "config/gtk-3.0", "config/gtk-4.0"]:
+            for path in ["migrations", "default", "lib", "config/gtk-3.0", "config/gtk-4.0"]:
                 shutil.copytree(source / path, root / path)
             # Prevent theme application, process signals, D-Bus or service
             # changes on this host. The real setup/migration code is exercised.

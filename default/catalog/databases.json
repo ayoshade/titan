@@ -1,0 +1,7 @@
+{
+  "postgres": {"image":"postgres:18","port":5432,"data_path":"/var/lib/postgresql","environment":{"POSTGRES_USER":"titan","POSTGRES_DB":"titan","POSTGRES_HOST_AUTH_METHOD":"trust"}},
+  "mysql": {"image":"mysql:8.4","port":3306,"data_path":"/var/lib/mysql","environment":{"MYSQL_ALLOW_EMPTY_PASSWORD":"yes","MYSQL_DATABASE":"titan"}},
+  "mariadb": {"image":"mariadb:11.8","port":3306,"data_path":"/var/lib/mysql","environment":{"MARIADB_ALLOW_EMPTY_ROOT_PASSWORD":"yes","MARIADB_DATABASE":"titan"}},
+  "redis": {"image":"redis:7","port":6379,"data_path":"/data","command":["redis-server","--appendonly","yes"]},
+  "mongodb": {"image":"mongo:8","port":27017,"data_path":"/data/db"}
+}

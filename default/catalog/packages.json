@@ -1,0 +1,168 @@
+{
+  "shell-tools": {
+    "packages": [
+      "fzf",
+      "zoxide",
+      "ripgrep",
+      "eza",
+      "fd",
+      "bat",
+      "starship",
+      "rsync",
+      "inotify-tools",
+      "lazygit"
+    ],
+    "after_install": [
+      "Open a new interactive Bash shell; existing aliases and prompt overrides take priority"
+    ]
+  },
+  "pdf": {
+    "packages": [
+      "xournalpp"
+    ]
+  },
+  "images": {
+    "packages": [
+      "imv",
+      "imagemagick"
+    ]
+  },
+  "media": {
+    "packages": [
+      "ffmpeg",
+      "mpv",
+      "yt-dlp",
+      "qrencode",
+      "zbar"
+    ]
+  },
+  "docker": {
+    "packages": [
+      "docker",
+      "docker-compose"
+    ],
+    "after_install": [
+      "titan service enable docker",
+      "titan dev install cli",
+      "titan dev db list"
+    ]
+  },
+  "terminal-kitty": {
+    "packages": [
+      "kitty"
+    ]
+  },
+  "terminal-foot": {
+    "packages": [
+      "foot"
+    ]
+  },
+  "terminal-ghostty": {
+    "packages": [
+      "ghostty"
+    ]
+  },
+  "terminal-alacritty": {
+    "packages": [
+      "alacritty"
+    ]
+  },
+  "editor-neovim": {
+    "packages": [
+      "neovim"
+    ]
+  },
+  "editor-helix": {
+    "packages": [
+      "helix"
+    ]
+  },
+  "editor-vscode": {
+    "packages": [
+      "code"
+    ]
+  },
+  "editor-zed": {
+    "packages": [
+      "zed"
+    ]
+  },
+  "editor-vim": {
+    "packages": [
+      "vim"
+    ]
+  },
+  "editor-emacs": {
+    "packages": [
+      "emacs"
+    ]
+  },
+  "browser-firefox": {
+    "packages": [
+      "firefox"
+    ]
+  },
+  "browser-chromium": {
+    "packages": [
+      "chromium"
+    ]
+  },
+  "signal": {
+    "packages": [
+      "signal-desktop"
+    ]
+  },
+  "obsidian": {
+    "packages": [
+      "obsidian"
+    ]
+  },
+  "gaming": {
+    "packages": [
+      "steam",
+      "lutris",
+      "gamemode",
+      "mangohud"
+    ],
+    "repositories": [
+      "multilib"
+    ],
+    "after_install": [
+      "Steam needs the multilib repository; GPU selection and drivers remain hardware-specific"
+    ]
+  },
+  "retro": {
+    "packages": [
+      "retroarch",
+      "retroarch-assets-ozone",
+      "retroarch-assets-xmb"
+    ]
+  },
+  "printing": {
+    "packages": [
+      "cups",
+      "system-config-printer"
+    ],
+    "after_install": [
+      "titan service enable printing"
+    ]
+  },
+  "sharing": {
+    "packages": [],
+    "aur": [
+      "localsend-bin"
+    ],
+    "after_install": [
+      "Review the AUR build through an installed paru or yay helper"
+    ]
+  },
+  "tailscale": {
+    "packages": [
+      "tailscale"
+    ],
+    "after_install": [
+      "titan service enable tailscale",
+      "titan service login tailscale"
+    ]
+  }
+}

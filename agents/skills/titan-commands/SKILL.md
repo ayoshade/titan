@@ -12,12 +12,18 @@ Find the source root through `titan version` or the current checkout. Read its
 `AGENTS.md` and `docs/workflow.md` before editing. Installed defaults under
 `/usr/share/titan` are package-owned; develop in a checkout.
 
+The [agent reference library](../../../docs/research/agent-references.md) links
+the [Omarchy source clone](/home/shade/.cache/titan/references/omarchy) and the
+[Quickshell API archive](/home/shade/.webfetch/quickshell/index.md). Consult the
+coverage ledger before rebuilding an existing operation.
+
 ## Select the owner
 
 | Interface | Implementation |
 | --- | --- |
 | `titan COMMAND` | `bin/titan`: top-level dispatch and `usage()` |
 | Desktop operations | `bin/workflow`, `lib/titan/workflow.py` |
+| Additional user operations | `scripts/titan-*`, `lib/titan/desktop_cli.py`, family modules; see `docs/operations.md` |
 | Shell control | `bin/titan-shell`, IPC target `shell` in `config/quickshell/umbra/shell.qml` |
 | Settings | `config/quickshell/umbra/theme/settings-schema.json`, consumed by the CLI and Settings UI |
 | Menu actions | `config/quickshell/umbra/assets/menus.json` and the existing action handlers |

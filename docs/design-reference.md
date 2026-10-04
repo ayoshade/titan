@@ -2,6 +2,11 @@
 
 Public channel: https://www.youtube.com/@saneAspect/videos
 
+For distribution/workflow behavior and versioned shell APIs, see the local
+[agent reference library](research/agent-references.md), including the cloned
+Omarchy repository and the owner's Quickshell documentation archive. saneAspect
+remains Titan's visual reference.
+
 ## Material inspected
 
 - **Why I added a workspace switcher to my Dynamic Island** — October 2,

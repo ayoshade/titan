@@ -1,0 +1,29 @@
+# Callable utilities use Titan's maintained interfaces, never eval user input.
+_titan_cli() {
+ local _titan_functions_root
+ _titan_functions_root=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/../.." && pwd)
+ "$_titan_functions_root/bin/titan" "$@"
+}
+declare -F compress >/dev/null || compress() { _titan_cli archive compress "$@"; }
+declare -F decompress >/dev/null || decompress() { _titan_cli archive extract "$@"; }
+declare -F tdl >/dev/null || tdl() { _titan_cli tmux dev --attach "$@"; }
+declare -F tds >/dev/null || tds() { _titan_cli tmux square --attach "$@"; }
+declare -F tsl >/dev/null || tsl() { _titan_cli tmux swarm --attach "$@"; }
+declare -F fip >/dev/null || fip() { _titan_cli forward start "$@"; }
+declare -F lip >/dev/null || lip() { _titan_cli forward list; }
+declare -F dip >/dev/null || dip() { _titan_cli forward stop "$@"; }
+declare -F rsw >/dev/null || rsw() { _titan_cli watch start "$@"; }
+declare -F lsw >/dev/null || lsw() { _titan_cli watch list; }
+declare -F dsw >/dev/null || dsw() { _titan_cli watch stop "$@"; }
+declare -F ga >/dev/null || ga() {
+ local _titan_worktree_destination
+ _titan_worktree_destination=$(_titan_cli worktree add "$@") || return
+ cd -- "$_titan_worktree_destination"
+}
+declare -F ff >/dev/null || ff() {
+ command -v fzf >/dev/null || { printf 'Install: titan pkg bundle shell-tools --apply\n' >&2; return 1; }
+ local _titan_selected_file
+ _titan_selected_file=$(command rg --files --hidden --glob '!.git/**' --null | fzf --read0 --print0 | tr -d '\0') || return
+ [[ -n $_titan_selected_file ]] && "${EDITOR:-nvim}" -- "$_titan_selected_file"
+}
+declare -F mkcd >/dev/null || mkcd() { [[ $# == 1 ]] && mkdir -p -- "$1" && cd -- "$1"; }

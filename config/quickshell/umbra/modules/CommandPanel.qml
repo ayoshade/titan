@@ -39,8 +39,9 @@ SearchMenu {
   if(kind==="reminders") fetch("reminder-list")
   if(kind==="worldclock") fetch("worldclock")
   if(kind==="emojis") emojiFile.reload()
+  if(definition.maintenance) fetch("maintenance-list",kind)
  }
- function fetch(operation) { if(reader.running) return; readerKind=kind; reader.command=[Paths.workflow,operation]; reader.running=true }
+ function fetch(operation,value) { if(reader.running) return; readerKind=kind; reader.command=[Paths.workflow,operation].concat(value===undefined ? [] : [value]); reader.running=true }
  function execute(action,value) {
   if(!action || action==="none") return
   if(action==="close") { UiState.close(); return }

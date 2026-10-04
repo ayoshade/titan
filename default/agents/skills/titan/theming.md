@@ -4,6 +4,13 @@ One palette catalog drives the shell, Kitty and Hyprland borders. Wallpapers
 belong to themes. Fonts, radii and motion are settings. Change sources, never
 generated files.
 
+`apply-theme` also writes tmux, btop, Neovim palette data, Foot, Ghostty,
+Alacritty and Helix colors into machine state. Consumers use copied-once
+defaults from `default/config/`; install missing files with `titan config install`.
+User configs retain priority. `titan font list|current|set FAMILY` changes the
+monospace preference without rewriting application overrides. See
+`docs/operations.md` for application and recovery interfaces.
+
 ## Pieces and where they live
 
 | Thing | Source of truth | Applied by |

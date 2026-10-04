@@ -1,0 +1,906 @@
+{
+  "schema": 1,
+  "revision": "5c4da021469517449770579793b37ce26d0a0d48",
+  "commands": {
+    "omarchy": {
+      "status": "adapted",
+      "equivalent": "bin/titan",
+      "notes": "Titan uses explicit dispatch and argparse; no Omarchy prefix scanner."
+    },
+    "omarchy-agent-crash": {
+      "status": "partial",
+      "equivalent": "titan doctor / scripts/lock-rescue / diagnose-crash skill",
+      "notes": "Health/lock diagnostics and crash investigation exist; event-driven crash watcher is missing."
+    },
+    "omarchy-apply-hardware": {
+      "status": "partial",
+      "equivalent": "titan hardware / system/hardware/profiles.json",
+      "notes": "Read-only detection and conservative package plans; automatic physical GPU/laptop tuning remains unimplemented."
+    },
+    "omarchy-apply-lock": {
+      "status": "partial",
+      "equivalent": "Titan installer / system templates",
+      "notes": "QEMU target setup and original Plymouth theme exist; portable live-machine apply/switcher API is absent."
+    },
+    "omarchy-apply-system": {
+      "status": "partial",
+      "equivalent": "Titan installer / system templates",
+      "notes": "QEMU target setup and original Plymouth theme exist; portable live-machine apply/switcher API is absent."
+    },
+    "omarchy-audio-input-mute": {
+      "status": "adapted",
+      "equivalent": "titan audio / bin/workflow audio / Quickshell Audio",
+      "notes": "Original Titan operation; CLI and desktop implementation follow Titan interfaces."
+    },
+    "omarchy-audio-input-set-default": {
+      "status": "adapted",
+      "equivalent": "titan audio / bin/workflow audio / Quickshell Audio",
+      "notes": "Original Titan operation; CLI and desktop implementation follow Titan interfaces."
+    },
+    "omarchy-audio-output-set-default": {
+      "status": "adapted",
+      "equivalent": "titan audio / bin/workflow audio / Quickshell Audio",
+      "notes": "Original Titan operation; CLI and desktop implementation follow Titan interfaces."
+    },
+    "omarchy-audio-output-sink": {
+      "status": "adapted",
+      "equivalent": "titan audio / bin/workflow audio / Quickshell Audio",
+      "notes": "Original Titan operation; CLI and desktop implementation follow Titan interfaces."
+    },
+    "omarchy-audio-output-switch": {
+      "status": "adapted",
+      "equivalent": "titan audio / bin/workflow audio / Quickshell Audio",
+      "notes": "Original Titan operation; CLI and desktop implementation follow Titan interfaces."
+    },
+    "omarchy-audio-output-volume": {
+      "status": "adapted",
+      "equivalent": "titan audio / bin/workflow audio / Quickshell Audio",
+      "notes": "Original Titan operation; CLI and desktop implementation follow Titan interfaces."
+    },
+    "omarchy-audio-source-switch": {
+      "status": "adapted",
+      "equivalent": "titan audio / bin/workflow audio / Quickshell Audio",
+      "notes": "Original Titan operation; CLI and desktop implementation follow Titan interfaces."
+    },
+    "omarchy-bar": {
+      "status": "adapted",
+      "equivalent": "titan-shell ipc / Quickshell CommandPanel",
+      "notes": "Existing shell menus and native service state; Titan visual design and architecture retained."
+    },
+    "omarchy-battery-present": {
+      "status": "adapted",
+      "equivalent": "titan battery / Quickshell UPower",
+      "notes": "Original Titan operation; CLI and desktop implementation follow Titan interfaces."
+    },
+    "omarchy-battery-status": {
+      "status": "adapted",
+      "equivalent": "titan battery / Quickshell UPower",
+      "notes": "Original Titan operation; CLI and desktop implementation follow Titan interfaces."
+    },
+    "omarchy-bluetooth-device": {
+      "status": "adapted",
+      "equivalent": "titan bluetooth / Quickshell NetState",
+      "notes": "Original Titan operation; CLI and desktop implementation follow Titan interfaces."
+    },
+    "omarchy-bluetooth-power": {
+      "status": "adapted",
+      "equivalent": "titan bluetooth / Quickshell NetState",
+      "notes": "Original Titan operation; CLI and desktop implementation follow Titan interfaces."
+    },
+    "omarchy-brightness-display": {
+      "status": "partial",
+      "equivalent": "bin/workflow brightness|keyboard-light",
+      "notes": "Detected laptop controls; external DDC and Apple-specific backlights remain missing."
+    },
+    "omarchy-brightness-keyboard": {
+      "status": "partial",
+      "equivalent": "bin/workflow brightness|keyboard-light",
+      "notes": "Detected laptop controls; external DDC and Apple-specific backlights remain missing."
+    },
+    "omarchy-brightness-keyboard-mute": {
+      "status": "partial",
+      "equivalent": "bin/workflow brightness|keyboard-light",
+      "notes": "Detected laptop controls; external DDC and Apple-specific backlights remain missing."
+    },
+    "omarchy-capture-qr": {
+      "status": "adapted",
+      "equivalent": "titan qr capture",
+      "notes": "Original Titan operation; CLI and desktop implementation follow Titan interfaces."
+    },
+    "omarchy-capture-region": {
+      "status": "partial",
+      "equivalent": "bin/workflow capture",
+      "notes": "Existing region/window/monitor picker; live rather than frozen selection, recording/OCR require more hardware acceptance."
+    },
+    "omarchy-capture-screenrecording": {
+      "status": "partial",
+      "equivalent": "bin/workflow capture",
+      "notes": "Existing region/window/monitor picker; live rather than frozen selection, recording/OCR require more hardware acceptance."
+    },
+    "omarchy-capture-screenrecording-with-webcam": {
+      "status": "partial",
+      "equivalent": "bin/workflow webcam",
+      "notes": "Existing overlay and resize; explicit camera chooser and recording synchronization remain missing."
+    },
+    "omarchy-capture-screenshot": {
+      "status": "partial",
+      "equivalent": "bin/workflow capture",
+      "notes": "Existing region/window/monitor picker; live rather than frozen selection, recording/OCR require more hardware acceptance."
+    },
+    "omarchy-capture-text": {
+      "status": "partial",
+      "equivalent": "bin/workflow capture",
+      "notes": "Existing region/window/monitor picker; live rather than frozen selection, recording/OCR require more hardware acceptance."
+    },
+    "omarchy-capture-webcam-list": {
+      "status": "partial",
+      "equivalent": "bin/workflow webcam",
+      "notes": "Existing overlay and resize; explicit camera chooser and recording synchronization remain missing."
+    },
+    "omarchy-capture-webcam-resize": {
+      "status": "partial",
+      "equivalent": "bin/workflow webcam",
+      "notes": "Existing overlay and resize; explicit camera chooser and recording synchronization remain missing."
+    },
+    "omarchy-clipboard-open": {
+      "status": "partial",
+      "equivalent": "bin/workflow clipboard-* / titan clipboard",
+      "notes": "History and file/text copying exist; selection copies and paste remains explicit."
+    },
+    "omarchy-clipboard-paste-file": {
+      "status": "partial",
+      "equivalent": "bin/workflow clipboard-* / titan clipboard",
+      "notes": "History and file/text copying exist; selection copies and paste remains explicit."
+    },
+    "omarchy-clipboard-paste-text": {
+      "status": "partial",
+      "equivalent": "bin/workflow clipboard-* / titan clipboard",
+      "notes": "History and file/text copying exist; selection copies and paste remains explicit."
+    },
+    "omarchy-cmd-default-browser": {
+      "status": "adapted",
+      "equivalent": "titan launch / lib/titan/apps.py",
+      "notes": "Original Titan operation; CLI and desktop implementation follow Titan interfaces."
+    },
+    "omarchy-cmd-terminal-cwd": {
+      "status": "adapted",
+      "equivalent": "titan launch / lib/titan/apps.py",
+      "notes": "Original Titan operation; CLI and desktop implementation follow Titan interfaces."
+    },
+    "omarchy-crash-watch": {
+      "status": "partial",
+      "equivalent": "titan doctor / scripts/lock-rescue / diagnose-crash skill",
+      "notes": "Health/lock diagnostics and crash investigation exist; event-driven crash watcher is missing."
+    },
+    "omarchy-debug": {
+      "status": "partial",
+      "equivalent": "titan doctor / scripts/lock-rescue / diagnose-crash skill",
+      "notes": "Health/lock diagnostics and crash investigation exist; event-driven crash watcher is missing."
+    },
+    "omarchy-debug-idle": {
+      "status": "partial",
+      "equivalent": "titan doctor / scripts/lock-rescue / diagnose-crash skill",
+      "notes": "Health/lock diagnostics and crash investigation exist; event-driven crash watcher is missing."
+    },
+    "omarchy-default-agent": {
+      "status": "adapted",
+      "equivalent": "titan defaults get|set|reset KIND",
+      "notes": "Original Titan operation; CLI and desktop implementation follow Titan interfaces."
+    },
+    "omarchy-default-browser": {
+      "status": "adapted",
+      "equivalent": "titan defaults get|set|reset KIND",
+      "notes": "Original Titan operation; CLI and desktop implementation follow Titan interfaces."
+    },
+    "omarchy-default-editor": {
+      "status": "adapted",
+      "equivalent": "titan defaults get|set|reset KIND",
+      "notes": "Original Titan operation; CLI and desktop implementation follow Titan interfaces."
+    },
+    "omarchy-default-terminal": {
+      "status": "adapted",
+      "equivalent": "titan defaults get|set|reset KIND",
+      "notes": "Original Titan operation; CLI and desktop implementation follow Titan interfaces."
+    },
+    "omarchy-dev-add-migration": {
+      "status": "partial",
+      "equivalent": "agents/skills/titan-migrations/SKILL.md",
+      "notes": "Documented versioned migrations; no generator command yet."
+    },
+    "omarchy-dev-pkg-test": {
+      "status": "adapted",
+      "equivalent": "tools/vm-test",
+      "notes": "Original Titan operation; CLI and desktop implementation follow Titan interfaces."
+    },
+    "omarchy-display-text-size": {
+      "status": "partial",
+      "equivalent": "bin/workflow scale / titan settings fontSize",
+      "notes": "Clean scaling and shell font size exist; global text-size integration is incomplete."
+    },
+    "omarchy-font-current": {
+      "status": "adapted",
+      "equivalent": "titan font",
+      "notes": "Original Titan operation; CLI and desktop implementation follow Titan interfaces."
+    },
+    "omarchy-font-list": {
+      "status": "adapted",
+      "equivalent": "titan font",
+      "notes": "Original Titan operation; CLI and desktop implementation follow Titan interfaces."
+    },
+    "omarchy-font-set": {
+      "status": "adapted",
+      "equivalent": "titan font",
+      "notes": "Original Titan operation; CLI and desktop implementation follow Titan interfaces."
+    },
+    "omarchy-git-url-check": {
+      "status": "partial",
+      "equivalent": "lib/titan/apps.py HTTP URL validation",
+      "notes": "Used by webapps/plugins; no standalone repository-validation command."
+    },
+    "omarchy-hook": {
+      "status": "adapted",
+      "equivalent": "titan hook NAME / ~/.config/titan/hooks",
+      "notes": "Event hooks with bounded execution; create user hook files directly."
+    },
+    "omarchy-hook-install": {
+      "status": "adapted",
+      "equivalent": "titan hook NAME / ~/.config/titan/hooks",
+      "notes": "Event hooks with bounded execution; create user hook files directly."
+    },
+    "omarchy-hw-hybrid-gpu": {
+      "status": "partial",
+      "equivalent": "titan hardware / system/hardware/profiles.json",
+      "notes": "Read-only detection and conservative package plans; automatic physical GPU/laptop tuning remains unimplemented."
+    },
+    "omarchy-hw-intel": {
+      "status": "partial",
+      "equivalent": "titan hardware / system/hardware/profiles.json",
+      "notes": "Read-only detection and conservative package plans; automatic physical GPU/laptop tuning remains unimplemented."
+    },
+    "omarchy-hw-laptop": {
+      "status": "partial",
+      "equivalent": "titan hardware / system/hardware/profiles.json",
+      "notes": "Read-only detection and conservative package plans; automatic physical GPU/laptop tuning remains unimplemented."
+    },
+    "omarchy-hw-match": {
+      "status": "partial",
+      "equivalent": "titan hardware / system/hardware/profiles.json",
+      "notes": "Read-only detection and conservative package plans; automatic physical GPU/laptop tuning remains unimplemented."
+    },
+    "omarchy-hw-nvidia": {
+      "status": "partial",
+      "equivalent": "titan hardware / system/hardware/profiles.json",
+      "notes": "Read-only detection and conservative package plans; automatic physical GPU/laptop tuning remains unimplemented."
+    },
+    "omarchy-hw-vm": {
+      "status": "partial",
+      "equivalent": "titan hardware / system/hardware/profiles.json",
+      "notes": "Read-only detection and conservative package plans; automatic physical GPU/laptop tuning remains unimplemented."
+    },
+    "omarchy-hw-vulkan": {
+      "status": "partial",
+      "equivalent": "titan hardware / system/hardware/profiles.json",
+      "notes": "Read-only detection and conservative package plans; automatic physical GPU/laptop tuning remains unimplemented."
+    },
+    "omarchy-hyprland-focus-app": {
+      "status": "adapted",
+      "equivalent": "titan launch --focus CLASS app EXECUTABLE",
+      "notes": "Original Titan operation; CLI and desktop implementation follow Titan interfaces."
+    },
+    "omarchy-hyprland-monitor-internal-mirror": {
+      "status": "adapted",
+      "equivalent": "bin/workflow mirror",
+      "notes": "Original Titan operation; CLI and desktop implementation follow Titan interfaces."
+    },
+    "omarchy-hyprland-monitor-scaling": {
+      "status": "partial",
+      "equivalent": "bin/workflow scale / titan settings fontSize",
+      "notes": "Clean scaling and shell font size exist; global text-size integration is incomplete."
+    },
+    "omarchy-hyprland-session-locked": {
+      "status": "partial",
+      "equivalent": "scripts/lock-status",
+      "notes": "Faillock-aware status exists; not a direct Omarchy locked-session API."
+    },
+    "omarchy-hyprland-window-close-all": {
+      "status": "adapted",
+      "equivalent": "bin/workflow compositor operations",
+      "notes": "Original Titan operation; CLI and desktop implementation follow Titan interfaces."
+    },
+    "omarchy-hyprland-window-gaps-toggle": {
+      "status": "adapted",
+      "equivalent": "bin/workflow compositor operations",
+      "notes": "Original Titan operation; CLI and desktop implementation follow Titan interfaces."
+    },
+    "omarchy-hyprland-window-pop": {
+      "status": "adapted",
+      "equivalent": "bin/workflow compositor operations",
+      "notes": "Original Titan operation; CLI and desktop implementation follow Titan interfaces."
+    },
+    "omarchy-hyprland-window-single-square-aspect-toggle": {
+      "status": "adapted",
+      "equivalent": "bin/workflow compositor operations",
+      "notes": "Original Titan operation; CLI and desktop implementation follow Titan interfaces."
+    },
+    "omarchy-hyprland-window-tiled-fullscreen-toggle": {
+      "status": "adapted",
+      "equivalent": "bin/workflow compositor operations",
+      "notes": "Original Titan operation; CLI and desktop implementation follow Titan interfaces."
+    },
+    "omarchy-hyprland-window-transparency-toggle": {
+      "status": "adapted",
+      "equivalent": "bin/workflow compositor operations",
+      "notes": "Original Titan operation; CLI and desktop implementation follow Titan interfaces."
+    },
+    "omarchy-hyprland-window-width": {
+      "status": "adapted",
+      "equivalent": "bin/workflow compositor operations",
+      "notes": "Original Titan operation; CLI and desktop implementation follow Titan interfaces."
+    },
+    "omarchy-hyprland-workspace-layout-toggle": {
+      "status": "adapted",
+      "equivalent": "bin/workflow compositor operations",
+      "notes": "Original Titan operation; CLI and desktop implementation follow Titan interfaces."
+    },
+    "omarchy-install-and-launch": {
+      "status": "partial",
+      "equivalent": "titan pkg",
+      "notes": "Package operations exist; chooser, multi-provider resolution, auto-launch and missing-list semantics differ."
+    },
+    "omarchy-install-app": {
+      "status": "partial",
+      "equivalent": "titan pkg",
+      "notes": "Package operations exist; chooser, multi-provider resolution, auto-launch and missing-list semantics differ."
+    },
+    "omarchy-install-browser": {
+      "status": "partial",
+      "equivalent": "titan pkg bundle NAME",
+      "notes": "Packages/recipes are available; service login, multilib and driver setup remain explicit."
+    },
+    "omarchy-install-dev-env": {
+      "status": "adapted",
+      "equivalent": "titan dev install NAME / mise use -g TOOL",
+      "notes": "Runtime recipes use mise; not all installations have been exercised."
+    },
+    "omarchy-install-docker-dbs": {
+      "status": "partial",
+      "equivalent": "titan dev db",
+      "notes": "Five loopback-only databases with named volumes; MSSQL is not implemented."
+    },
+    "omarchy-install-editor-emacs": {
+      "status": "partial",
+      "equivalent": "titan pkg bundle NAME",
+      "notes": "Packages/recipes are available; service login, multilib and driver setup remain explicit."
+    },
+    "omarchy-install-editor-helix": {
+      "status": "partial",
+      "equivalent": "titan pkg bundle NAME",
+      "notes": "Packages/recipes are available; service login, multilib and driver setup remain explicit."
+    },
+    "omarchy-install-editor-vscode": {
+      "status": "partial",
+      "equivalent": "titan pkg bundle NAME",
+      "notes": "Packages/recipes are available; service login, multilib and driver setup remain explicit."
+    },
+    "omarchy-install-editor-zed": {
+      "status": "partial",
+      "equivalent": "titan pkg bundle NAME",
+      "notes": "Packages/recipes are available; service login, multilib and driver setup remain explicit."
+    },
+    "omarchy-install-gaming-retroarch": {
+      "status": "partial",
+      "equivalent": "titan pkg bundle NAME",
+      "notes": "Packages/recipes are available; service login, multilib and driver setup remain explicit."
+    },
+    "omarchy-install-service-signal": {
+      "status": "partial",
+      "equivalent": "titan pkg bundle NAME",
+      "notes": "Packages/recipes are available; service login, multilib and driver setup remain explicit."
+    },
+    "omarchy-install-service-tailscale": {
+      "status": "partial",
+      "equivalent": "titan pkg bundle NAME",
+      "notes": "Packages/recipes are available; service login, multilib and driver setup remain explicit."
+    },
+    "omarchy-install-terminal": {
+      "status": "partial",
+      "equivalent": "titan pkg bundle NAME",
+      "notes": "Packages/recipes are available; service login, multilib and driver setup remain explicit."
+    },
+    "omarchy-launch-1password": {
+      "status": "partial",
+      "equivalent": "bin/workflow app NAME",
+      "notes": "Launch routes exist. Optional apps/accounts are not installed automatically; Herdr is not bundled."
+    },
+    "omarchy-launch-browser": {
+      "status": "adapted",
+      "equivalent": "titan launch / lib/titan/apps.py",
+      "notes": "Original Titan operation; CLI and desktop implementation follow Titan interfaces."
+    },
+    "omarchy-launch-config-editor": {
+      "status": "adapted",
+      "equivalent": "titan launch / lib/titan/apps.py",
+      "notes": "Original Titan operation; CLI and desktop implementation follow Titan interfaces."
+    },
+    "omarchy-launch-docker-tui": {
+      "status": "partial",
+      "equivalent": "bin/workflow app NAME",
+      "notes": "Launch routes exist. Optional apps/accounts are not installed automatically; Herdr is not bundled."
+    },
+    "omarchy-launch-editor": {
+      "status": "adapted",
+      "equivalent": "titan launch / lib/titan/apps.py",
+      "notes": "Original Titan operation; CLI and desktop implementation follow Titan interfaces."
+    },
+    "omarchy-launch-nautilus": {
+      "status": "adapted",
+      "equivalent": "bin/workflow app files|files-cwd",
+      "notes": "Titan uses Thunar as its file manager."
+    },
+    "omarchy-launch-nautilus-cwd": {
+      "status": "adapted",
+      "equivalent": "bin/workflow app files|files-cwd",
+      "notes": "Titan uses Thunar as its file manager."
+    },
+    "omarchy-launch-or-focus": {
+      "status": "partial",
+      "equivalent": "titan launch --focus / titan webapp launch",
+      "notes": "Exact-class focus exists; Firefox web apps use ordinary windows and no distinct app class."
+    },
+    "omarchy-launch-or-focus-tui": {
+      "status": "partial",
+      "equivalent": "titan launch --focus / titan webapp launch",
+      "notes": "Exact-class focus exists; Firefox web apps use ordinary windows and no distinct app class."
+    },
+    "omarchy-launch-or-focus-webapp": {
+      "status": "partial",
+      "equivalent": "titan launch --focus / titan webapp launch",
+      "notes": "Exact-class focus exists; Firefox web apps use ordinary windows and no distinct app class."
+    },
+    "omarchy-launch-signal": {
+      "status": "partial",
+      "equivalent": "bin/workflow app NAME",
+      "notes": "Launch routes exist. Optional apps/accounts are not installed automatically; Herdr is not bundled."
+    },
+    "omarchy-launch-spotify": {
+      "status": "partial",
+      "equivalent": "bin/workflow app NAME",
+      "notes": "Launch routes exist. Optional apps/accounts are not installed automatically; Herdr is not bundled."
+    },
+    "omarchy-launch-terminal": {
+      "status": "adapted",
+      "equivalent": "titan launch / lib/titan/apps.py",
+      "notes": "Original Titan operation; CLI and desktop implementation follow Titan interfaces."
+    },
+    "omarchy-launch-terminal-herdr": {
+      "status": "partial",
+      "equivalent": "bin/workflow app NAME",
+      "notes": "Launch routes exist. Optional apps/accounts are not installed automatically; Herdr is not bundled."
+    },
+    "omarchy-launch-terminal-tmux": {
+      "status": "partial",
+      "equivalent": "bin/workflow app NAME",
+      "notes": "Launch routes exist. Optional apps/accounts are not installed automatically; Herdr is not bundled."
+    },
+    "omarchy-launch-tui": {
+      "status": "adapted",
+      "equivalent": "titan launch / lib/titan/apps.py",
+      "notes": "Original Titan operation; CLI and desktop implementation follow Titan interfaces."
+    },
+    "omarchy-launch-webapp": {
+      "status": "partial",
+      "equivalent": "titan webapp",
+      "notes": "Managed launchers and Chromium app windows; installed icon names only, no automatic favicon downloads."
+    },
+    "omarchy-menu": {
+      "status": "adapted",
+      "equivalent": "titan-shell ipc / Quickshell CommandPanel",
+      "notes": "Existing shell menus and native service state; Titan visual design and architecture retained."
+    },
+    "omarchy-menu-clipboard": {
+      "status": "adapted",
+      "equivalent": "titan-shell ipc / Quickshell CommandPanel",
+      "notes": "Existing shell menus and native service state; Titan visual design and architecture retained."
+    },
+    "omarchy-menu-emoji": {
+      "status": "adapted",
+      "equivalent": "titan-shell ipc / Quickshell CommandPanel",
+      "notes": "Existing shell menus and native service state; Titan visual design and architecture retained."
+    },
+    "omarchy-menu-file": {
+      "status": "partial",
+      "equivalent": "Quickshell search menus / scripts/titan-task",
+      "notes": "Common forms and searchable choices exist; generic file/timezone pickers remain missing."
+    },
+    "omarchy-menu-herdr-keybindings": {
+      "status": "adapted",
+      "equivalent": "titan-shell ipc / Quickshell CommandPanel",
+      "notes": "Existing shell menus and native service state; Titan visual design and architecture retained."
+    },
+    "omarchy-menu-images": {
+      "status": "partial",
+      "equivalent": "Quickshell search menus / scripts/titan-task",
+      "notes": "Common forms and searchable choices exist; generic file/timezone pickers remain missing."
+    },
+    "omarchy-menu-input": {
+      "status": "partial",
+      "equivalent": "Quickshell search menus / scripts/titan-task",
+      "notes": "Common forms and searchable choices exist; generic file/timezone pickers remain missing."
+    },
+    "omarchy-menu-keybindings": {
+      "status": "adapted",
+      "equivalent": "titan-shell ipc / Quickshell CommandPanel",
+      "notes": "Existing shell menus and native service state; Titan visual design and architecture retained."
+    },
+    "omarchy-menu-select": {
+      "status": "partial",
+      "equivalent": "Quickshell search menus / scripts/titan-task",
+      "notes": "Common forms and searchable choices exist; generic file/timezone pickers remain missing."
+    },
+    "omarchy-menu-share": {
+      "status": "adapted",
+      "equivalent": "titan-shell ipc / Quickshell CommandPanel",
+      "notes": "Existing shell menus and native service state; Titan visual design and architecture retained."
+    },
+    "omarchy-menu-timezone": {
+      "status": "partial",
+      "equivalent": "Quickshell search menus / scripts/titan-task",
+      "notes": "Common forms and searchable choices exist; generic file/timezone pickers remain missing."
+    },
+    "omarchy-menu-tmux-keybindings": {
+      "status": "adapted",
+      "equivalent": "titan-shell ipc / Quickshell CommandPanel",
+      "notes": "Existing shell menus and native service state; Titan visual design and architecture retained."
+    },
+    "omarchy-migrate": {
+      "status": "partial",
+      "equivalent": "titan version|migrate|update",
+      "notes": "Titan package/Git updates and migrations exist; release-channel selection and reference notices differ."
+    },
+    "omarchy-migrate-notify": {
+      "status": "partial",
+      "equivalent": "titan version|migrate|update",
+      "notes": "Titan package/Git updates and migrations exist; release-channel selection and reference notices differ."
+    },
+    "omarchy-mise-install": {
+      "status": "adapted",
+      "equivalent": "titan dev install NAME / mise use -g TOOL",
+      "notes": "Runtime recipes use mise; not all installations have been exercised."
+    },
+    "omarchy-network-password": {
+      "status": "partial",
+      "equivalent": "titan network",
+      "notes": "Status omits SSIDs/secrets; explicit nmcli QR/password view is local and interactive."
+    },
+    "omarchy-network-qr": {
+      "status": "partial",
+      "equivalent": "titan network",
+      "notes": "Status omits SSIDs/secrets; explicit nmcli QR/password view is local and interactive."
+    },
+    "omarchy-network-status": {
+      "status": "partial",
+      "equivalent": "titan network",
+      "notes": "Status omits SSIDs/secrets; explicit nmcli QR/password view is local and interactive."
+    },
+    "omarchy-notification-dismiss": {
+      "status": "partial",
+      "equivalent": "native Quickshell notifications / bin/workflow info",
+      "notes": "Notification actions and one-shot time/weather paths; upstream notices/weather data services are incomplete."
+    },
+    "omarchy-notification-send": {
+      "status": "partial",
+      "equivalent": "native Quickshell notifications / bin/workflow info",
+      "notes": "Notification actions and one-shot time/weather paths; upstream notices/weather data services are incomplete."
+    },
+    "omarchy-notification-time": {
+      "status": "partial",
+      "equivalent": "native Quickshell notifications / bin/workflow info",
+      "notes": "Notification actions and one-shot time/weather paths; upstream notices/weather data services are incomplete."
+    },
+    "omarchy-notification-weather": {
+      "status": "partial",
+      "equivalent": "native Quickshell notifications / bin/workflow info",
+      "notes": "Notification actions and one-shot time/weather paths; upstream notices/weather data services are incomplete."
+    },
+    "omarchy-osd": {
+      "status": "adapted",
+      "equivalent": "titan-shell ipc / Quickshell CommandPanel",
+      "notes": "Existing shell menus and native service state; Titan visual design and architecture retained."
+    },
+    "omarchy-pkg-add": {
+      "status": "partial",
+      "equivalent": "titan pkg",
+      "notes": "Package operations exist; chooser, multi-provider resolution, auto-launch and missing-list semantics differ."
+    },
+    "omarchy-pkg-aur-accessible": {
+      "status": "partial",
+      "equivalent": "titan pkg aur",
+      "notes": "Uses an already installed paru/yay helper; no automatic AUR-helper bootstrap."
+    },
+    "omarchy-pkg-aur-add": {
+      "status": "partial",
+      "equivalent": "titan pkg aur",
+      "notes": "Uses an already installed paru/yay helper; no automatic AUR-helper bootstrap."
+    },
+    "omarchy-pkg-aur-install": {
+      "status": "partial",
+      "equivalent": "titan pkg aur",
+      "notes": "Uses an already installed paru/yay helper; no automatic AUR-helper bootstrap."
+    },
+    "omarchy-pkg-drop": {
+      "status": "partial",
+      "equivalent": "titan pkg",
+      "notes": "Package operations exist; chooser, multi-provider resolution, auto-launch and missing-list semantics differ."
+    },
+    "omarchy-pkg-install": {
+      "status": "partial",
+      "equivalent": "titan pkg",
+      "notes": "Package operations exist; chooser, multi-provider resolution, auto-launch and missing-list semantics differ."
+    },
+    "omarchy-pkg-missing": {
+      "status": "partial",
+      "equivalent": "titan pkg",
+      "notes": "Package operations exist; chooser, multi-provider resolution, auto-launch and missing-list semantics differ."
+    },
+    "omarchy-pkg-present": {
+      "status": "partial",
+      "equivalent": "titan pkg",
+      "notes": "Package operations exist; chooser, multi-provider resolution, auto-launch and missing-list semantics differ."
+    },
+    "omarchy-pkg-remove": {
+      "status": "partial",
+      "equivalent": "titan pkg",
+      "notes": "Package operations exist; chooser, multi-provider resolution, auto-launch and missing-list semantics differ."
+    },
+    "omarchy-plugin-add": {
+      "status": "partial",
+      "equivalent": "titan plugin",
+      "notes": "Titan panel/service schema and host exist; upstream manifests, built-in cloning and bar replacement are unsupported."
+    },
+    "omarchy-plugin-disable": {
+      "status": "partial",
+      "equivalent": "titan plugin",
+      "notes": "Titan panel/service schema and host exist; upstream manifests, built-in cloning and bar replacement are unsupported."
+    },
+    "omarchy-plugin-enable": {
+      "status": "partial",
+      "equivalent": "titan plugin",
+      "notes": "Titan panel/service schema and host exist; upstream manifests, built-in cloning and bar replacement are unsupported."
+    },
+    "omarchy-plugin-list": {
+      "status": "partial",
+      "equivalent": "titan plugin",
+      "notes": "Titan panel/service schema and host exist; upstream manifests, built-in cloning and bar replacement are unsupported."
+    },
+    "omarchy-plugin-remove": {
+      "status": "partial",
+      "equivalent": "titan plugin",
+      "notes": "Titan panel/service schema and host exist; upstream manifests, built-in cloning and bar replacement are unsupported."
+    },
+    "omarchy-plugin-validate": {
+      "status": "partial",
+      "equivalent": "titan plugin",
+      "notes": "Titan panel/service schema and host exist; upstream manifests, built-in cloning and bar replacement are unsupported."
+    },
+    "omarchy-plymouth-current": {
+      "status": "partial",
+      "equivalent": "Titan installer / system templates",
+      "notes": "QEMU target setup and original Plymouth theme exist; portable live-machine apply/switcher API is absent."
+    },
+    "omarchy-plymouth-list": {
+      "status": "partial",
+      "equivalent": "Titan installer / system templates",
+      "notes": "QEMU target setup and original Plymouth theme exist; portable live-machine apply/switcher API is absent."
+    },
+    "omarchy-plymouth-reset": {
+      "status": "partial",
+      "equivalent": "Titan installer / system templates",
+      "notes": "QEMU target setup and original Plymouth theme exist; portable live-machine apply/switcher API is absent."
+    },
+    "omarchy-plymouth-set": {
+      "status": "partial",
+      "equivalent": "Titan installer / system templates",
+      "notes": "QEMU target setup and original Plymouth theme exist; portable live-machine apply/switcher API is absent."
+    },
+    "omarchy-power-present": {
+      "status": "adapted",
+      "equivalent": "titan battery / Quickshell UPower",
+      "notes": "Original Titan operation; CLI and desktop implementation follow Titan interfaces."
+    },
+    "omarchy-powerprofiles-init": {
+      "status": "partial",
+      "equivalent": "titan power",
+      "notes": "Profile CLI/native shell state; always-awake policy has priority and init is machine-specific."
+    },
+    "omarchy-powerprofiles-list": {
+      "status": "partial",
+      "equivalent": "titan power",
+      "notes": "Profile CLI/native shell state; always-awake policy has priority and init is machine-specific."
+    },
+    "omarchy-powerprofiles-set": {
+      "status": "partial",
+      "equivalent": "titan power",
+      "notes": "Profile CLI/native shell state; always-awake policy has priority and init is machine-specific."
+    },
+    "omarchy-refresh-applications": {
+      "status": "partial",
+      "equivalent": "titan webapp install|remove",
+      "notes": "Desktop entries are managed; no proprietary app/icon bundle refresh."
+    },
+    "omarchy-refresh-config": {
+      "status": "adapted",
+      "equivalent": "titan config install|diff|backup|reset|restore",
+      "notes": "Original Titan operation; CLI and desktop implementation follow Titan interfaces."
+    },
+    "omarchy-reminder": {
+      "status": "partial",
+      "equivalent": "bin/workflow reminder-*",
+      "notes": "Existing reminders use transient units; persistence across reboot remains a known gap."
+    },
+    "omarchy-restart-shell": {
+      "status": "adapted",
+      "equivalent": "titan-shell / scripts/shell-restart",
+      "notes": "Original Titan operation; CLI and desktop implementation follow Titan interfaces."
+    },
+    "omarchy-shell": {
+      "status": "adapted",
+      "equivalent": "titan-shell / scripts/shell-restart",
+      "notes": "Original Titan operation; CLI and desktop implementation follow Titan interfaces."
+    },
+    "omarchy-snapshot": {
+      "status": "partial",
+      "equivalent": "scripts/install-snapshots / docs/snapshots.md",
+      "notes": "Snapper integration exists; no full interactive snapshot browser/rollback interface."
+    },
+    "omarchy-system-lid-close": {
+      "status": "titan-policy",
+      "equivalent": "docs/always-awake.md",
+      "notes": "Do not reproduce automatic sleep/idle changes on this laptop. Portable policy remains unfinished."
+    },
+    "omarchy-system-lock": {
+      "status": "adapted",
+      "equivalent": "scripts/lock / Quickshell SessionMenu",
+      "notes": "Original Titan operation; CLI and desktop implementation follow Titan interfaces."
+    },
+    "omarchy-system-logout": {
+      "status": "adapted",
+      "equivalent": "scripts/lock / Quickshell SessionMenu",
+      "notes": "Original Titan operation; CLI and desktop implementation follow Titan interfaces."
+    },
+    "omarchy-system-reboot": {
+      "status": "adapted",
+      "equivalent": "scripts/lock / Quickshell SessionMenu",
+      "notes": "Original Titan operation; CLI and desktop implementation follow Titan interfaces."
+    },
+    "omarchy-system-shutdown": {
+      "status": "adapted",
+      "equivalent": "scripts/lock / Quickshell SessionMenu",
+      "notes": "Original Titan operation; CLI and desktop implementation follow Titan interfaces."
+    },
+    "omarchy-system-sleep-lock": {
+      "status": "titan-policy",
+      "equivalent": "docs/always-awake.md",
+      "notes": "Do not reproduce automatic sleep/idle changes on this laptop. Portable policy remains unfinished."
+    },
+    "omarchy-system-sleep-monitor": {
+      "status": "titan-policy",
+      "equivalent": "docs/always-awake.md",
+      "notes": "Do not reproduce automatic sleep/idle changes on this laptop. Portable policy remains unfinished."
+    },
+    "omarchy-system-wake": {
+      "status": "titan-policy",
+      "equivalent": "docs/always-awake.md",
+      "notes": "Do not reproduce automatic sleep/idle changes on this laptop. Portable policy remains unfinished."
+    },
+    "omarchy-theme-bg-current": {
+      "status": "partial",
+      "equivalent": "titan theme / titan wallpaper",
+      "notes": "Built-in palettes and per-theme backgrounds exist; no user palette import or theme git install/remove yet."
+    },
+    "omarchy-theme-bg-next": {
+      "status": "partial",
+      "equivalent": "titan theme / titan wallpaper",
+      "notes": "Built-in palettes and per-theme backgrounds exist; no user palette import or theme git install/remove yet."
+    },
+    "omarchy-theme-bg-set": {
+      "status": "partial",
+      "equivalent": "titan theme / titan wallpaper",
+      "notes": "Built-in palettes and per-theme backgrounds exist; no user palette import or theme git install/remove yet."
+    },
+    "omarchy-theme-current": {
+      "status": "partial",
+      "equivalent": "titan theme / titan wallpaper",
+      "notes": "Built-in palettes and per-theme backgrounds exist; no user palette import or theme git install/remove yet."
+    },
+    "omarchy-theme-list": {
+      "status": "partial",
+      "equivalent": "titan theme / titan wallpaper",
+      "notes": "Built-in palettes and per-theme backgrounds exist; no user palette import or theme git install/remove yet."
+    },
+    "omarchy-theme-set": {
+      "status": "partial",
+      "equivalent": "titan theme / titan wallpaper",
+      "notes": "Built-in palettes and per-theme backgrounds exist; no user palette import or theme git install/remove yet."
+    },
+    "omarchy-theme-set-foot": {
+      "status": "partial",
+      "equivalent": "scripts/apply-theme / lib/titan/app_theme.py",
+      "notes": "Original generated consumers; GTK stays dark Adwaita, running optional app reload/palette coverage is incomplete."
+    },
+    "omarchy-theme-set-gnome": {
+      "status": "partial",
+      "equivalent": "scripts/apply-theme / lib/titan/app_theme.py",
+      "notes": "Original generated consumers; GTK stays dark Adwaita, running optional app reload/palette coverage is incomplete."
+    },
+    "omarchy-theme-set-tmux": {
+      "status": "partial",
+      "equivalent": "scripts/apply-theme / lib/titan/app_theme.py",
+      "notes": "Original generated consumers; GTK stays dark Adwaita, running optional app reload/palette coverage is incomplete."
+    },
+    "omarchy-toggle-bar": {
+      "status": "adapted",
+      "equivalent": "bin/workflow / Quickshell native actions",
+      "notes": "Original Titan operation; CLI and desktop implementation follow Titan interfaces."
+    },
+    "omarchy-toggle-idle": {
+      "status": "titan-policy",
+      "equivalent": "docs/always-awake.md",
+      "notes": "Do not reproduce automatic sleep/idle changes on this laptop. Portable policy remains unfinished."
+    },
+    "omarchy-toggle-nightlight": {
+      "status": "adapted",
+      "equivalent": "bin/workflow / Quickshell native actions",
+      "notes": "Original Titan operation; CLI and desktop implementation follow Titan interfaces."
+    },
+    "omarchy-toggle-notification-silencing": {
+      "status": "adapted",
+      "equivalent": "bin/workflow / Quickshell native actions",
+      "notes": "Original Titan operation; CLI and desktop implementation follow Titan interfaces."
+    },
+    "omarchy-toggle-screensaver": {
+      "status": "titan-policy",
+      "equivalent": "docs/always-awake.md",
+      "notes": "Do not reproduce automatic sleep/idle changes on this laptop. Portable policy remains unfinished."
+    },
+    "omarchy-toggle-touchpad": {
+      "status": "adapted",
+      "equivalent": "bin/workflow / Quickshell native actions",
+      "notes": "Original Titan operation; CLI and desktop implementation follow Titan interfaces."
+    },
+    "omarchy-transcode": {
+      "status": "adapted",
+      "equivalent": "titan transcode",
+      "notes": "Image/video formats and bounded sizes, source preservation and clipboard URI option."
+    },
+    "omarchy-update": {
+      "status": "partial",
+      "equivalent": "titan version|migrate|update",
+      "notes": "Titan package/Git updates and migrations exist; release-channel selection and reference notices differ."
+    },
+    "omarchy-update-system-pkgs": {
+      "status": "partial",
+      "equivalent": "titan version|migrate|update",
+      "notes": "Titan package/Git updates and migrations exist; release-channel selection and reference notices differ."
+    },
+    "omarchy-version": {
+      "status": "partial",
+      "equivalent": "titan version|migrate|update",
+      "notes": "Titan package/Git updates and migrations exist; release-channel selection and reference notices differ."
+    },
+    "omarchy-version-branch": {
+      "status": "partial",
+      "equivalent": "titan version|migrate|update",
+      "notes": "Titan package/Git updates and migrations exist; release-channel selection and reference notices differ."
+    },
+    "omarchy-webapp-install": {
+      "status": "partial",
+      "equivalent": "titan webapp",
+      "notes": "Managed launchers and Chromium app windows; installed icon names only, no automatic favicon downloads."
+    },
+    "omarchy-webapp-remove": {
+      "status": "partial",
+      "equivalent": "titan webapp",
+      "notes": "Managed launchers and Chromium app windows; installed icon names only, no automatic favicon downloads."
+    }
+  }
+}

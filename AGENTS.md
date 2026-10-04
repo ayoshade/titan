@@ -77,6 +77,14 @@ instead of maintaining two competing instruction sets.
 
 ## Start each task
 
+Local upstream material is indexed in
+[docs/research/agent-references.md](docs/research/agent-references.md): the
+[Omarchy reference clone](/home/shade/.cache/titan/references/omarchy) and the
+[Quickshell documentation archive](/home/shade/.webfetch/quickshell/index.md).
+Use the pinned Omarchy revision and Quickshell v0.3.1 pages, and consult the
+durable coverage ledger before repeating implementation work. These paths are
+development references only, never runtime dependencies.
+
 1. Read this guide, `README.md`, `docs/design-reference.md`, and the relevant
    verification notes and source files. Inspect `git status`, diffs and recent
    commits before editing. Read applicable nested agent instructions if present.
@@ -210,6 +218,8 @@ wl-clipboard, grim/slurp and suitable XDG portals.
 | `system/hardware/profiles.json`, `lib/titan/hardware.py` | Read-only detection and conservative hardware package selection (`titan hardware`) |
 | `agents/skills/` | Repository development guides, read through the task table above; not shipped as desktop defaults |
 | `default/agents/skills/` | Three bundled end-user skills: `titan`, `titan-app`, `diagnose-crash`; `titan skills` links them into Claude and Codex (respecting `CODEX_HOME`) |
+| `default/config/`, `default/catalog/`, `default/bash/` | Copied-once developer dotfiles, optional package/runtime/database recipes, modular interactive Bash defaults |
+| `lib/titan/{apps,configuration,packages,development,utilities,media_tools,system_status,plugins}.py` | Modular operations behind `scripts/titan-*` and `titan`; shared primitives in `ops.py`, parser in `desktop_cli.py` |
 | `docs/` | Research, hardware, decisions, validation and recovery |
 
 Shell settings are declared once in `theme/settings-schema.json`. The Settings

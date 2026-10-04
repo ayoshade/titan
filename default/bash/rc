@@ -1,7 +1,13 @@
 # Titan's interactive Bash defaults, sourced from ~/.bashrc (titan setup adds
 # the line). Put your own changes in ~/.bashrc after it; updates replace this file.
 
-# mise is Titan's tool and runtime manager: `mise use -g gh`, `mise use node@22`.
-if command -v mise >/dev/null; then
- eval "$(mise activate bash)"
-fi
+# Resolve siblings without depending on the caller's cwd or an exported root.
+_titan_bash_dir=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
+for _titan_bash_module in env aliases functions init; do
+ . "$_titan_bash_dir/$_titan_bash_module"
+done
+# User extensions load last, in lexical order. No project-local PATH injection.
+for _titan_bash_plugin in "${XDG_CONFIG_HOME:-$HOME/.config}"/titan/bash/rc.d/*.sh; do
+ [[ -f $_titan_bash_plugin ]] && . "$_titan_bash_plugin"
+done
+unset _titan_bash_dir _titan_bash_module _titan_bash_plugin

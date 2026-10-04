@@ -51,24 +51,19 @@ def save_state(data):
     atomic(STATE/'hypr-runtime.lua','\n'.join(lines)+'\n')
 
 def app(name):
+    from apps import browser, editor, focused_cwd, terminal
     web={'chatgpt':'https://chatgpt.com','grok':'https://grok.com','calendar':'https://app.hey.com/calendar/weeks/',
          'email':'https://app.hey.com','email-new':'https://app.hey.com/messages/new?display=standalone&new_window=true',
          'youtube':'https://youtube.com/','whatsapp':'https://web.whatsapp.com/','messages':'https://messages.google.com/web/conversations',
          'photos':'https://photos.google.com/','maps':'https://maps.google.com/','x':'https://x.com/','x-post':'https://x.com/compose/post'}
-    if name in web: return launch('firefox','--new-window',web[name])
-    cwd=pathlib.Path.home()
-    try:
-        window=active(); pid=window.get('pid',0)
-        # Foreground terminal child holds the useful cwd, not Kitty's original cwd.
-        children=pathlib.Path(f'/proc/{pid}/task/{pid}/children').read_text().split()
-        cwd=pathlib.Path(f'/proc/{children[-1] if children else pid}/cwd').resolve(strict=True)
-    except (OSError,SystemExit): pass
-    commands={'terminal':['kitty'],'browser':['firefox'],'browser-private':['firefox','--private-window'],
-              'files':['thunar'],'files-cwd':['thunar',str(cwd)],'editor':['kitty','--directory',str(cwd),'nvim'],
-              'tmux':['kitty','--directory',str(cwd),'tmux','new-session','-A','-s','titan'],'herdr':['kitty','herdr'],
-              'spotify':['spotify'],'cliamp':['kitty','cliamp'],'docker':['kitty','lazydocker'],'signal':['signal-desktop'],
-              'obsidian':['obsidian'],'omawrite':['omawrite'],'passwords':['1password'],'activity':['kitty','btop'],
-              'codex':['kitty','--directory',str(ROOT),'codex'],'claude':['kitty','--directory',str(ROOT),'claude']}
+    if name in web: return launch(*browser([web[name]]))
+    cwd=focused_cwd()
+    commands={'terminal':terminal(cwd=cwd),'browser':browser(),'browser-private':browser(private=True),
+              'files':['thunar'],'files-cwd':['thunar',str(cwd)],'editor':editor(cwd=cwd),
+              'tmux':terminal(['tmux','new-session','-A','-s','titan'],cwd),'herdr':terminal(['herdr']),
+              'spotify':['spotify'],'cliamp':terminal(['cliamp']),'docker':terminal(['lazydocker']),'signal':['signal-desktop'],
+              'obsidian':['obsidian'],'omawrite':['omawrite'],'passwords':['1password'],'activity':terminal(['btop']),
+              'codex':terminal(['codex'],ROOT),'claude':terminal(['claude'],ROOT)}
     command=commands[name]
     for binary in command:
         if binary in ('nvim','tmux','herdr','cliamp','lazydocker','btop','codex','claude'): require(binary)
@@ -477,6 +472,12 @@ def keybindings():
 def main(argv):
     name,*args=argv
     if name=='app': app(args[0])
+    elif name=='maintenance-list':
+        from maintenance_menu import items
+        print(json.dumps(items(args[0])))
+    elif name=='maintenance':
+        from maintenance_menu import launch as launch_maintenance
+        launch_maintenance(args[0])
     elif name in ('layout','gaps','square','desktop','tiled-fullscreen','transparency','pop','width'): window_operation(name,args)
     elif name=='close-all': ipc('menu','close-all')
     elif name=='close-all-confirmed':
@@ -522,10 +523,8 @@ def main(argv):
         from urllib.parse import quote
         launch('firefox','--new-window','https://wttr.in/'+quote(args[0],safe=''))
     elif name=='transcode':
-        require('ffmpeg'); source=pathlib.Path(args[0]).expanduser().resolve(strict=True)
-        if not source.is_file(): raise ValueError('Select a local video file')
-        target=source.with_name(source.stem+'-titan.mp4')
-        run('ffmpeg','-nostdin','-n','-i',source,'-c:v','libx264','-crf','23','-c:a','aac',target,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL); notify('Transcode complete',str(target))
+        from media_tools import transcode
+        target=transcode(args[0]); notify('Transcode complete',str(target))
     elif name=='eject':
         require('eject'); run('eject')
     elif name=='bar-set': atomic(STATE/'shell-settings.json',json.dumps({'barVisible':args[0]=='true'})+'\n')

@@ -1,5 +1,18 @@
 # Control center, settings, themes and wallpapers: reference notes
 
+## Workflow menu additions — 2026-10-04
+
+The pinned Omarchy workflow study added Install, Setup, Services and Remove
+menus to Titan's existing CommandPanel/SearchMenu. These are functional
+extensions, with existing black surfaces, row geometry, typography and icons;
+there was no new saneAspect video review or visual redesign in this batch.
+At 1366×768, scale 1, everforest/theme accent, Application bundles was opened
+and its UI-only crop inspected: 24 loaded catalog entries, consistent visible
+first-ten rows and no clipped labels. Scrolling/navigation beyond the visible
+rows and each maintenance action still need acceptance coverage. The menu was
+closed afterward. See [verification](../verification.md) and the
+[agent reference library](agent-references.md).
+
 These notes come from frame sampling of saneAspect videos on 2026-10-03; see
 [saneaspect-videos.md](saneaspect-videos.md) for review depth. Measurements
 are at 1920×1080. Treat any section he never opened as unknown.

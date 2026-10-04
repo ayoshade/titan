@@ -1,0 +1,21 @@
+# Titan developer defaults. Existing Git identity and configuration are preserved.
+[init]
+    defaultBranch = main
+[push]
+    autoSetupRemote = true
+[fetch]
+    prune = true
+[diff]
+    algorithm = histogram
+    colorMoved = plain
+[merge]
+    conflictStyle = zdiff3
+[rerere]
+    enabled = true
+[branch]
+    sort = -committerdate
+[alias]
+    st = status --short --branch
+    co = checkout
+    br = branch
+    ci = commit

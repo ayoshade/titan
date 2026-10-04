@@ -1,0 +1,12 @@
+[
+  {"id":"tmux","path":"tmux/tmux.conf"},
+  {"id":"git","path":"git/config"},
+  {"id":"nvim","path":"nvim/init.lua"},
+  {"id":"btop","path":"btop/btop.conf"},
+  {"id":"starship","path":"starship.toml"},
+  {"id":"inputrc","path":"readline/inputrc"},
+  {"id":"foot","path":"foot/foot.ini"},
+  {"id":"ghostty","path":"ghostty/config"},
+  {"id":"alacritty","path":"alacritty/alacritty.toml"},
+  {"id":"helix","path":"helix/config.toml"}
+]

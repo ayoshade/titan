@@ -8,6 +8,14 @@ interpolation of user text, filenames or calculator expressions.
 
 ## Agent interfaces
 
+Additional original modular operations (defaults, launchers, web apps,
+packages, development/service recipes, dotfile recovery, fonts, hooks,
+utilities, media, hardware controls and optional QML plugins) are documented
+in [operations.md](operations.md). Super+Space's Install/Setup/Remove lists use
+the same catalogs and CLI routes. Reference paths and version checks are in
+[the agent reference library](research/agent-references.md); remaining parity
+work is tracked in [the Omarchy ledger](research/omarchy.md).
+
 - `titan version|setup|migrate|update|doctor|hardware|skills|theme|settings|wallpaper|shell`
   (`bin/titan`) is the top-level command. `titan doctor` (`scripts/doctor`)
   always fails on static errors: scripts, Python, Hyprland config, and live

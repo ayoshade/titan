@@ -1,5 +1,15 @@
 # Extending Titan: menu entries, shell features, operations, Hyprland plugins
 
+Optional user QML panel/service plugins also have an original Titan registry:
+`titan plugin validate|install|add|list|enable|disable|remove|refresh`.
+See `docs/operations.md` in the source checkout or
+`/usr/share/doc/titan/operations.md` in a packaged installation for its schema
+and examples. Install leaves code disabled; enable explicitly loads it in the
+existing shell. Plugins run as ordinary user code, with no sandbox. Their
+schema isn't compatible with Omarchy's; built-in cloning/bar replacement isn't
+implemented. Use this registry for independent user panels/services; the
+methods below are for developing Titan's built-in features.
+
 "Plugin" can mean four different things here. Pick the smallest that does the
 job.
 

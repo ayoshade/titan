@@ -89,6 +89,12 @@ networking or changes firewall rules.
 
 ## Everyday use
 
+The [modular workflow additions](docs/operations.md) provide developer
+dotfiles, package/runtime/service recipes, default-app choices, web apps,
+configuration recovery, hooks and optional QML extensions. Install, Setup
+and Remove are available in Super+Space. [Omarchy coverage](docs/research/omarchy.md)
+tracks remaining work against the pinned reference; full parity is ongoing.
+
 | Key | Action |
 | --- | --- |
 | Super+Return | Terminal (Kitty) |

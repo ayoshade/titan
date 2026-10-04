@@ -25,6 +25,9 @@ for script in "$root"/bin/* "$root"/scripts/* "$root"/tools/*; do
  if head -n1 "$script" | grep -q python; then python -c 'import ast,sys; ast.parse(open(sys.argv[1]).read(),sys.argv[1])' "$script"; else bash -n "$script"; fi
 done
 # bin/ is the public interface; scripts/NAME links keep pre-0.3 callers working.
+for script in "$root"/default/bash/*; do
+ [[ -f $script ]] && bash -n "$script"
+done
 for name in titan titan-shell titan-session titan-install workflow; do
  [[ -x $root/bin/$name && $(readlink -f "$root/scripts/$name") == "$root/bin/$name" ]] || { printf 'Missing command or compatibility link: %s\n' "$name" >&2; exit 1; }
 done

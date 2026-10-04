@@ -8,6 +8,11 @@ description: Develop Titan bootstrap, per-user setup, hardware profiles, package
 Adapted from Omarchy's install-scripts guide. Read the checkout's `AGENTS.md`,
 `docs/distribution.md` and `docs/installation.md` for the actual install scope.
 
+The [agent reference library](../../../docs/research/agent-references.md) links
+the pinned [Omarchy checkout](/home/shade/.cache/titan/references/omarchy) and
+the [Quickshell archive](/home/shade/.webfetch/quickshell/index.md). Use upstream
+installation workflows as behavior references; preserve Titan's VM guards.
+
 ## Ownership boundaries
 
 | Layer | Titan source |
